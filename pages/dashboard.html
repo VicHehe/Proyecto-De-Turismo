@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel de Administración</title>
+    <link rel="stylesheet" href="../css/login.css" />
+    <style>
+        .user-list {
+            list-style: none;
+            padding: 0;
+        }
+        .user-list li {
+            border-bottom: 1px solid #000;
+            padding: 0.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .user-info {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .rol-badge {
+            border: 1px solid #000;
+            padding: 0.15rem 0.5rem;
+            font-size: 0.8rem;
+            background: #eaeaea;
+        }
+        .btn-small {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .user-count {
+            border: 1px solid #000;
+            padding: 0.3rem 0.8rem;
+            background: #f0f0f0;
+        }
+        .logout-btn {
+            border-color: #000;
+        }
+        .logout-btn:hover {
+            background: #000;
+            color: #fff;
+        }
+        .mensaje {
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>👑 Panel de Administración</h1>
+        <div>
+            <span class="user-count" id="userCount">0 usuarios</span>
+            <button class="btn logout-btn" id="btnCerrarSesion">Cerrar Sesión</button>
+        </div>
+    </div>
+    
+    <p>Gestión de usuarios del sistema. Solo los administradores pueden acceder aquí.</p>
+    
+    <div id="dashboardMensaje" class="mensaje hidden"></div>
+    
+    <h2>Lista de Usuarios</h2>
+    <ul class="user-list" id="listaUsuarios">
+        <li>Cargando usuarios...</li>
+    </ul>
+    
+    <hr />
+    
+    <div class="form-group">
+        <label for="buscarUsuario">Buscar por RUT</label>
+        <input type="text" id="buscarUsuario" placeholder="Ej: 12345678-9" />
+        <button class="btn btn-small" id="btnBuscar">Buscar</button>
+    </div>
+</div>
+
+<script src="../js/admin.js"></script>
+</body>
+</html>
