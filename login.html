@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Gestión de Salidas</title>
+    <link rel="stylesheet" href="css/login.css" />
+</head>
+<body>
+<div class="container">
+    <!-- VISTA LOGIN -->
+    <div id="vistaLogin">
+        <h1>🔐 Inicio de Sesión</h1>
+        <p>Sistema de Gestión de Salidas y Excursiones</p>
+        
+        <div id="loginMensaje" class="mensaje hidden"></div>
+        
+        <div class="form-group">
+            <label for="loginRut">RUT (con guión)</label>
+            <input type="text" id="loginRut" placeholder="Ej: 12345678-9" />
+        </div>
+        <div class="form-group">
+            <label for="loginPass">Contraseña</label>
+            <input type="password" id="loginPass" placeholder="********" />
+        </div>
+        
+        <div class="botones">
+            <button class="btn" id="btnLogin">Ingresar</button>
+            <button class="btn" id="btnMostrarRegistro">Registrarse</button>
+        </div>
+    </div>
+
+    <!-- VISTA REGISTRO -->
+    <div id="vistaRegistro" class="hidden">
+        <h1>📝 Registro de Usuario</h1>
+        <p>Todos los campos son obligatorios</p>
+        
+        <div id="registroMensaje" class="mensaje hidden"></div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="regNombre">Nombre completo</label>
+                <input type="text" id="regNombre" required />
+            </div>
+            <div class="form-group">
+                <label for="regApellido">Apellido</label>
+                <input type="text" id="regApellido" required />
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="regEdad">Edad</label>
+                <input type="number" id="regEdad" required />
+            </div>
+            <div class="form-group">
+                <label for="regRut">RUT (con guión)</label>
+                <input type="text" id="regRut" placeholder="Ej: 12345678-9" required />
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="regTelefono">Teléfono</label>
+                <input type="text" id="regTelefono" required />
+            </div>
+            <div class="form-group">
+                <label for="regGmail">Gmail</label>
+                <input type="email" id="regGmail" required />
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="regHistorial">Historial médico</label>
+            <input type="text" id="regHistorial" placeholder="Alergias, discapacidades, condiciones" required />
+        </div>
+        
+        <div class="form-group">
+            <label for="regPassword">Contraseña</label>
+            <input type="password" id="regPassword" required />
+        </div>
+        
+        <div class="botones">
+            <button class="btn" id="btnRegistrar">Registrarse</button>
+            <button class="btn" id="btnVolverLogin">Volver al Login</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/login.js"></script>
+</body>
+</html>
