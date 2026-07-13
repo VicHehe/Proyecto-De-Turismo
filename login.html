@@ -16,7 +16,7 @@
             min-height: 100vh;
         }
         .login-box {
-            max-width: 400px;
+            max-width: 500px;
             width: 100%;
             border: 2px solid #000;
             padding: 2rem;
@@ -87,6 +87,18 @@
         .hidden {
             display: none;
         }
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+        .form-row .field {
+            flex: 1;
+        }
+        .rol-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
@@ -116,13 +128,39 @@
 
     <!-- REGISTRO -->
     <div id="panelRegistro" class="hidden">
-        <div class="field">
-            <label>RUT (con guión)</label>
-            <input type="text" id="regRut" placeholder="Ej: 12345678-9">
+        <div class="form-row">
+            <div class="field">
+                <label>Nombre</label>
+                <input type="text" id="regNombre" placeholder="Tu nombre">
+            </div>
+            <div class="field">
+                <label>Apellido</label>
+                <input type="text" id="regApellido" placeholder="Tu apellido">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="field">
+                <label>Edad</label>
+                <input type="number" id="regEdad" placeholder="18">
+            </div>
+            <div class="field">
+                <label>RUT (con guión)</label>
+                <input type="text" id="regRut" placeholder="Ej: 12345678-9">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="field">
+                <label>Teléfono</label>
+                <input type="text" id="regTelefono" placeholder="912345678">
+            </div>
+            <div class="field">
+                <label>Gmail</label>
+                <input type="email" id="regGmail" placeholder="ejemplo@gmail.com">
+            </div>
         </div>
         <div class="field">
-            <label>Nombre completo</label>
-            <input type="text" id="regNombre" placeholder="Tu nombre completo">
+            <label>Historial médico</label>
+            <input type="text" id="regHistorial" placeholder="Alergias, condiciones, etc.">
         </div>
         <div class="field">
             <label>Contraseña</label>
@@ -132,6 +170,7 @@
             <label>Confirmar contraseña</label>
             <input type="password" id="regPass2" placeholder="********">
         </div>
+        <div class="rol-info" id="rolInfo">⚠️ Si tu RUT está autorizado, obtendrás ese rol. Si no, serás Visitante.</div>
         <button class="btn-submit" onclick="registro()">Crear cuenta</button>
         <div class="msg" id="registroMsg"></div>
     </div>
@@ -140,7 +179,6 @@
 <script src="js/github.js"></script>
 <script src="js/auth.js"></script>
 <script>
-    // Si ya hay sesión, redirigir al index
     if (Auth.getSesion()) window.location.href = 'index.html';
 
     function switchTab(tab) {
@@ -175,26 +213,34 @@
     }
 
     async function registro() {
-        const rut = document.getElementById('regRut').value.trim();
         const nombre = document.getElementById('regNombre').value.trim();
+        const apellido = document.getElementById('regApellido').value.trim();
+        const edad = document.getElementById('regEdad').value.trim();
+        const rut = document.getElementById('regRut').value.trim();
+        const telefono = document.getElementById('regTelefono').value.trim();
+        const gmail = document.getElementById('regGmail').value.trim();
+        const historial = document.getElementById('regHistorial').value.trim();
         const pass = document.getElementById('regPass').value;
         const pass2 = document.getElementById('regPass2').value;
 
-        if (!rut || !nombre || !pass || !pass2)
-            return mostrarMsg('registroMsg', 'Completá todos los campos', 'error');
+        if (!nombre || !apellido || !edad || !rut || !telefono || !gmail || !historial || !pass || !pass2)
+            return mostrarMsg('registroMsg', 'Todos los campos son obligatorios', 'error');
         if (pass !== pass2)
             return mostrarMsg('registroMsg', 'Las contraseñas no coinciden', 'error');
         if (pass.length < 6)
             return mostrarMsg('registroMsg', 'La contraseña debe tener al menos 6 caracteres', 'error');
 
-        const res = await Auth.registro(rut, nombre, pass);
+        const res = await Auth.registro(rut, nombre, apellido, edad, telefono, gmail, historial, pass);
         if (!res.ok) return mostrarMsg('registroMsg', res.error, 'error');
 
-        mostrarMsg('registroMsg', '✅ Cuenta creada. Iniciá sesión.', 'success');
-        setTimeout(() => switchTab('login'), 1500);
+        const mensajeRol = res.rol === 'visitante' 
+            ? '✅ Cuenta creada como Visitante. Un administrador puede cambiar tu rol.' 
+            : `✅ Cuenta creada como ${res.rol}`;
+        
+        mostrarMsg('registroMsg', mensajeRol, 'success');
+        setTimeout(() => switchTab('login'), 2000);
     }
 
-    // Enter para enviar
     document.getElementById('loginPass').addEventListener('keydown', e => {
         if (e.key === 'Enter') login();
     });
