@@ -2,9 +2,15 @@
   "usuarios": [
     {
       "rut": "22785939-3",
-      "nombre": "Victor Tilleria",
-      "rol": "admin",
+      "nombre": "Victor",
+      "apellido": "Tilleria",
+      "edad": 17,
+      "telefono": "990113844",
+      "gmail": "victortilleria116@gmail.com",
+      "historial": "Ninguno",
       "password": "Devictor.",
+      "rol": "admin",
+      "estado": "activo",
       "fechaRegistro": "2026-07-13T00:00:00.000Z"
     }
   ],
@@ -12,7 +18,7 @@
     {
       "rut": "22785939-3",
       "rol": "admin",
-      "nombre": "VictorTilleria"
+      "nombre": "Victor Tilleria"
     }
   ]
 }
