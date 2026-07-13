@@ -1,5 +1,5 @@
 // ============================================================
-// CONEXIÓN CON CLOUDFLARE WORKER
+// CONEXIÓN CON CLOUDFLARE WORKER - VERSIÓN MEJORADA
 // ============================================================
 
 const WORKER_URL = 'https://green-flower-8734.victortilleria116.workers.dev';
@@ -27,7 +27,12 @@ const GitHub = {
             
             // Si el archivo existe, decodificar el contenido base64
             if (data.content) {
-                return JSON.parse(atob(data.content.replace(/\n/g, '')));
+                // Limpiar el contenido base64 (quitar saltos de línea)
+                const base64 = data.content.replace(/\n/g, '').replace(/\r/g, '');
+                // Decodificar base64 a texto
+                const decoded = atob(base64);
+                // Parsear JSON
+                return JSON.parse(decoded);
             }
             
             return null;
@@ -46,9 +51,13 @@ const GitHub = {
      */
     async escribir(path, contenido, sha = null) {
         try {
+            // Convertir contenido a JSON y luego a base64
+            const jsonString = JSON.stringify(contenido, null, 2);
+            const base64 = btoa(unescape(encodeURIComponent(jsonString)));
+            
             const body = {
                 message: `Actualización de ${path} desde sistema de turismo`,
-                content: btoa(unescape(encodeURIComponent(JSON.stringify(contenido, null, 2)))),
+                content: base64,
             };
             
             if (sha) {
@@ -63,7 +72,13 @@ const GitHub = {
                 body: JSON.stringify(body)
             });
             
-            return res.ok;
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error('Error al guardar:', errorText);
+                return false;
+            }
+            
+            return true;
         } catch (error) {
             console.error(`Error en escribir(${path}):`, error);
             return false;
