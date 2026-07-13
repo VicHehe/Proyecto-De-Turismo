@@ -85,7 +85,7 @@
             background: #ebffeb;
         }
         .hidden {
-            display: none;
+            display: none !important;
         }
         .form-row {
             display: flex;
@@ -130,8 +130,8 @@
         <div class="msg" id="loginMsg"></div>
     </div>
 
-    <!-- REGISTRO -->
-    <div id="panelRegistro" class="hidden">
+    <!-- REGISTRO - AHORA VISIBLE -->
+    <div id="panelRegistro">
         <div class="form-row">
             <div class="field">
                 <label>Nombre</label>
@@ -174,7 +174,7 @@
             <label>Confirmar contraseña</label>
             <input type="password" id="regPass2" placeholder="********">
         </div>
-        <div class="rol-info" id="rolInfo">⚠️ Si tu RUT está autorizado en el sistema, obtendrás ese rol. Si no, serás Visitante.</div>
+        <div class="rol-info">⚠️ Si tu RUT está autorizado, obtendrás ese rol. Si no, serás Visitante.</div>
         <button class="btn-submit" id="btnRegistro" onclick="registro()">Crear cuenta</button>
         <div class="msg" id="registroMsg"></div>
     </div>
@@ -190,8 +190,8 @@
 
     function switchTab(tab) {
         const esLogin = tab === 'login';
-        document.getElementById('panelLogin').style.display = esLogin ? '' : 'none';
-        document.getElementById('panelRegistro').style.display = esLogin ? 'none' : '';
+        document.getElementById('panelLogin').style.display = esLogin ? 'block' : 'none';
+        document.getElementById('panelRegistro').style.display = esLogin ? 'none' : 'block';
         document.querySelectorAll('.tab-btn').forEach((b, i) => {
             b.classList.toggle('active', esLogin ? i === 0 : i === 1);
         });
