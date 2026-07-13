@@ -1,3 +1,200 @@
+// ============ VERIFICAR SESIÓN ============
+function verificarSesion() {
+    const usuarioStr = sessionStorage.getItem('cc_sesion');
+    if (!usuarioStr) {
+        window.location.href = '../login.html';
+        return null;
+    }
+    
+    const usuario = JSON.parse(usuarioStr);
+    if (usuario.rol !== 'admin') {
+        alert('Acceso denegado. Solo administradores.');
+        window.location.href = '../login.html';
+        return null;
+    }
+    
+    return usuario;
+}
+
+// ============ CARGAR USUARIOS ============
+async function cargarUsuarios() {
+    try {
+        const datos = await GitHub.leer('datos/usuarios.json');
+        if (!datos) {
+            // Crear datos iniciales si no existen
+            const inicial = {
+                usuarios: [
+                    {
+                        rut: "22785939-3",
+                        nombre: "Victor",
+                        apellido: "Tilleria",
+                        edad: 17,
+                        telefono: "990113844",
+                        gmail: "victortilleria116@gmail.com",
+                        historial: "Ninguno",
+                        password: "Devictor.",
+                        rol: "admin",
+                        estado: "activo",
+                        fechaRegistro: "2026-07-13T00:00:00.000Z"
+                    }
+                ],
+                ruts_autorizados: [
+                    {
+                        rut: "22785939-3",
+                        rol: "admin",
+                        nombre: "Victor Tilleria"
+                    }
+                ]
+            };
+            await GitHub.escribir('datos/usuarios.json', inicial);
+            return inicial.usuarios;
+        }
+        return datos.usuarios || [];
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarMensaje('Error al cargar usuarios', 'error');
+        return [];
+    }
+}
+
+// ============ GUARDAR USUARIOS ============
+async function guardarUsuarios(usuarios) {
+    try {
+        const datos = await GitHub.leer('datos/usuarios.json');
+        if (!datos) return false;
+        
+        datos.usuarios = usuarios;
+        const sha = await GitHub.sha('datos/usuarios.json');
+        return await GitHub.escribir('datos/usuarios.json', datos, sha);
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarMensaje('Error al guardar cambios', 'error');
+        return false;
+    }
+}
+
+// ============ RENDERIZAR LISTA ============
+function renderizarUsuarios(usuarios) {
+    const lista = document.getElementById('listaUsuarios');
+    
+    if (!usuarios || usuarios.length === 0) {
+        lista.innerHTML = '<li>No hay usuarios registrados</li>';
+        document.getElementById('userCount').textContent = '0 usuarios';
+        return;
+    }
+    
+    document.getElementById('userCount').textContent = `${usuarios.length} usuarios`;
+    
+    lista.innerHTML = usuarios.map(usuario => {
+        const estadoEmoji = usuario.estado === 'baneado' ? '🚫' : 
+                           usuario.estado === 'kick' ? '⏰' : '✅';
+        const estadoColor = usuario.estado === 'baneado' ? '#ff0000' : 
+                           usuario.estado === 'kick' ? '#ff9900' : '#00cc00';
+        
+        // Verificar si la contraseña ya es hash (64 caracteres hexadecimales)
+        const esHash = /^[0-9a-f]{64}$/.test(usuario.password);
+        const passDisplay = esHash ? '🔒 Hasheada' : '📝 Texto plano';
+        const passColor = esHash ? '#00cc00' : '#ff9900';
+        
+        return `
+        <li>
+            <div class="user-info">
+                <strong>${usuario.nombre} ${usuario.apellido}</strong>
+                <span>${usuario.rut}</span>
+                <span class="rol-badge">${usuario.rol}</span>
+                <span style="color:${estadoColor};">${estadoEmoji} ${usuario.estado || 'activo'}</span>
+                <span style="color:${passColor};">${passDisplay}</span>
+                <span>${usuario.gmail}</span>
+                <span>${usuario.telefono}</span>
+            </div>
+            <div class="user-actions">
+                ${usuario.rut !== '22785939-3' ? `
+                    <select class="btn btn-small" onchange="cambiarRol('${usuario.rut}', this.value)">
+                        <option value="admin" ${usuario.rol === 'admin' ? 'selected' : ''}>Admin</option>
+                        <option value="guia" ${usuario.rol === 'guia' ? 'selected' : ''}>Guía</option>
+                        <option value="estudiante" ${usuario.rol === 'estudiante' ? 'selected' : ''}>Estudiante</option>
+                        <option value="visitante" ${usuario.rol === 'visitante' ? 'selected' : ''}>Visitante</option>
+                    </select>
+                    
+                    <select class="btn btn-small" onchange="cambiarEstado('${usuario.rut}', this.value)">
+                        <option value="activo" ${usuario.estado === 'activo' ? 'selected' : ''}>✅ Activo</option>
+                        <option value="kick" ${usuario.estado === 'kick' ? 'selected' : ''}>⏰ Kickeado</option>
+                        <option value="baneado" ${usuario.estado === 'baneado' ? 'selected' : ''}>🚫 Baneado</option>
+                    </select>
+                    
+                    <!-- BOTÓN PARA HASHEAR CONTRASEÑA (solo si no es hash) -->
+                    ${!esHash ? `
+                        <button class="btn btn-small" onclick="convertirPasswordAHash('${usuario.rut}')">🔒 Hash</button>
+                    ` : `
+                        <span style="font-size: 12px; color: #00cc00;">✅ Hash</span>
+                    `}
+                    
+                    <button class="btn btn-small" onclick="cambiarPassword('${usuario.rut}')">🔑 Cambiar Pass</button>
+                    <button class="btn btn-small btn-danger" onclick="eliminarUsuario('${usuario.rut}')">🗑️</button>
+                ` : `
+                    <span style="font-weight: bold;">🔒 Admin Principal</span>
+                `}
+            </div>
+        </li>
+    `}).join('');
+}
+
+// ============ CAMBIAR ROL ============
+async function cambiarRol(rut, nuevoRol) {
+    if (!confirm(`¿Cambiar rol de ${rut} a "${nuevoRol}"?`)) return;
+    
+    const usuarios = await cargarUsuarios();
+    const usuario = usuarios.find(u => u.rut === rut);
+    
+    if (!usuario) {
+        mostrarMensaje('Usuario no encontrado', 'error');
+        return;
+    }
+    
+    if (rut === '22785939-3') {
+        mostrarMensaje('No se puede cambiar el rol del admin principal', 'error');
+        return;
+    }
+    
+    usuario.rol = nuevoRol;
+    
+    if (await guardarUsuarios(usuarios)) {
+        mostrarMensaje(`Rol de ${usuario.nombre} cambiado a ${nuevoRol}`, 'exito');
+        await actualizarLista();
+    }
+}
+
+// ============ CAMBIAR ESTADO ============
+async function cambiarEstado(rut, nuevoEstado) {
+    const mensajes = {
+        'activo': '✅ Activar usuario',
+        'kick': '⏰ Kicketear usuario (temporal)',
+        'baneado': '🚫 Banear usuario (permanente)'
+    };
+    
+    if (!confirm(`${mensajes[nuevoEstado]}?`)) return;
+    
+    const usuarios = await cargarUsuarios();
+    const usuario = usuarios.find(u => u.rut === rut);
+    
+    if (!usuario) {
+        mostrarMensaje('Usuario no encontrado', 'error');
+        return;
+    }
+    
+    if (rut === '22785939-3') {
+        mostrarMensaje('No se puede cambiar el estado del admin principal', 'error');
+        return;
+    }
+    
+    usuario.estado = nuevoEstado;
+    
+    if (await guardarUsuarios(usuarios)) {
+        mostrarMensaje(`Estado de ${usuario.nombre} cambiado a ${nuevoEstado}`, 'exito');
+        await actualizarLista();
+    }
+}
+
 // ============ CONVERTIR CONTRASEÑA A HASH ============
 async function convertirPasswordAHash(rut) {
     if (!confirm(`¿Convertir la contraseña de ${rut} a hash? Esto mejora la seguridad.`)) return;
@@ -15,7 +212,7 @@ async function convertirPasswordAHash(rut) {
         return;
     }
     
-    // Verificar si ya es hash (tiene 64 caracteres hexadecimales)
+    // Verificar si ya es hash (64 caracteres hexadecimales)
     if (/^[0-9a-f]{64}$/.test(usuario.password)) {
         mostrarMensaje('⚠️ Esta contraseña ya está hasheada', 'error');
         return;
@@ -31,14 +228,17 @@ async function convertirPasswordAHash(rut) {
     }
 }
 
-// ============ CAMBIAR CONTRASEÑA MANUALMENTE ============
-async function cambiarPassword(rut, nuevaPassword) {
-    if (!confirm(`¿Cambiar contraseña de ${rut}?`)) return;
+// ============ CAMBIAR CONTRASEÑA CON PROMPT ============
+async function cambiarPassword(rut) {
+    const nuevaPassword = prompt('Ingresa la nueva contraseña (mínimo 6 caracteres):');
+    if (!nuevaPassword) return;
     
     if (nuevaPassword.length < 6) {
         mostrarMensaje('La contraseña debe tener al menos 6 caracteres', 'error');
         return;
     }
+    
+    if (!confirm(`¿Cambiar contraseña de ${rut}?`)) return;
     
     const usuarios = await cargarUsuarios();
     const usuario = usuarios.find(u => u.rut === rut);
@@ -53,6 +253,7 @@ async function cambiarPassword(rut, nuevaPassword) {
         return;
     }
     
+    // Siempre guardar hasheado
     const hash = await Auth.hashPassword(nuevaPassword);
     usuario.password = hash;
     
@@ -61,3 +262,102 @@ async function cambiarPassword(rut, nuevaPassword) {
         await actualizarLista();
     }
 }
+
+// ============ ELIMINAR USUARIO ============
+async function eliminarUsuario(rut) {
+    if (!confirm(`¿Eliminar al usuario ${rut}? Esta acción es permanente.`)) return;
+    
+    if (rut === '22785939-3') {
+        mostrarMensaje('No se puede eliminar al admin principal', 'error');
+        return;
+    }
+    
+    const usuarios = await cargarUsuarios();
+    const index = usuarios.findIndex(u => u.rut === rut);
+    
+    if (index === -1) {
+        mostrarMensaje('Usuario no encontrado', 'error');
+        return;
+    }
+    
+    usuarios.splice(index, 1);
+    
+    if (await guardarUsuarios(usuarios)) {
+        mostrarMensaje('Usuario eliminado correctamente', 'exito');
+        await actualizarLista();
+    }
+}
+
+// ============ ACTUALIZAR LISTA ============
+async function actualizarLista() {
+    const usuarios = await cargarUsuarios();
+    renderizarUsuarios(usuarios);
+}
+
+// ============ BUSCAR USUARIO ============
+async function buscarUsuario() {
+    const busqueda = document.getElementById('buscarUsuario').value.trim();
+    if (!busqueda) {
+        await actualizarLista();
+        return;
+    }
+    
+    const usuarios = await cargarUsuarios();
+    const filtrados = usuarios.filter(u => 
+        u.rut.includes(busqueda) || 
+        (u.nombre && u.nombre.toLowerCase().includes(busqueda.toLowerCase())) ||
+        (u.apellido && u.apellido.toLowerCase().includes(busqueda.toLowerCase()))
+    );
+    
+    renderizarUsuarios(filtrados);
+}
+
+// ============ MOSTRAR MENSAJE ============
+function mostrarMensaje(texto, tipo = 'info') {
+    const mensajeDiv = document.getElementById('dashboardMensaje');
+    if (mensajeDiv) {
+        mensajeDiv.textContent = texto;
+        mensajeDiv.className = 'mensaje';
+        if (tipo === 'error') {
+            mensajeDiv.style.borderColor = '#000';
+            mensajeDiv.style.background = '#ffebeb';
+        } else if (tipo === 'exito') {
+            mensajeDiv.style.borderColor = '#000';
+            mensajeDiv.style.background = '#ebffeb';
+        }
+        mensajeDiv.classList.remove('hidden');
+        
+        setTimeout(() => {
+            mensajeDiv.classList.add('hidden');
+        }, 3000);
+    }
+}
+
+// ============ CERRAR SESIÓN ============
+function cerrarSesion() {
+    sessionStorage.removeItem('cc_sesion');
+    window.location.href = '../login.html';
+}
+
+// ============ EVENTOS ============
+document.addEventListener('DOMContentLoaded', function() {
+    const usuario = verificarSesion();
+    if (!usuario) return;
+    
+    actualizarLista();
+    
+    document.getElementById('btnCerrarSesion').addEventListener('click', cerrarSesion);
+    document.getElementById('btnBuscar').addEventListener('click', buscarUsuario);
+    document.getElementById('buscarUsuario').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            buscarUsuario();
+        }
+    });
+});
+
+// ============ EXPORTAR PARA USO EN HTML ============
+window.cambiarRol = cambiarRol;
+window.cambiarEstado = cambiarEstado;
+window.convertirPasswordAHash = convertirPasswordAHash;
+window.cambiarPassword = cambiarPassword;
+window.eliminarUsuario = eliminarUsuario;
