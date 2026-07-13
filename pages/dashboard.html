@@ -12,12 +12,10 @@
         }
         .user-list li {
             border-bottom: 1px solid #000;
-            padding: 0.5rem 0;
+            padding: 0.8rem 0;
             display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 0.5rem;
-            align-items: center;
         }
         .user-info {
             display: flex;
@@ -29,6 +27,7 @@
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
+            align-items: center;
         }
         .rol-badge {
             border: 1px solid #000;
@@ -39,6 +38,14 @@
         .btn-small {
             padding: 0.3rem 0.8rem;
             font-size: 0.8rem;
+        }
+        .btn-danger {
+            border-color: #ff0000;
+            color: #ff0000;
+        }
+        .btn-danger:hover {
+            background: #ff0000;
+            color: #fff;
         }
         .header {
             display: flex;
@@ -62,6 +69,27 @@
         .mensaje {
             margin: 1rem 0;
         }
+        select.btn-small {
+            background: #fff;
+            cursor: pointer;
+        }
+        .estado-badge {
+            padding: 0.15rem 0.5rem;
+            font-size: 0.8rem;
+            border-radius: 3px;
+        }
+        .estado-activo {
+            background: #d4edda;
+            color: #155724;
+        }
+        .estado-kick {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .estado-baneado {
+            background: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
@@ -74,7 +102,7 @@
         </div>
     </div>
     
-    <p>Gestión de usuarios del sistema. Solo los administradores pueden acceder aquí.</p>
+    <p>Gestión de usuarios del sistema.</p>
     
     <div id="dashboardMensaje" class="mensaje hidden"></div>
     
@@ -92,6 +120,8 @@
     </div>
 </div>
 
+<script src="../js/github.js"></script>
+<script src="../js/auth.js"></script>
 <script src="../js/admin.js"></script>
 </body>
 </html>
