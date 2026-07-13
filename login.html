@@ -130,8 +130,8 @@
         <div class="msg" id="loginMsg"></div>
     </div>
 
-    <!-- REGISTRO -->
-    <div id="panelRegistro" class="hidden">
+    <!-- REGISTRO - AHORA VISIBLE -->
+    <div id="panelRegistro">
         <div class="form-row">
             <div class="field">
                 <label>Nombre</label>
@@ -181,25 +181,21 @@
 </div>
 
 <!-- ===== SCRIPTS ===== -->
-<!-- Primero github.js, luego auth.js -->
 <script src="js/github.js"></script>
 <script src="js/auth.js"></script>
 
 <script>
     // ============================================================
-    // CÓDIGO DE LOGIN/REGISTRO
+    // CÓDIGO DE LOGIN/REGISTRO - Todo después de los scripts
     // ============================================================
 
-    // Verificar si ya hay sesión
-    (function() {
-        try {
-            if (typeof Auth !== 'undefined' && Auth.getSesion()) {
-                window.location.href = 'pages/dashboard.html';
-            }
-        } catch(e) {
-            console.log('No hay sesión activa');
-        }
-    })();
+    // Verificar que Auth esté definido
+    if (typeof Auth === 'undefined') {
+        console.error('❌ Auth no está definido. Revisa que auth.js se haya cargado.');
+        document.body.innerHTML = '<h1>Error: Auth no está definido</h1><p>Revisa la consola para más detalles.</p>';
+    } else {
+        console.log('✅ Auth cargado correctamente');
+    }
 
     function switchTab(tab) {
         const esLogin = tab === 'login';
@@ -237,9 +233,8 @@
             return mostrarMsg('loginMsg', 'Completá todos los campos', 'error');
         }
 
-        // Verificar que Auth esté definido
         if (typeof Auth === 'undefined') {
-            return mostrarMsg('loginMsg', 'Error: Auth no está definido. Revisa que auth.js se haya cargado.', 'error');
+            return mostrarMsg('loginMsg', 'Error: Auth no está definido', 'error');
         }
 
         setLoading('btnLogin', true);
@@ -252,7 +247,6 @@
                 return mostrarMsg('loginMsg', res.error, 'error');
             }
 
-            // Redirigir según rol
             if (res.rol === 'admin') {
                 window.location.href = 'pages/dashboard.html';
             } else {
@@ -276,7 +270,6 @@
         const pass = document.getElementById('regPass').value;
         const pass2 = document.getElementById('regPass2').value;
 
-        // Validaciones
         if (!nombre || !apellido || !edad || !rut || !telefono || !gmail || !historial || !pass || !pass2) {
             return mostrarMsg('registroMsg', 'Todos los campos son obligatorios', 'error');
         }
@@ -290,9 +283,8 @@
             return mostrarMsg('registroMsg', 'Edad inválida', 'error');
         }
 
-        // Verificar que Auth esté definido
         if (typeof Auth === 'undefined') {
-            return mostrarMsg('registroMsg', 'Error: Auth no está definido. Revisa que auth.js se haya cargado.', 'error');
+            return mostrarMsg('registroMsg', 'Error: Auth no está definido', 'error');
         }
 
         setLoading('btnRegistro', true);
@@ -311,10 +303,8 @@
             
             mostrarMsg('registroMsg', mensajeRol, 'success');
             
-            // Limpiar formulario
             document.querySelectorAll('#panelRegistro input').forEach(input => input.value = '');
             
-            // Cambiar a login después de 2 segundos
             setTimeout(() => {
                 switchTab('login');
                 mostrarMsg('loginMsg', '✅ Registro exitoso. Inicia sesión.', 'success');
@@ -325,7 +315,7 @@
         }
     }
 
-    // ===== ENTER PARA ENVIAR =====
+    // ===== EVENTOS =====
     document.getElementById('loginPass').addEventListener('keydown', e => {
         if (e.key === 'Enter') login();
     });
@@ -333,8 +323,10 @@
         if (e.key === 'Enter') registro();
     });
 
-    console.log('✅ login.html cargado correctamente');
-    console.log('Auth:', typeof Auth !== 'undefined' ? '✅ Definido' : '❌ No definido');
+    // ===== INICIALIZAR =====
+    // Asegurar que el panel de registro esté oculto al inicio
+    document.getElementById('panelRegistro').style.display = 'none';
+    document.getElementById('panelLogin').style.display = 'block';
 </script>
 </body>
 </html>
