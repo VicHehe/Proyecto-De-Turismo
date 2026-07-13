@@ -19,6 +19,14 @@ const Auth = {
         return s;
     },
 
+    // Verificar si usuario está baneado
+    async verificarEstado(rut) {
+        const datos = await GitHub.leer('datos/usuarios.json');
+        if (!datos) return false;
+        const usuario = datos.usuarios.find(u => u.rut === rut);
+        return usuario ? usuario.estado || 'activo' : 'activo';
+    },
+
     async hashPassword(password) {
         const encoder = new TextEncoder();
         const data = encoder.encode(password);
@@ -40,37 +48,53 @@ const Auth = {
         const usuario = datos.usuarios.find(u => u.rut === rutFormateado);
         if (!usuario) return { ok: false, error: 'RUT no registrado' };
         
+        // Verificar estado del usuario
+        if (usuario.estado === 'baneado') {
+            return { ok: false, error: '❌ Usuario baneado permanentemente' };
+        }
+        if (usuario.estado === 'kick') {
+            return { ok: false, error: '⏰ Usuario kickeado temporalmente' };
+        }
+        
         const hash = await this.hashPassword(password);
         if (usuario.password !== hash) return { ok: false, error: 'Contraseña incorrecta' };
         
         this.setSesion({
             rut: usuario.rut,
             nombre: usuario.nombre,
-            rol: usuario.rol
+            apellido: usuario.apellido,
+            rol: usuario.rol,
+            estado: usuario.estado || 'activo'
         });
         
         return { ok: true, rol: usuario.rol };
     },
 
-    async registro(rut, nombre, password) {
+    async registro(rut, nombre, apellido, edad, telefono, gmail, historial, password) {
         const rutFormateado = this.formatearRut(rut);
         const datos = await GitHub.leer('datos/usuarios.json');
         if (!datos) return { ok: false, error: 'Error al conectar con el servidor' };
-        
-        // Verificar si el RUT está autorizado
-        const autorizado = datos.ruts_autorizados.find(r => r.rut === rutFormateado);
-        if (!autorizado) return { ok: false, error: 'Tu RUT no está autorizado para registrarse' };
         
         // Verificar si ya está registrado
         const existe = datos.usuarios.find(u => u.rut === rutFormateado);
         if (existe) return { ok: false, error: 'Este RUT ya tiene una cuenta' };
         
+        // Verificar si está autorizado (para saber qué rol darle)
+        const autorizado = datos.ruts_autorizados.find(r => r.rut === rutFormateado);
+        const rol = autorizado ? autorizado.rol : 'visitante';
+        
         const hash = await this.hashPassword(password);
         datos.usuarios.push({
             rut: rutFormateado,
             nombre: nombre,
-            rol: autorizado.rol,
+            apellido: apellido,
+            edad: parseInt(edad),
+            telefono: telefono,
+            gmail: gmail,
+            historial: historial,
             password: hash,
+            rol: rol,
+            estado: 'activo',
             fechaRegistro: new Date().toISOString()
         });
         
@@ -78,6 +102,6 @@ const Auth = {
         const ok = await GitHub.escribir('datos/usuarios.json', datos, sha);
         if (!ok) return { ok: false, error: 'Error al guardar en el servidor' };
         
-        return { ok: true };
+        return { ok: true, rol: rol };
     }
 };
