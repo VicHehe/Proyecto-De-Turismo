@@ -16,19 +16,25 @@ function verificarSesion() {
     return usuario;
 }
 
-// ============ CARGAR USUARIOS (desde GitHub) ============
+// ============ CARGAR USUARIOS ============
 async function cargarUsuarios() {
     try {
         const datos = await GitHub.leer('datos/usuarios.json');
         if (!datos) {
-            // Si no existe, crear datos iniciales
+            // Crear datos iniciales si no existen
             const inicial = {
                 usuarios: [
                     {
                         rut: "22785939-3",
-                        nombre: "Victor Tilleria",
-                        rol: "admin",
+                        nombre: "Victor",
+                        apellido: "Tilleria",
+                        edad: 30,
+                        telefono: "912345678",
+                        gmail: "victor@turismo.cl",
+                        historial: "Ninguno",
                         password: "Devictor.",
+                        rol: "admin",
+                        estado: "activo",
                         fechaRegistro: "2026-07-13T00:00:00.000Z"
                     }
                 ],
@@ -36,7 +42,7 @@ async function cargarUsuarios() {
                     {
                         rut: "22785939-3",
                         rol: "admin",
-                        nombre: "VictorTilleria"
+                        nombre: "Victor Tilleria"
                     }
                 ]
             };
@@ -51,10 +57,9 @@ async function cargarUsuarios() {
     }
 }
 
-// ============ GUARDAR USUARIOS (en GitHub) ============
+// ============ GUARDAR USUARIOS ============
 async function guardarUsuarios(usuarios) {
     try {
-        // Obtener datos completos para preservar ruts_autorizados
         const datos = await GitHub.leer('datos/usuarios.json');
         if (!datos) return false;
         
@@ -80,25 +85,44 @@ function renderizarUsuarios(usuarios) {
     
     document.getElementById('userCount').textContent = `${usuarios.length} usuarios`;
     
-    lista.innerHTML = usuarios.map(usuario => `
+    lista.innerHTML = usuarios.map(usuario => {
+        const estadoEmoji = usuario.estado === 'baneado' ? '🚫' : 
+                           usuario.estado === 'kick' ? '⏰' : '✅';
+        const estadoColor = usuario.estado === 'baneado' ? '#ff0000' : 
+                           usuario.estado === 'kick' ? '#ff9900' : '#00cc00';
+        
+        return `
         <li>
             <div class="user-info">
-                <strong>${usuario.nombre}</strong>
+                <strong>${usuario.nombre} ${usuario.apellido}</strong>
                 <span>${usuario.rut}</span>
                 <span class="rol-badge">${usuario.rol}</span>
-                <span>${usuario.fechaRegistro ? new Date(usuario.fechaRegistro).toLocaleDateString() : '—'}</span>
+                <span style="color:${estadoColor};">${estadoEmoji} ${usuario.estado || 'activo'}</span>
+                <span>${usuario.gmail}</span>
+                <span>${usuario.telefono}</span>
             </div>
             <div class="user-actions">
                 ${usuario.rut !== '22785939-3' ? `
-                    <button class="btn btn-small" onclick="cambiarRol('${usuario.rut}', 'admin')">Hacer Admin</button>
-                    <button class="btn btn-small" onclick="cambiarRol('${usuario.rut}', 'estudiante')">Hacer Estudiante</button>
-                    <button class="btn btn-small btn-danger" onclick="eliminarUsuario('${usuario.rut}')">Eliminar</button>
+                    <select class="btn btn-small" onchange="cambiarRol('${usuario.rut}', this.value)">
+                        <option value="admin" ${usuario.rol === 'admin' ? 'selected' : ''}>Admin</option>
+                        <option value="guia" ${usuario.rol === 'guia' ? 'selected' : ''}>Guía</option>
+                        <option value="estudiante" ${usuario.rol === 'estudiante' ? 'selected' : ''}>Estudiante</option>
+                        <option value="visitante" ${usuario.rol === 'visitante' ? 'selected' : ''}>Visitante</option>
+                    </select>
+                    
+                    <select class="btn btn-small" onchange="cambiarEstado('${usuario.rut}', this.value)">
+                        <option value="activo" ${usuario.estado === 'activo' ? 'selected' : ''}>✅ Activo</option>
+                        <option value="kick" ${usuario.estado === 'kick' ? 'selected' : ''}>⏰ Kickeado</option>
+                        <option value="baneado" ${usuario.estado === 'baneado' ? 'selected' : ''}>🚫 Baneado</option>
+                    </select>
+                    
+                    <button class="btn btn-small btn-danger" onclick="eliminarUsuario('${usuario.rut}')">🗑️</button>
                 ` : `
                     <span style="font-weight: bold;">🔒 Admin Principal</span>
                 `}
             </div>
         </li>
-    `).join('');
+    `}).join('');
 }
 
 // ============ CAMBIAR ROL ============
@@ -113,7 +137,7 @@ async function cambiarRol(rut, nuevoRol) {
         return;
     }
     
-    if (rut === '22785939-3' && nuevoRol !== 'admin') {
+    if (rut === '22785939-3') {
         mostrarMensaje('No se puede cambiar el rol del admin principal', 'error');
         return;
     }
@@ -126,9 +150,40 @@ async function cambiarRol(rut, nuevoRol) {
     }
 }
 
+// ============ CAMBIAR ESTADO ============
+async function cambiarEstado(rut, nuevoEstado) {
+    const mensajes = {
+        'activo': '✅ Activar usuario',
+        'kick': '⏰ Kicketear usuario (temporal)',
+        'baneado': '🚫 Banear usuario (permanente)'
+    };
+    
+    if (!confirm(`${mensajes[nuevoEstado]}?`)) return;
+    
+    const usuarios = await cargarUsuarios();
+    const usuario = usuarios.find(u => u.rut === rut);
+    
+    if (!usuario) {
+        mostrarMensaje('Usuario no encontrado', 'error');
+        return;
+    }
+    
+    if (rut === '22785939-3') {
+        mostrarMensaje('No se puede cambiar el estado del admin principal', 'error');
+        return;
+    }
+    
+    usuario.estado = nuevoEstado;
+    
+    if (await guardarUsuarios(usuarios)) {
+        mostrarMensaje(`Estado de ${usuario.nombre} cambiado a ${nuevoEstado}`, 'exito');
+        await actualizarLista();
+    }
+}
+
 // ============ ELIMINAR USUARIO ============
 async function eliminarUsuario(rut) {
-    if (!confirm(`¿Eliminar al usuario ${rut}?`)) return;
+    if (!confirm(`¿Eliminar al usuario ${rut}? Esta acción es permanente.`)) return;
     
     if (rut === '22785939-3') {
         mostrarMensaje('No se puede eliminar al admin principal', 'error');
@@ -168,7 +223,8 @@ async function buscarUsuario() {
     const usuarios = await cargarUsuarios();
     const filtrados = usuarios.filter(u => 
         u.rut.includes(busqueda) || 
-        (u.nombre && u.nombre.toLowerCase().includes(busqueda.toLowerCase()))
+        (u.nombre && u.nombre.toLowerCase().includes(busqueda.toLowerCase())) ||
+        (u.apellido && u.apellido.toLowerCase().includes(busqueda.toLowerCase()))
     );
     
     renderizarUsuarios(filtrados);
@@ -219,4 +275,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ============ EXPORTAR PARA USO EN HTML ============
 window.cambiarRol = cambiarRol;
+window.cambiarEstado = cambiarEstado;
 window.eliminarUsuario = eliminarUsuario;
