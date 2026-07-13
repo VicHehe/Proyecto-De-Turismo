@@ -19,16 +19,14 @@ const Auth = {
         return s;
     },
 
-    // Verificar si usuario está baneado
-    async verificarEstado(rut) {
-        const datos = await GitHub.leer('datos/usuarios.json');
-        if (!datos) return false;
-        const usuario = datos.usuarios.find(u => u.rut === rut);
-        return usuario ? usuario.estado || 'activo' : 'activo';
+    async hashPassword(password) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hash = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hash))
+            .map(b => b.toString(16).padStart(2, '0'))
+            .join('');
     },
-
-    // ⚠️ ELIMINADO: ya no se usa hash
-    // async hashPassword(password) { ... }
 
     formatearRut(rut) {
         return rut.replace(/\./g, '').toUpperCase().trim();
@@ -42,7 +40,7 @@ const Auth = {
         const usuario = datos.usuarios.find(u => u.rut === rutFormateado);
         if (!usuario) return { ok: false, error: 'RUT no registrado' };
         
-        // Verificar estado del usuario
+        // Verificar estado
         if (usuario.estado === 'baneado') {
             return { ok: false, error: '❌ Usuario baneado permanentemente' };
         }
@@ -50,8 +48,11 @@ const Auth = {
             return { ok: false, error: '⏰ Usuario kickeado temporalmente' };
         }
         
-        // ✅ COMPARACIÓN EN TEXTO PLANO (sin hash)
-        if (usuario.password !== password) {
+        // ✅ COMPARACIÓN DUAL: texto plano O hash
+        const passwordHash = await this.hashPassword(password);
+        const esValida = (usuario.password === password) || (usuario.password === passwordHash);
+        
+        if (!esValida) {
             return { ok: false, error: 'Contraseña incorrecta' };
         }
         
@@ -71,15 +72,14 @@ const Auth = {
         const datos = await GitHub.leer('datos/usuarios.json');
         if (!datos) return { ok: false, error: 'Error al conectar con el servidor' };
         
-        // Verificar si ya está registrado
         const existe = datos.usuarios.find(u => u.rut === rutFormateado);
         if (existe) return { ok: false, error: 'Este RUT ya tiene una cuenta' };
         
-        // Verificar si está autorizado (para saber qué rol darle)
         const autorizado = datos.ruts_autorizados.find(r => r.rut === rutFormateado);
         const rol = autorizado ? autorizado.rol : 'visitante';
         
-        // ✅ GUARDAR CONTRASEÑA EN TEXTO PLANO (sin hash)
+        // ✅ GUARDAR SIEMPRE HASHEADO
+        const passwordHash = await this.hashPassword(password);
         datos.usuarios.push({
             rut: rutFormateado,
             nombre: nombre,
@@ -88,7 +88,7 @@ const Auth = {
             telefono: telefono,
             gmail: gmail,
             historial: historial,
-            password: password,  // 👈 Texto plano
+            password: passwordHash,  // Siempre hash
             rol: rol,
             estado: 'activo',
             fechaRegistro: new Date().toISOString()
