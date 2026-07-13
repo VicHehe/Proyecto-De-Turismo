@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistema de Gestión de Salidas</title>
     <style>
+        /* Estilos básicos en blanco y negro */
         body {
             font-family: system-ui, sans-serif;
             background: white;
@@ -67,9 +68,6 @@
             font-weight: bold;
             cursor: pointer;
         }
-        .btn-submit:hover {
-            background: #333;
-        }
         .btn-submit:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -88,9 +86,6 @@
             display: block;
             background: #ebffeb;
         }
-        .hidden {
-            display: none !important;
-        }
         .form-row {
             display: flex;
             gap: 1rem;
@@ -102,6 +97,10 @@
             font-size: 12px;
             color: #666;
             margin-top: 4px;
+        }
+        /* Ocultar paneles con display, no con class hidden */
+        .panel-hidden {
+            display: none !important;
         }
     </style>
 </head>
@@ -116,7 +115,7 @@
         <button class="tab-btn" id="tabRegistro" onclick="switchTab('registro')">Registrarse</button>
     </div>
 
-    <!-- LOGIN -->
+    <!-- PANEL LOGIN -->
     <div id="panelLogin">
         <div class="field">
             <label>RUT (con guión)</label>
@@ -130,8 +129,8 @@
         <div class="msg" id="loginMsg"></div>
     </div>
 
-    <!-- REGISTRO -->
-    <div id="panelRegistro" class="hidden">
+    <!-- PANEL REGISTRO (visible por defecto, se oculta con JS al inicio) -->
+    <div id="panelRegistro">
         <div class="form-row">
             <div class="field">
                 <label>Nombre</label>
@@ -180,24 +179,28 @@
     </div>
 </div>
 
+<!-- ===== SCRIPTS ===== -->
 <script src="js/github.js"></script>
 <script src="js/auth.js"></script>
 
 <script>
     // ============================================================
-    // CÓDIGO DE LOGIN/REGISTRO
+    // CÓDIGO DE LOGIN Y REGISTRO
     // ============================================================
 
-    // Si ya hay sesión, redirigir
-    if (typeof Auth !== 'undefined' && Auth.getSesion()) {
-        const sesion = Auth.getSesion();
-        if (sesion.rol === 'admin') {
-            window.location.href = 'pages/dashboard.html';
-        } else {
-            window.location.href = 'index.html';
-        }
+    // Verificar si Auth está definido
+    if (typeof Auth === 'undefined') {
+        document.body.innerHTML = '<h1>Error: Auth no está definido</h1><p>Revisa que auth.js se haya cargado correctamente.</p>';
+        console.error('❌ Auth no está definido');
+    } else {
+        console.log('✅ Auth cargado correctamente');
     }
 
+    // Ocultar panel de registro al inicio (solo se muestra login)
+    document.getElementById('panelRegistro').style.display = 'none';
+    document.getElementById('panelLogin').style.display = 'block';
+
+    // Función para cambiar entre pestañas
     function switchTab(tab) {
         const esLogin = tab === 'login';
         document.getElementById('panelLogin').style.display = esLogin ? 'block' : 'none';
@@ -239,21 +242,13 @@
         }
 
         setLoading('btnLogin', true);
-        
         try {
             const res = await Auth.login(rut, pass);
             setLoading('btnLogin', false);
-
             if (!res.ok) {
                 return mostrarMsg('loginMsg', res.error, 'error');
             }
-
-            // Redirigir según rol
-            if (res.rol === 'admin') {
-                window.location.href = 'pages/dashboard.html';
-            } else {
-                window.location.href = 'index.html';
-            }
+            // Si llega aquí, la redirección ya la maneja Auth.login
         } catch (error) {
             setLoading('btnLogin', false);
             mostrarMsg('loginMsg', 'Error: ' + error.message, 'error');
@@ -290,11 +285,9 @@
         }
 
         setLoading('btnRegistro', true);
-        
         try {
             const res = await Auth.registro(rut, nombre, apellido, edad, telefono, gmail, historial, pass);
             setLoading('btnRegistro', false);
-
             if (!res.ok) {
                 return mostrarMsg('registroMsg', res.error, 'error');
             }
@@ -304,7 +297,6 @@
                 : `✅ Cuenta creada como ${res.rol.toUpperCase()}`;
             
             mostrarMsg('registroMsg', mensajeRol, 'success');
-            
             document.querySelectorAll('#panelRegistro input').forEach(input => input.value = '');
             
             setTimeout(() => {
@@ -325,13 +317,7 @@
         if (e.key === 'Enter') registro();
     });
 
-    // ===== INICIALIZAR =====
-    // Asegurar que el panel de registro esté oculto al inicio
-    document.getElementById('panelRegistro').style.display = 'none';
-    document.getElementById('panelLogin').style.display = 'block';
-
     console.log('✅ login.html cargado correctamente');
-    console.log('Auth:', typeof Auth !== 'undefined' ? '✅ Definido' : '❌ No definido');
 </script>
 </body>
 </html>
