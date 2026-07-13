@@ -98,7 +98,6 @@
             color: #666;
             margin-top: 4px;
         }
-        /* Ocultar paneles con display, no con class hidden */
         .panel-hidden {
             display: none !important;
         }
@@ -129,8 +128,8 @@
         <div class="msg" id="loginMsg"></div>
     </div>
 
-    <!-- PANEL REGISTRO (visible por defecto, se oculta con JS al inicio) -->
-    <div id="panelRegistro">
+    <!-- PANEL REGISTRO -->
+    <div id="panelRegistro" style="display:none;">
         <div class="form-row">
             <div class="field">
                 <label>Nombre</label>
@@ -195,10 +194,6 @@
     } else {
         console.log('✅ Auth cargado correctamente');
     }
-
-    // Ocultar panel de registro al inicio (solo se muestra login)
-    document.getElementById('panelRegistro').style.display = 'none';
-    document.getElementById('panelLogin').style.display = 'block';
 
     // Función para cambiar entre pestañas
     function switchTab(tab) {
