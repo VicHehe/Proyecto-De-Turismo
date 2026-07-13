@@ -99,6 +99,10 @@
             color: #666;
             margin-top: 4px;
         }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -108,8 +112,8 @@
     <p>Salidas y Excursiones</p>
 
     <div class="tab-btns">
-        <button class="tab-btn active" onclick="switchTab('login')">Iniciar sesión</button>
-        <button class="tab-btn" onclick="switchTab('registro')">Registrarse</button>
+        <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">Iniciar sesión</button>
+        <button class="tab-btn" id="tabRegistro" onclick="switchTab('registro')">Registrarse</button>
     </div>
 
     <!-- LOGIN -->
@@ -122,7 +126,7 @@
             <label>Contraseña</label>
             <input type="password" id="loginPass" placeholder="********">
         </div>
-        <button class="btn-submit" onclick="login()">Iniciar sesión</button>
+        <button class="btn-submit" id="btnLogin" onclick="login()">Iniciar sesión</button>
         <div class="msg" id="loginMsg"></div>
     </div>
 
@@ -170,8 +174,8 @@
             <label>Confirmar contraseña</label>
             <input type="password" id="regPass2" placeholder="********">
         </div>
-        <div class="rol-info" id="rolInfo">⚠️ Si tu RUT está autorizado, obtendrás ese rol. Si no, serás Visitante.</div>
-        <button class="btn-submit" onclick="registro()">Crear cuenta</button>
+        <div class="rol-info" id="rolInfo">⚠️ Si tu RUT está autorizado en el sistema, obtendrás ese rol. Si no, serás Visitante.</div>
+        <button class="btn-submit" id="btnRegistro" onclick="registro()">Crear cuenta</button>
         <div class="msg" id="registroMsg"></div>
     </div>
 </div>
@@ -179,7 +183,10 @@
 <script src="js/github.js"></script>
 <script src="js/auth.js"></script>
 <script>
-    if (Auth.getSesion()) window.location.href = 'index.html';
+    // Si ya hay sesión, redirigir al index
+    if (Auth.getSesion()) {
+        window.location.href = 'index.html';
+    }
 
     function switchTab(tab) {
         const esLogin = tab === 'login';
@@ -188,21 +195,41 @@
         document.querySelectorAll('.tab-btn').forEach((b, i) => {
             b.classList.toggle('active', esLogin ? i === 0 : i === 1);
         });
+        // Limpiar mensajes al cambiar de pestaña
+        document.getElementById('loginMsg').className = 'msg';
+        document.getElementById('loginMsg').style.display = 'none';
+        document.getElementById('registroMsg').className = 'msg';
+        document.getElementById('registroMsg').style.display = 'none';
     }
 
     function mostrarMsg(id, texto, tipo) {
         const el = document.getElementById(id);
         el.textContent = texto;
         el.className = `msg ${tipo}`;
+        el.style.display = 'block';
+    }
+
+    function setLoading(btnId, loading) {
+        const btn = document.getElementById(btnId);
+        btn.disabled = loading;
+        btn.textContent = loading ? 'Cargando...' : btnId === 'btnLogin' ? 'Iniciar sesión' : 'Crear cuenta';
     }
 
     async function login() {
         const rut = document.getElementById('loginRut').value.trim();
         const pass = document.getElementById('loginPass').value;
-        if (!rut || !pass) return mostrarMsg('loginMsg', 'Completá todos los campos', 'error');
+        
+        if (!rut || !pass) {
+            return mostrarMsg('loginMsg', 'Completá todos los campos', 'error');
+        }
 
+        setLoading('btnLogin', true);
         const res = await Auth.login(rut, pass);
-        if (!res.ok) return mostrarMsg('loginMsg', res.error, 'error');
+        setLoading('btnLogin', false);
+
+        if (!res.ok) {
+            return mostrarMsg('loginMsg', res.error, 'error');
+        }
 
         // Redirigir según rol
         if (res.rol === 'admin') {
@@ -223,29 +250,57 @@
         const pass = document.getElementById('regPass').value;
         const pass2 = document.getElementById('regPass2').value;
 
-        if (!nombre || !apellido || !edad || !rut || !telefono || !gmail || !historial || !pass || !pass2)
+        // Validaciones
+        if (!nombre || !apellido || !edad || !rut || !telefono || !gmail || !historial || !pass || !pass2) {
             return mostrarMsg('registroMsg', 'Todos los campos son obligatorios', 'error');
-        if (pass !== pass2)
+        }
+        if (pass !== pass2) {
             return mostrarMsg('registroMsg', 'Las contraseñas no coinciden', 'error');
-        if (pass.length < 6)
+        }
+        if (pass.length < 6) {
             return mostrarMsg('registroMsg', 'La contraseña debe tener al menos 6 caracteres', 'error');
+        }
+        if (isNaN(edad) || parseInt(edad) < 1) {
+            return mostrarMsg('registroMsg', 'Edad inválida', 'error');
+        }
 
+        setLoading('btnRegistro', true);
         const res = await Auth.registro(rut, nombre, apellido, edad, telefono, gmail, historial, pass);
-        if (!res.ok) return mostrarMsg('registroMsg', res.error, 'error');
+        setLoading('btnRegistro', false);
+
+        if (!res.ok) {
+            return mostrarMsg('registroMsg', res.error, 'error');
+        }
 
         const mensajeRol = res.rol === 'visitante' 
             ? '✅ Cuenta creada como Visitante. Un administrador puede cambiar tu rol.' 
-            : `✅ Cuenta creada como ${res.rol}`;
+            : `✅ Cuenta creada como ${res.rol.toUpperCase()}`;
         
         mostrarMsg('registroMsg', mensajeRol, 'success');
-        setTimeout(() => switchTab('login'), 2000);
+        
+        // Limpiar formulario después de registro exitoso
+        document.querySelectorAll('#panelRegistro input').forEach(input => input.value = '');
+        
+        // Cambiar a login después de 2 segundos
+        setTimeout(() => {
+            switchTab('login');
+            mostrarMsg('loginMsg', '✅ Registro exitoso. Inicia sesión.', 'success');
+        }, 2000);
     }
 
+    // Enter para enviar
     document.getElementById('loginPass').addEventListener('keydown', e => {
         if (e.key === 'Enter') login();
     });
     document.getElementById('regPass2').addEventListener('keydown', e => {
         if (e.key === 'Enter') registro();
+    });
+
+    // Enter en campos de registro
+    document.querySelectorAll('#panelRegistro input').forEach(input => {
+        input.addEventListener('keydown', e => {
+            if (e.key === 'Enter') registro();
+        });
     });
 </script>
 </body>
