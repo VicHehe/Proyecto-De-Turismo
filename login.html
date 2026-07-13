@@ -130,8 +130,8 @@
         <div class="msg" id="loginMsg"></div>
     </div>
 
-    <!-- REGISTRO - AHORA VISIBLE -->
-    <div id="panelRegistro">
+    <!-- REGISTRO -->
+    <div id="panelRegistro" class="hidden">
         <div class="form-row">
             <div class="field">
                 <label>Nombre</label>
@@ -180,21 +180,22 @@
     </div>
 </div>
 
-<!-- ===== SCRIPTS ===== -->
 <script src="js/github.js"></script>
 <script src="js/auth.js"></script>
 
 <script>
     // ============================================================
-    // CÓDIGO DE LOGIN/REGISTRO - Todo después de los scripts
+    // CÓDIGO DE LOGIN/REGISTRO
     // ============================================================
 
-    // Verificar que Auth esté definido
-    if (typeof Auth === 'undefined') {
-        console.error('❌ Auth no está definido. Revisa que auth.js se haya cargado.');
-        document.body.innerHTML = '<h1>Error: Auth no está definido</h1><p>Revisa la consola para más detalles.</p>';
-    } else {
-        console.log('✅ Auth cargado correctamente');
+    // Si ya hay sesión, redirigir
+    if (typeof Auth !== 'undefined' && Auth.getSesion()) {
+        const sesion = Auth.getSesion();
+        if (sesion.rol === 'admin') {
+            window.location.href = 'pages/dashboard.html';
+        } else {
+            window.location.href = 'index.html';
+        }
     }
 
     function switchTab(tab) {
@@ -247,6 +248,7 @@
                 return mostrarMsg('loginMsg', res.error, 'error');
             }
 
+            // Redirigir según rol
             if (res.rol === 'admin') {
                 window.location.href = 'pages/dashboard.html';
             } else {
@@ -327,6 +329,9 @@
     // Asegurar que el panel de registro esté oculto al inicio
     document.getElementById('panelRegistro').style.display = 'none';
     document.getElementById('panelLogin').style.display = 'block';
+
+    console.log('✅ login.html cargado correctamente');
+    console.log('Auth:', typeof Auth !== 'undefined' ? '✅ Definido' : '❌ No definido');
 </script>
 </body>
 </html>
