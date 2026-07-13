@@ -91,11 +91,6 @@ function renderizarUsuarios(usuarios) {
         const estadoColor = usuario.estado === 'baneado' ? '#ff0000' : 
                            usuario.estado === 'kick' ? '#ff9900' : '#00cc00';
         
-        // Verificar si la contraseña ya es hash (64 caracteres hexadecimales)
-        const esHash = /^[0-9a-f]{64}$/.test(usuario.password);
-        const passDisplay = esHash ? '🔒 Hasheada' : '📝 Texto plano';
-        const passColor = esHash ? '#00cc00' : '#ff9900';
-        
         return `
         <li>
             <div class="user-info">
@@ -103,7 +98,6 @@ function renderizarUsuarios(usuarios) {
                 <span>${usuario.rut}</span>
                 <span class="rol-badge">${usuario.rol}</span>
                 <span style="color:${estadoColor};">${estadoEmoji} ${usuario.estado || 'activo'}</span>
-                <span style="color:${passColor};">${passDisplay}</span>
                 <span>${usuario.gmail}</span>
                 <span>${usuario.telefono}</span>
             </div>
@@ -122,14 +116,6 @@ function renderizarUsuarios(usuarios) {
                         <option value="baneado" ${usuario.estado === 'baneado' ? 'selected' : ''}>🚫 Baneado</option>
                     </select>
                     
-                    <!-- BOTÓN PARA HASHEAR CONTRASEÑA (solo si no es hash) -->
-                    ${!esHash ? `
-                        <button class="btn btn-small" onclick="convertirPasswordAHash('${usuario.rut}')">🔒 Hash</button>
-                    ` : `
-                        <span style="font-size: 12px; color: #00cc00;">✅ Hash</span>
-                    `}
-                    
-                    <button class="btn btn-small" onclick="cambiarPassword('${usuario.rut}')">🔑 Cambiar Pass</button>
                     <button class="btn btn-small btn-danger" onclick="eliminarUsuario('${usuario.rut}')">🗑️</button>
                 ` : `
                     <span style="font-weight: bold;">🔒 Admin Principal</span>
@@ -191,74 +177,6 @@ async function cambiarEstado(rut, nuevoEstado) {
     
     if (await guardarUsuarios(usuarios)) {
         mostrarMensaje(`Estado de ${usuario.nombre} cambiado a ${nuevoEstado}`, 'exito');
-        await actualizarLista();
-    }
-}
-
-// ============ CONVERTIR CONTRASEÑA A HASH ============
-async function convertirPasswordAHash(rut) {
-    if (!confirm(`¿Convertir la contraseña de ${rut} a hash? Esto mejora la seguridad.`)) return;
-    
-    const usuarios = await cargarUsuarios();
-    const usuario = usuarios.find(u => u.rut === rut);
-    
-    if (!usuario) {
-        mostrarMensaje('Usuario no encontrado', 'error');
-        return;
-    }
-    
-    if (rut === '22785939-3') {
-        mostrarMensaje('No se puede modificar la contraseña del admin principal', 'error');
-        return;
-    }
-    
-    // Verificar si ya es hash (64 caracteres hexadecimales)
-    if (/^[0-9a-f]{64}$/.test(usuario.password)) {
-        mostrarMensaje('⚠️ Esta contraseña ya está hasheada', 'error');
-        return;
-    }
-    
-    // Generar hash de la contraseña actual
-    const hash = await Auth.hashPassword(usuario.password);
-    usuario.password = hash;
-    
-    if (await guardarUsuarios(usuarios)) {
-        mostrarMensaje(`✅ Contraseña de ${usuario.nombre} hasheada correctamente`, 'exito');
-        await actualizarLista();
-    }
-}
-
-// ============ CAMBIAR CONTRASEÑA CON PROMPT ============
-async function cambiarPassword(rut) {
-    const nuevaPassword = prompt('Ingresa la nueva contraseña (mínimo 6 caracteres):');
-    if (!nuevaPassword) return;
-    
-    if (nuevaPassword.length < 6) {
-        mostrarMensaje('La contraseña debe tener al menos 6 caracteres', 'error');
-        return;
-    }
-    
-    if (!confirm(`¿Cambiar contraseña de ${rut}?`)) return;
-    
-    const usuarios = await cargarUsuarios();
-    const usuario = usuarios.find(u => u.rut === rut);
-    
-    if (!usuario) {
-        mostrarMensaje('Usuario no encontrado', 'error');
-        return;
-    }
-    
-    if (rut === '22785939-3') {
-        mostrarMensaje('No se puede cambiar la contraseña del admin principal', 'error');
-        return;
-    }
-    
-    // Siempre guardar hasheado
-    const hash = await Auth.hashPassword(nuevaPassword);
-    usuario.password = hash;
-    
-    if (await guardarUsuarios(usuarios)) {
-        mostrarMensaje(`✅ Contraseña de ${usuario.nombre} cambiada`, 'exito');
         await actualizarLista();
     }
 }
@@ -358,6 +276,4 @@ document.addEventListener('DOMContentLoaded', function() {
 // ============ EXPORTAR PARA USO EN HTML ============
 window.cambiarRol = cambiarRol;
 window.cambiarEstado = cambiarEstado;
-window.convertirPasswordAHash = convertirPasswordAHash;
-window.cambiarPassword = cambiarPassword;
 window.eliminarUsuario = eliminarUsuario;
