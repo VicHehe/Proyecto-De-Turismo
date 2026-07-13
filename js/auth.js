@@ -27,14 +27,8 @@ const Auth = {
         return usuario ? usuario.estado || 'activo' : 'activo';
     },
 
-    async hashPassword(password) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(password);
-        const hash = await crypto.subtle.digest('SHA-256', data);
-        return Array.from(new Uint8Array(hash))
-            .map(b => b.toString(16).padStart(2, '0'))
-            .join('');
-    },
+    // ⚠️ ELIMINADO: ya no se usa hash
+    // async hashPassword(password) { ... }
 
     formatearRut(rut) {
         return rut.replace(/\./g, '').toUpperCase().trim();
@@ -56,8 +50,10 @@ const Auth = {
             return { ok: false, error: '⏰ Usuario kickeado temporalmente' };
         }
         
-        const hash = await this.hashPassword(password);
-        if (usuario.password !== hash) return { ok: false, error: 'Contraseña incorrecta' };
+        // ✅ COMPARACIÓN EN TEXTO PLANO (sin hash)
+        if (usuario.password !== password) {
+            return { ok: false, error: 'Contraseña incorrecta' };
+        }
         
         this.setSesion({
             rut: usuario.rut,
@@ -83,7 +79,7 @@ const Auth = {
         const autorizado = datos.ruts_autorizados.find(r => r.rut === rutFormateado);
         const rol = autorizado ? autorizado.rol : 'visitante';
         
-        const hash = await this.hashPassword(password);
+        // ✅ GUARDAR CONTRASEÑA EN TEXTO PLANO (sin hash)
         datos.usuarios.push({
             rut: rutFormateado,
             nombre: nombre,
@@ -92,7 +88,7 @@ const Auth = {
             telefono: telefono,
             gmail: gmail,
             historial: historial,
-            password: hash,
+            password: password,  // 👈 Texto plano
             rol: rol,
             estado: 'activo',
             fechaRegistro: new Date().toISOString()
