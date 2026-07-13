@@ -70,6 +70,10 @@
         .btn-submit:hover {
             background: #333;
         }
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         .msg {
             margin-top: 1rem;
             padding: 0.5rem;
@@ -99,10 +103,6 @@
             color: #666;
             margin-top: 4px;
         }
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
     </style>
 </head>
 <body>
@@ -120,18 +120,18 @@
     <div id="panelLogin">
         <div class="field">
             <label>RUT (con guión)</label>
-            <input type="text" id="loginRut" placeholder="Ej: 12345678-9">
+            <input type="text" id="loginRut" placeholder="Ej: 12345678-9" value="22785939-3">
         </div>
         <div class="field">
             <label>Contraseña</label>
-            <input type="password" id="loginPass" placeholder="********">
+            <input type="password" id="loginPass" placeholder="********" value="Devictor.">
         </div>
         <button class="btn-submit" id="btnLogin" onclick="login()">Iniciar sesión</button>
         <div class="msg" id="loginMsg"></div>
     </div>
 
-    <!-- REGISTRO - AHORA VISIBLE -->
-    <div id="panelRegistro">
+    <!-- REGISTRO -->
+    <div id="panelRegistro" class="hidden">
         <div class="form-row">
             <div class="field">
                 <label>Nombre</label>
@@ -180,13 +180,26 @@
     </div>
 </div>
 
+<!-- ===== SCRIPTS ===== -->
+<!-- Primero github.js, luego auth.js -->
 <script src="js/github.js"></script>
 <script src="js/auth.js"></script>
+
 <script>
-    // Si ya hay sesión, redirigir al index
-    if (Auth.getSesion()) {
-        window.location.href = 'index.html';
-    }
+    // ============================================================
+    // CÓDIGO DE LOGIN/REGISTRO
+    // ============================================================
+
+    // Verificar si ya hay sesión
+    (function() {
+        try {
+            if (typeof Auth !== 'undefined' && Auth.getSesion()) {
+                window.location.href = 'pages/dashboard.html';
+            }
+        } catch(e) {
+            console.log('No hay sesión activa');
+        }
+    })();
 
     function switchTab(tab) {
         const esLogin = tab === 'login';
@@ -195,7 +208,7 @@
         document.querySelectorAll('.tab-btn').forEach((b, i) => {
             b.classList.toggle('active', esLogin ? i === 0 : i === 1);
         });
-        // Limpiar mensajes al cambiar de pestaña
+        // Limpiar mensajes
         document.getElementById('loginMsg').className = 'msg';
         document.getElementById('loginMsg').style.display = 'none';
         document.getElementById('registroMsg').className = 'msg';
@@ -215,6 +228,7 @@
         btn.textContent = loading ? 'Cargando...' : btnId === 'btnLogin' ? 'Iniciar sesión' : 'Crear cuenta';
     }
 
+    // ===== LOGIN =====
     async function login() {
         const rut = document.getElementById('loginRut').value.trim();
         const pass = document.getElementById('loginPass').value;
@@ -223,22 +237,34 @@
             return mostrarMsg('loginMsg', 'Completá todos los campos', 'error');
         }
 
-        setLoading('btnLogin', true);
-        const res = await Auth.login(rut, pass);
-        setLoading('btnLogin', false);
-
-        if (!res.ok) {
-            return mostrarMsg('loginMsg', res.error, 'error');
+        // Verificar que Auth esté definido
+        if (typeof Auth === 'undefined') {
+            return mostrarMsg('loginMsg', 'Error: Auth no está definido. Revisa que auth.js se haya cargado.', 'error');
         }
 
-        // Redirigir según rol
-        if (res.rol === 'admin') {
-            window.location.href = 'dashboard.html';
-        } else {
-            window.location.href = 'index.html';
+        setLoading('btnLogin', true);
+        
+        try {
+            const res = await Auth.login(rut, pass);
+            setLoading('btnLogin', false);
+
+            if (!res.ok) {
+                return mostrarMsg('loginMsg', res.error, 'error');
+            }
+
+            // Redirigir según rol
+            if (res.rol === 'admin') {
+                window.location.href = 'pages/dashboard.html';
+            } else {
+                window.location.href = 'index.html';
+            }
+        } catch (error) {
+            setLoading('btnLogin', false);
+            mostrarMsg('loginMsg', 'Error: ' + error.message, 'error');
         }
     }
 
+    // ===== REGISTRO =====
     async function registro() {
         const nombre = document.getElementById('regNombre').value.trim();
         const apellido = document.getElementById('regApellido').value.trim();
@@ -264,31 +290,42 @@
             return mostrarMsg('registroMsg', 'Edad inválida', 'error');
         }
 
-        setLoading('btnRegistro', true);
-        const res = await Auth.registro(rut, nombre, apellido, edad, telefono, gmail, historial, pass);
-        setLoading('btnRegistro', false);
-
-        if (!res.ok) {
-            return mostrarMsg('registroMsg', res.error, 'error');
+        // Verificar que Auth esté definido
+        if (typeof Auth === 'undefined') {
+            return mostrarMsg('registroMsg', 'Error: Auth no está definido. Revisa que auth.js se haya cargado.', 'error');
         }
 
-        const mensajeRol = res.rol === 'visitante' 
-            ? '✅ Cuenta creada como Visitante. Un administrador puede cambiar tu rol.' 
-            : `✅ Cuenta creada como ${res.rol.toUpperCase()}`;
+        setLoading('btnRegistro', true);
         
-        mostrarMsg('registroMsg', mensajeRol, 'success');
-        
-        // Limpiar formulario después de registro exitoso
-        document.querySelectorAll('#panelRegistro input').forEach(input => input.value = '');
-        
-        // Cambiar a login después de 2 segundos
-        setTimeout(() => {
-            switchTab('login');
-            mostrarMsg('loginMsg', '✅ Registro exitoso. Inicia sesión.', 'success');
-        }, 2000);
+        try {
+            const res = await Auth.registro(rut, nombre, apellido, edad, telefono, gmail, historial, pass);
+            setLoading('btnRegistro', false);
+
+            if (!res.ok) {
+                return mostrarMsg('registroMsg', res.error, 'error');
+            }
+
+            const mensajeRol = res.rol === 'visitante' 
+                ? '✅ Cuenta creada como Visitante. Un administrador puede cambiar tu rol.' 
+                : `✅ Cuenta creada como ${res.rol.toUpperCase()}`;
+            
+            mostrarMsg('registroMsg', mensajeRol, 'success');
+            
+            // Limpiar formulario
+            document.querySelectorAll('#panelRegistro input').forEach(input => input.value = '');
+            
+            // Cambiar a login después de 2 segundos
+            setTimeout(() => {
+                switchTab('login');
+                mostrarMsg('loginMsg', '✅ Registro exitoso. Inicia sesión.', 'success');
+            }, 2000);
+        } catch (error) {
+            setLoading('btnRegistro', false);
+            mostrarMsg('registroMsg', 'Error: ' + error.message, 'error');
+        }
     }
 
-    // Enter para enviar
+    // ===== ENTER PARA ENVIAR =====
     document.getElementById('loginPass').addEventListener('keydown', e => {
         if (e.key === 'Enter') login();
     });
@@ -296,12 +333,8 @@
         if (e.key === 'Enter') registro();
     });
 
-    // Enter en campos de registro
-    document.querySelectorAll('#panelRegistro input').forEach(input => {
-        input.addEventListener('keydown', e => {
-            if (e.key === 'Enter') registro();
-        });
-    });
+    console.log('✅ login.html cargado correctamente');
+    console.log('Auth:', typeof Auth !== 'undefined' ? '✅ Definido' : '❌ No definido');
 </script>
 </body>
 </html>
