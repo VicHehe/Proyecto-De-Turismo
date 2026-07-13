@@ -1,6 +1,6 @@
 // ============ VERIFICAR SESIÓN ============
 function verificarSesion() {
-    const usuarioStr = sessionStorage.getItem('usuarioActual');
+    const usuarioStr = sessionStorage.getItem('cc_sesion');
     if (!usuarioStr) {
         window.location.href = '../login.html';
         return null;
@@ -16,13 +16,34 @@ function verificarSesion() {
     return usuario;
 }
 
-// ============ CARGAR USUARIOS ============
+// ============ CARGAR USUARIOS (desde GitHub) ============
 async function cargarUsuarios() {
     try {
-        const response = await fetch('../data/db.json');
-        if (!response.ok) throw new Error('Error al cargar usuarios');
-        const db = await response.json();
-        return db.usuarios || [];
+        const datos = await GitHub.leer('datos/usuarios.json');
+        if (!datos) {
+            // Si no existe, crear datos iniciales
+            const inicial = {
+                usuarios: [
+                    {
+                        rut: "22785939-3",
+                        nombre: "Victor Tilleria",
+                        rol: "admin",
+                        password: "Devictor.",
+                        fechaRegistro: "2026-07-13T00:00:00.000Z"
+                    }
+                ],
+                ruts_autorizados: [
+                    {
+                        rut: "22785939-3",
+                        rol: "admin",
+                        nombre: "VictorTilleria"
+                    }
+                ]
+            };
+            await GitHub.escribir('datos/usuarios.json', inicial);
+            return inicial.usuarios;
+        }
+        return datos.usuarios || [];
     } catch (error) {
         console.error('Error:', error);
         mostrarMensaje('Error al cargar usuarios', 'error');
@@ -30,19 +51,16 @@ async function cargarUsuarios() {
     }
 }
 
-// ============ GUARDAR USUARIOS ============
+// ============ GUARDAR USUARIOS (en GitHub) ============
 async function guardarUsuarios(usuarios) {
     try {
-        const db = { usuarios: usuarios };
-        const response = await fetch('../data/db.json', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(db)
-        });
-        if (!response.ok) throw new Error('Error al guardar');
-        return true;
+        // Obtener datos completos para preservar ruts_autorizados
+        const datos = await GitHub.leer('datos/usuarios.json');
+        if (!datos) return false;
+        
+        datos.usuarios = usuarios;
+        const sha = await GitHub.sha('datos/usuarios.json');
+        return await GitHub.escribir('datos/usuarios.json', datos, sha);
     } catch (error) {
         console.error('Error:', error);
         mostrarMensaje('Error al guardar cambios', 'error');
@@ -65,14 +83,13 @@ function renderizarUsuarios(usuarios) {
     lista.innerHTML = usuarios.map(usuario => `
         <li>
             <div class="user-info">
-                <strong>${usuario.nombre} ${usuario.apellido}</strong>
+                <strong>${usuario.nombre}</strong>
                 <span>${usuario.rut}</span>
                 <span class="rol-badge">${usuario.rol}</span>
-                <span>${usuario.gmail}</span>
-                <span>${usuario.telefono}</span>
+                <span>${usuario.fechaRegistro ? new Date(usuario.fechaRegistro).toLocaleDateString() : '—'}</span>
             </div>
             <div class="user-actions">
-                ${usuario.rut !== '12345678-9' ? `
+                ${usuario.rut !== '22785939-3' ? `
                     <button class="btn btn-small" onclick="cambiarRol('${usuario.rut}', 'admin')">Hacer Admin</button>
                     <button class="btn btn-small" onclick="cambiarRol('${usuario.rut}', 'estudiante')">Hacer Estudiante</button>
                     <button class="btn btn-small btn-danger" onclick="eliminarUsuario('${usuario.rut}')">Eliminar</button>
@@ -96,7 +113,7 @@ async function cambiarRol(rut, nuevoRol) {
         return;
     }
     
-    if (rut === '12345678-9' && nuevoRol !== 'admin') {
+    if (rut === '22785939-3' && nuevoRol !== 'admin') {
         mostrarMensaje('No se puede cambiar el rol del admin principal', 'error');
         return;
     }
@@ -113,7 +130,7 @@ async function cambiarRol(rut, nuevoRol) {
 async function eliminarUsuario(rut) {
     if (!confirm(`¿Eliminar al usuario ${rut}?`)) return;
     
-    if (rut === '12345678-9') {
+    if (rut === '22785939-3') {
         mostrarMensaje('No se puede eliminar al admin principal', 'error');
         return;
     }
@@ -151,8 +168,7 @@ async function buscarUsuario() {
     const usuarios = await cargarUsuarios();
     const filtrados = usuarios.filter(u => 
         u.rut.includes(busqueda) || 
-        u.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-        u.apellido.toLowerCase().includes(busqueda.toLowerCase())
+        (u.nombre && u.nombre.toLowerCase().includes(busqueda.toLowerCase()))
     );
     
     renderizarUsuarios(filtrados);
@@ -173,7 +189,6 @@ function mostrarMensaje(texto, tipo = 'info') {
         }
         mensajeDiv.classList.remove('hidden');
         
-        // Ocultar después de 3 segundos
         setTimeout(() => {
             mensajeDiv.classList.add('hidden');
         }, 3000);
@@ -182,20 +197,17 @@ function mostrarMensaje(texto, tipo = 'info') {
 
 // ============ CERRAR SESIÓN ============
 function cerrarSesion() {
-    sessionStorage.removeItem('usuarioActual');
+    sessionStorage.removeItem('cc_sesion');
     window.location.href = '../login.html';
 }
 
 // ============ EVENTOS ============
 document.addEventListener('DOMContentLoaded', function() {
-    // Verificar sesión
     const usuario = verificarSesion();
     if (!usuario) return;
     
-    // Cargar usuarios
     actualizarLista();
     
-    // Eventos
     document.getElementById('btnCerrarSesion').addEventListener('click', cerrarSesion);
     document.getElementById('btnBuscar').addEventListener('click', buscarUsuario);
     document.getElementById('buscarUsuario').addEventListener('keypress', function(e) {
