@@ -1,0 +1,14 @@
+{
+  "salidas": [
+    {
+      "id": "salida_1",
+      "titulo": "Visita Museo de Historia Natural",
+      "fecha": "2026-07-20",
+      "descripcion": "Recorrido guiado por el museo con colecciones de paleontología.",
+      "lugares": ["Museo", "Almuerzo", "Museo"],
+      "guia": "Ana Profesora",
+      "precio": 12500,
+      "curso": "4° Medio A"
+    }
+  ]
+}
