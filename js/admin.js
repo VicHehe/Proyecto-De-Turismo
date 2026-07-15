@@ -91,12 +91,15 @@ function renderizarUsuarios(usuarios) {
         const estadoColor = usuario.estado === 'baneado' ? '#ff0000' : 
                            usuario.estado === 'kick' ? '#ff9900' : '#00cc00';
         
+        // Mostrar "estudiante" en lugar de "visitante" visualmente
+        const rolMostrado = usuario.rol === 'visitante' ? 'estudiante' : usuario.rol;
+        
         return `
         <li>
             <div class="user-info">
                 <strong>${usuario.nombre} ${usuario.apellido}</strong>
                 <span>${usuario.rut}</span>
-                <span class="rol-badge">${usuario.rol}</span>
+                <span class="rol-badge">${rolMostrado}</span>
                 <span style="color:${estadoColor};">${estadoEmoji} ${usuario.estado || 'activo'}</span>
                 <span>${usuario.gmail}</span>
                 <span>${usuario.telefono}</span>
@@ -106,8 +109,7 @@ function renderizarUsuarios(usuarios) {
                     <select class="btn btn-small" onchange="cambiarRol('${usuario.rut}', this.value)">
                         <option value="admin" ${usuario.rol === 'admin' ? 'selected' : ''}>Admin</option>
                         <option value="guia" ${usuario.rol === 'guia' ? 'selected' : ''}>Guía</option>
-                        <option value="estudiante" ${usuario.rol === 'estudiante' ? 'selected' : ''}>Estudiante</option>
-                        <option value="visitante" ${usuario.rol === 'visitante' ? 'selected' : ''}>Visitante</option>
+                        <option value="estudiante" ${(usuario.rol === 'estudiante' || usuario.rol === 'visitante') ? 'selected' : ''}>Estudiante</option>
                     </select>
                     
                     <select class="btn btn-small" onchange="cambiarEstado('${usuario.rut}', this.value)">
