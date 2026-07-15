@@ -6,45 +6,61 @@
     <title>Planificar Salida</title>
     <link rel="stylesheet" href="css/estilo.css">
     <style>
-        /* Estilos adicionales para la nueva interfaz */
+        /* Estilos adicionales */
+        .seccion {
+            margin-bottom: 2rem;
+            border: 1px solid #000;
+            padding: 1.5rem;
+            background: #fff;
+        }
+        .seccion h2 {
+            margin-top: 0;
+            border-bottom: 1px solid #000;
+            padding-bottom: 0.3rem;
+        }
         .busqueda {
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
             align-items: center;
         }
-        .busqueda input {
-            flex: 2;
-            min-width: 200px;
+        .busqueda input, .busqueda select {
+            padding: 0.4rem 0.6rem;
+            border: 1px solid #000;
+            background: #fff;
+            flex: 1;
+            min-width: 150px;
         }
         .busqueda button {
             flex: 0;
+            padding: 0.4rem 1rem;
         }
         .lista-items {
-            margin-top: 0.5rem;
             border: 1px solid #000;
             padding: 0.5rem;
             min-height: 60px;
+            margin-top: 0.5rem;
         }
-        .lista-items .item {
+        .item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.3rem 0;
+            padding: 0.4rem 0;
             border-bottom: 1px solid #ccc;
         }
-        .lista-items .item:last-child {
+        .item:last-child {
             border-bottom: none;
+        }
+        .item-eliminar {
+            cursor: pointer;
+            font-weight: bold;
+            color: #d00;
+            margin-left: 0.5rem;
         }
         .item-rol select {
             margin-left: 0.5rem;
             padding: 0.2rem;
             border: 1px solid #000;
-        }
-        .item-eliminar {
-            cursor: pointer;
-            font-weight: bold;
-            margin-left: 0.5rem;
         }
         .guia-automatico {
             background: #f0f0f0;
@@ -52,11 +68,11 @@
             padding: 0.2rem 0.5rem;
             font-size: 0.8rem;
         }
-        .oculto { display: none; }
         .tabla-participantes {
             width: 100%;
             border-collapse: collapse;
             margin-top: 0.5rem;
+            font-size: 0.9rem;
         }
         .tabla-participantes th, .tabla-participantes td {
             border: 1px solid #000;
@@ -73,13 +89,62 @@
             font-weight: bold;
             color: #d00;
         }
-        .datalist-wrapper {
-            position: relative;
-            width: 100%;
+        .btn-subir, .btn-bajar {
+            background: none;
+            border: 1px solid #000;
+            cursor: pointer;
+            padding: 0 0.4rem;
+            margin: 0 0.2rem;
         }
-        .datalist-wrapper input {
-            width: 100%;
+        .ruta-item {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1rem;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #ddd;
         }
+        .ruta-item:last-child {
+            border-bottom: none;
+        }
+        .ruta-item .tipo {
+            font-weight: bold;
+            min-width: 70px;
+        }
+        .ruta-item .desc {
+            flex: 2;
+            min-width: 150px;
+        }
+        .ruta-item .horario {
+            font-size: 0.9rem;
+            color: #333;
+        }
+        .ruta-item .acciones {
+            margin-left: auto;
+            display: flex;
+            gap: 0.3rem;
+        }
+        .ruta-item select {
+            padding: 0.2rem;
+            border: 1px solid #000;
+        }
+        .btn-ruta {
+            background: #fff;
+            border: 1px solid #000;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+        }
+        .btn-ruta:hover {
+            background: #eee;
+        }
+        .oculto { display: none; }
+        .mensaje {
+            border: 1px solid #000;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+        }
+        .mensaje-exito { background: #ebffeb; }
+        .mensaje-error { background: #ffebeb; }
     </style>
 </head>
 <body>
@@ -88,24 +153,23 @@
     <h1>🧭 Planificar una Salida</h1>
     <p class="muted">Completa los datos y guarda la salida para que aparezca en el lobby.</p>
 
-    <!-- ===== LUGARES ===== -->
-    <div class="columna" style="margin-bottom: 2rem;">
-        <h2 style="margin-top: 0;">📍 Lugares a visitar</h2>
-        <p class="muted">Busca un lugar por nombre y agrégalo a la lista.</p>
+    <!-- ===== SECCIÓN 1: LUGARES ===== -->
+    <div class="seccion">
+        <h2>📍 Lugares disponibles</h2>
+        <p class="muted">Busca un lugar por nombre para agregarlo a la ruta.</p>
         <div class="busqueda">
-            <input type="text" id="buscarLugar" list="listaLugares" placeholder="Escribe el nombre del lugar...">
+            <input type="text" id="buscarLugar" list="listaLugares" placeholder="Escribe el nombre...">
             <datalist id="listaLugares"></datalist>
-            <button class="btn" id="btnAgregarLugar">➕ Añadir</button>
+            <button class="btn" id="btnAgregarLugarARuta">➕ Añadir a la ruta</button>
         </div>
         <div id="listaLugaresSeleccionados" class="lista-items">
-            <!-- Aquí se mostrarán los lugares añadidos -->
             <p class="muted" style="text-align:center; width:100%;">No hay lugares añadidos aún.</p>
         </div>
     </div>
 
-    <!-- ===== PARTICIPANTES ===== -->
-    <div class="columna" style="margin-bottom: 2rem;">
-        <h2 style="margin-top: 0;">👥 Participantes</h2>
+    <!-- ===== SECCIÓN 2: PARTICIPANTES ===== -->
+    <div class="seccion">
+        <h2>👥 Participantes</h2>
         <p class="muted">Busca un usuario por nombre o RUT y asígnale un rol.</p>
         <div class="busqueda">
             <input type="text" id="buscarParticipante" list="listaParticipantes" placeholder="Nombre o RUT...">
@@ -117,23 +181,39 @@
             </select>
             <button class="btn" id="btnAgregarParticipante">➕ Añadir</button>
         </div>
-        <div style="margin-top: 0.5rem;">
-            <p><strong>Guía principal:</strong> <span class="guia-automatico" id="guiaPrincipal">Ana Profesora (11.111.111-1)</span> (se añade automáticamente)</p>
-        </div>
         <table class="tabla-participantes" id="tablaParticipantes">
             <thead>
                 <tr><th>Nombre</th><th>RUT</th><th>Rol</th><th>Acción</th></tr>
             </thead>
             <tbody id="cuerpoParticipantes">
-                <!-- Se llenará con JS -->
                 <tr><td colspan="4" style="text-align:center; color:#666;">No hay participantes añadidos</td></tr>
             </tbody>
         </table>
     </div>
 
-    <!-- ===== DATOS COMPLEMENTARIOS ===== -->
-    <div class="columna" style="margin-bottom: 2rem;">
-        <h2 style="margin-top: 0;">📎 Datos complementarios (opcionales)</h2>
+    <!-- ===== SECCIÓN 3: PLAN DE RUTA ===== -->
+    <div class="seccion">
+        <h2>🗺️ Plan de Ruta</h2>
+        <p class="muted">Define el itinerario en orden: lugares, traslados y pausas.</p>
+        <div class="busqueda" style="margin-bottom: 0.5rem;">
+            <select id="tipoActividad">
+                <option value="Lugar">📍 Lugar</option>
+                <option value="Traslado">🚌 Traslado</option>
+                <option value="Pausa">☕ Pausa / Comida</option>
+            </select>
+            <input type="text" id="descActividad" placeholder="Descripción (ej: 'Almuerzo en el parque')">
+            <input type="time" id="horaInicio" value="09:00">
+            <input type="time" id="horaFin" value="10:00">
+            <button class="btn" id="btnAgregarActividad">➕ Añadir a la ruta</button>
+        </div>
+        <div id="contenedorRuta" class="lista-items">
+            <p class="muted" style="text-align:center; width:100%;">No hay actividades en la ruta.</p>
+        </div>
+    </div>
+
+    <!-- ===== SECCIÓN 4: DATOS COMPLEMENTARIOS ===== -->
+    <div class="seccion">
+        <h2>📎 Datos complementarios (opcionales)</h2>
         <div class="grid-3">
             <div class="grupo">
                 <label>Curso (si es pedagógica)</label>
@@ -150,9 +230,9 @@
         </div>
     </div>
 
-    <!-- ===== TRANSPORTE (fijo) ===== -->
-    <div class="columna" style="margin-bottom: 2rem;">
-        <h2 style="margin-top: 0;">🚌 Transporte (automático)</h2>
+    <!-- ===== SECCIÓN 5: TRANSPORTE ===== -->
+    <div class="seccion">
+        <h2>🚌 Transporte (automático)</h2>
         <p class="muted">Los datos del transporte se cargan automáticamente.</p>
         <div class="info-transporte">
             <div class="grid-2">
@@ -186,9 +266,7 @@
             ✅ Guardar Salida
         </button>
     </div>
-
-    <!-- ===== MENSAJES ===== -->
-    <div id="mensajeFeedback" class="mensaje" style="display:none; border:1px solid #000; padding:0.5rem; margin-top:1rem;"></div>
+    <div id="mensajeFeedback" class="mensaje oculto"></div>
 
 </div>
 
@@ -199,14 +277,13 @@
 <script>
     (function() {
         // ---------- ESTADO ----------
-        let lugaresSeleccionados = []; // array de objetos {nombre, apertura, cierre}
-        let participantes = []; // array de objetos {nombre, rut, rol}
-        let guiaPrincipal = { nombre: "Ana Profesora", rut: "11.111.111-1" }; // por ahora fijo
+        let participantes = []; // {nombre, rut, rol}
+        let ruta = []; // {tipo, descripcion, inicio, fin} (inicio/fin son strings "HH:MM")
 
         // Referencias DOM
         const inputLugar = document.getElementById('buscarLugar');
         const datalistLugares = document.getElementById('listaLugares');
-        const btnAgregarLugar = document.getElementById('btnAgregarLugar');
+        const btnAgregarLugarARuta = document.getElementById('btnAgregarLugarARuta');
         const contenedorLugares = document.getElementById('listaLugaresSeleccionados');
 
         const inputParticipante = document.getElementById('buscarParticipante');
@@ -215,10 +292,16 @@
         const btnAgregarParticipante = document.getElementById('btnAgregarParticipante');
         const tablaParticipantes = document.getElementById('cuerpoParticipantes');
 
+        const tipoActividad = document.getElementById('tipoActividad');
+        const descActividad = document.getElementById('descActividad');
+        const horaInicio = document.getElementById('horaInicio');
+        const horaFin = document.getElementById('horaFin');
+        const btnAgregarActividad = document.getElementById('btnAgregarActividad');
+        const contenedorRuta = document.getElementById('contenedorRuta');
+
         const inputCurso = document.getElementById('inputCurso');
         const inputPrecio = document.getElementById('inputPrecio');
         const inputMenu = document.getElementById('inputMenu');
-
         const btnGuardar = document.getElementById('btnGuardarSalida');
         const mensajeFeedback = document.getElementById('mensajeFeedback');
 
@@ -253,66 +336,60 @@
         }
         cargarParticipantesDesdeUsuarios();
 
-        // ---------- FUNCIÓN PARA RENDERIZAR LUGARES ----------
-        function renderizarLugares() {
-            if (lugaresSeleccionados.length === 0) {
+        // ---------- FUNCIONES DE RENDERIZADO ----------
+
+        // Renderizar lugares (solo muestra los ya seleccionados para la ruta)
+        function renderizarLugaresSeleccionados() {
+            // Mostramos los lugares que ya están en la ruta (tipo 'Lugar')
+            const lugaresEnRuta = ruta.filter(a => a.tipo === 'Lugar');
+            if (lugaresEnRuta.length === 0) {
                 contenedorLugares.innerHTML = `<p class="muted" style="text-align:center; width:100%;">No hay lugares añadidos aún.</p>`;
                 return;
             }
-            contenedorLugares.innerHTML = lugaresSeleccionados.map((l, index) => `
+            contenedorLugares.innerHTML = lugaresEnRuta.map((act, idx) => `
                 <div class="item">
-                    <span><strong>${l.nombre}</strong> (${l.apertura} - ${l.cierre})</span>
-                    <span class="item-eliminar" data-index="${index}" style="cursor:pointer; color:#d00;">✖</span>
+                    <span><strong>${act.descripcion}</strong> (${act.inicio} - ${act.fin})</span>
+                    <span class="item-eliminar" data-index="${idx}" style="cursor:pointer; color:#d00;">✖</span>
                 </div>
             `).join('');
 
-            // Eventos eliminar
-            document.querySelectorAll('.item-eliminar').forEach(el => {
+            // Eventos eliminar (elimina de la ruta)
+            document.querySelectorAll('#listaLugaresSeleccionados .item-eliminar').forEach(el => {
                 el.addEventListener('click', function() {
                     const idx = parseInt(this.dataset.index);
-                    lugaresSeleccionados.splice(idx, 1);
-                    renderizarLugares();
+                    // Encontrar el índice real en la ruta (buscamos el elemento)
+                    const lugarNombre = this.parentElement.querySelector('strong').textContent;
+                    const realIdx = ruta.findIndex(a => a.tipo === 'Lugar' && a.descripcion === lugarNombre);
+                    if (realIdx !== -1) {
+                        ruta.splice(realIdx, 1);
+                        renderizarTodo();
+                    }
                 });
             });
         }
 
-        // ---------- FUNCIÓN PARA RENDERIZAR PARTICIPANTES ----------
+        // Renderizar participantes
         function renderizarParticipantes() {
-            // Siempre mostrar el guía principal en la tabla
-            const todos = [
-                { nombre: guiaPrincipal.nombre, rut: guiaPrincipal.rut, rol: 'Guía (principal)', esGuia: true },
-                ...participantes
-            ];
-
-            if (todos.length === 0) {
+            if (participantes.length === 0) {
                 tablaParticipantes.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#666;">No hay participantes añadidos</td></tr>`;
                 return;
             }
+            tablaParticipantes.innerHTML = participantes.map((p, idx) => `
+                <tr>
+                    <td>${p.nombre}</td>
+                    <td>${p.rut}</td>
+                    <td>
+                        <select class="cambiar-rol" data-index="${idx}">
+                            <option value="Visitante" ${p.rol === 'Visitante' ? 'selected' : ''}>Visitante</option>
+                            <option value="Asistente" ${p.rol === 'Asistente' ? 'selected' : ''}>Asistente</option>
+                            <option value="Guía" ${p.rol === 'Guía' ? 'selected' : ''}>Guía</option>
+                        </select>
+                    </td>
+                    <td><button class="btn-eliminar" data-index="${idx}">🗑️</button></td>
+                </tr>
+            `).join('');
 
-            tablaParticipantes.innerHTML = todos.map((p, idx) => {
-                const esGuia = p.esGuia || false;
-                const rolDisplay = p.rol || 'Visitante';
-                return `
-                    <tr>
-                        <td>${p.nombre}</td>
-                        <td>${p.rut}</td>
-                        <td>
-                            ${esGuia ? `<span class="guia-automatico">${rolDisplay}</span>` : `
-                                <select class="cambiar-rol" data-index="${idx - (todos.length - participantes.length)}">
-                                    <option value="Visitante" ${rolDisplay === 'Visitante' ? 'selected' : ''}>Visitante</option>
-                                    <option value="Asistente" ${rolDisplay === 'Asistente' ? 'selected' : ''}>Asistente</option>
-                                    <option value="Guía" ${rolDisplay === 'Guía' ? 'selected' : ''}>Guía</option>
-                                </select>
-                            `}
-                        </td>
-                        <td>
-                            ${esGuia ? '—' : `<button class="btn-eliminar" data-index="${idx - (todos.length - participantes.length)}">🗑️</button>`}
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-
-            // Eventos para cambiar rol (solo para no guías)
+            // Eventos cambio de rol
             document.querySelectorAll('.cambiar-rol').forEach(select => {
                 select.addEventListener('change', function() {
                     const idx = parseInt(this.dataset.index);
@@ -322,7 +399,7 @@
                 });
             });
 
-            // Eventos para eliminar participante (no guía)
+            // Eventos eliminar
             document.querySelectorAll('.btn-eliminar').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const idx = parseInt(this.dataset.index);
@@ -334,40 +411,107 @@
             });
         }
 
-        // ---------- AGREGAR LUGAR ----------
-        btnAgregarLugar.addEventListener('click', function() {
+        // Renderizar ruta completa
+        function renderizarRuta() {
+            if (ruta.length === 0) {
+                contenedorRuta.innerHTML = `<p class="muted" style="text-align:center; width:100%;">No hay actividades en la ruta.</p>`;
+                return;
+            }
+            contenedorRuta.innerHTML = ruta.map((act, idx) => `
+                <div class="ruta-item">
+                    <span class="tipo">${act.tipo}</span>
+                    <span class="desc">${act.descripcion}</span>
+                    <span class="horario">${act.inicio} - ${act.fin}</span>
+                    <div class="acciones">
+                        <button class="btn-ruta btn-subir" data-index="${idx}" ${idx === 0 ? 'disabled' : ''}>▲</button>
+                        <button class="btn-ruta btn-bajar" data-index="${idx}" ${idx === ruta.length-1 ? 'disabled' : ''}>▼</button>
+                        <button class="btn-ruta btn-eliminar" data-index="${idx}">✖</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Eventos para mover
+            document.querySelectorAll('.btn-subir').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.index);
+                    if (idx > 0) {
+                        [ruta[idx], ruta[idx-1]] = [ruta[idx-1], ruta[idx]];
+                        renderizarRuta();
+                        renderizarLugaresSeleccionados();
+                    }
+                });
+            });
+            document.querySelectorAll('.btn-bajar').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.index);
+                    if (idx < ruta.length-1) {
+                        [ruta[idx], ruta[idx+1]] = [ruta[idx+1], ruta[idx]];
+                        renderizarRuta();
+                        renderizarLugaresSeleccionados();
+                    }
+                });
+            });
+            document.querySelectorAll('.btn-eliminar').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.index);
+                    ruta.splice(idx, 1);
+                    renderizarRuta();
+                    renderizarLugaresSeleccionados();
+                });
+            });
+        }
+
+        function renderizarTodo() {
+            renderizarLugaresSeleccionados();
+            renderizarParticipantes();
+            renderizarRuta();
+        }
+
+        // ---------- AGREGAR LUGAR A LA RUTA ----------
+        btnAgregarLugarARuta.addEventListener('click', function() {
             const nombre = inputLugar.value.trim();
             if (!nombre) {
                 mostrarMensaje('Por favor, escribe o selecciona un lugar.', 'error');
                 return;
             }
-            // Buscar en la base de datos
             const lugarEncontrado = lugares.find(l => l.nombre.toLowerCase() === nombre.toLowerCase());
             if (!lugarEncontrado) {
-                mostrarMensaje('Lugar no encontrado en la base de datos. Verifica el nombre.', 'error');
+                mostrarMensaje('Lugar no encontrado en la base de datos.', 'error');
                 return;
             }
-            // Verificar duplicado
-            if (lugaresSeleccionados.some(l => l.nombre === lugarEncontrado.nombre)) {
-                mostrarMensaje('Este lugar ya está en la lista.', 'error');
-                return;
-            }
-            lugaresSeleccionados.push({
-                nombre: lugarEncontrado.nombre,
-                apertura: lugarEncontrado.apertura,
-                cierre: lugarEncontrado.cierre
+            // Añadir a la ruta como actividad tipo "Lugar"
+            ruta.push({
+                tipo: 'Lugar',
+                descripcion: lugarEncontrado.nombre,
+                inicio: lugarEncontrado.apertura || '--:--',
+                fin: lugarEncontrado.cierre || '--:--'
             });
-            renderizarLugares();
+            renderizarTodo();
             inputLugar.value = '';
-            mostrarMensaje(`✅ "${lugarEncontrado.nombre}" añadido.`, 'exito');
+            mostrarMensaje(`✅ "${lugarEncontrado.nombre}" añadido a la ruta.`, 'exito');
         });
 
-        // También añadir al presionar Enter
         inputLugar.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                btnAgregarLugar.click();
+                btnAgregarLugarARuta.click();
             }
+        });
+
+        // ---------- AGREGAR ACTIVIDAD A LA RUTA (manual) ----------
+        btnAgregarActividad.addEventListener('click', function() {
+            const tipo = tipoActividad.value;
+            const desc = descActividad.value.trim() || `Actividad ${tipo}`;
+            const inicio = horaInicio.value || '--:--';
+            const fin = horaFin.value || '--:--';
+            if (!desc) {
+                mostrarMensaje('Por favor, describe la actividad.', 'error');
+                return;
+            }
+            ruta.push({ tipo, descripcion: desc, inicio, fin });
+            renderizarTodo();
+            descActividad.value = '';
+            mostrarMensaje(`✅ Actividad "${desc}" añadida.`, 'exito');
         });
 
         // ---------- AGREGAR PARTICIPANTE ----------
@@ -377,7 +521,6 @@
                 mostrarMensaje('Por favor, selecciona un participante de la lista.', 'error');
                 return;
             }
-            // Extraer nombre y RUT del formato "Nombre Apellido (RUT)"
             const match = valor.match(/^(.+?)\s*\(([^)]+)\)$/);
             if (!match) {
                 mostrarMensaje('Formato inválido. Selecciona de la lista desplegable.', 'error');
@@ -385,13 +528,10 @@
             }
             const nombreCompleto = match[1].trim();
             const rut = match[2].trim();
-
-            // Verificar que no esté ya añadido (excepto el guía principal)
-            if (participantes.some(p => p.rut === rut) || guiaPrincipal.rut === rut) {
+            if (participantes.some(p => p.rut === rut)) {
                 mostrarMensaje('Este participante ya está en la lista.', 'error');
                 return;
             }
-
             const rol = selectRol.value;
             participantes.push({ nombre: nombreCompleto, rut, rol });
             renderizarParticipantes();
@@ -408,37 +548,37 @@
 
         // ---------- GUARDAR SALIDA ----------
         btnGuardarSalida.addEventListener('click', async function() {
-            // Validar que haya al menos un lugar
-            if (lugaresSeleccionados.length === 0) {
-                mostrarMensaje('⚠️ Debes añadir al menos un lugar.', 'error');
+            if (ruta.length === 0) {
+                mostrarMensaje('⚠️ Debes añadir al menos una actividad a la ruta.', 'error');
                 return;
             }
 
-            // Construir objeto salida
+            // Validar que haya al menos un guía
+            const guias = participantes.filter(p => p.rol === 'Guía');
+            if (guias.length === 0) {
+                mostrarMensaje('⚠️ Debes asignar al menos un participante como Guía.', 'error');
+                return;
+            }
+
             const salida = {
-                titulo: lugaresSeleccionados.map(l => l.nombre).join(' + '),
+                titulo: ruta.filter(a => a.tipo === 'Lugar').map(a => a.descripcion).join(' + ') || 'Salida sin título',
                 fecha: new Date().toISOString().slice(0,10),
-                descripcion: `Salida con ${lugaresSeleccionados.length} lugares.`,
-                lugares: lugaresSeleccionados.map(l => `${l.nombre} (${l.apertura} - ${l.cierre})`),
-                guia: guiaPrincipal.nombre,
+                descripcion: `Ruta con ${ruta.length} actividades.`,
+                ruta: ruta,
+                participantes: participantes,
+                guias: guias,
                 precio: parseInt(inputPrecio.value.replace(/\./g,'')) || 0,
                 curso: inputCurso.value.trim() || 'Sin curso',
-                menu: inputMenu.value.trim() || 'Sin menú',
-                participantes: [
-                    { nombre: guiaPrincipal.nombre, rut: guiaPrincipal.rut, rol: 'Guía principal' },
-                    ...participantes
-                ]
+                menu: inputMenu.value.trim() || 'Sin menú'
             };
 
             const ok = await Planificacion.guardarSalida(salida);
             if (ok) {
                 mostrarMensaje('✅ Salida guardada correctamente. ¡Aparecerá en el lobby!', 'exito');
                 // Limpiar formulario (opcional)
-                // Reiniciamos listas
-                lugaresSeleccionados = [];
+                ruta = [];
                 participantes = [];
-                renderizarLugares();
-                renderizarParticipantes();
+                renderizarTodo();
                 inputCurso.value = '';
                 inputPrecio.value = '';
                 inputMenu.value = '';
@@ -450,17 +590,15 @@
         // ---------- MOSTRAR MENSAJE ----------
         function mostrarMensaje(texto, tipo) {
             mensajeFeedback.textContent = texto;
-            mensajeFeedback.style.display = 'block';
-            mensajeFeedback.style.background = tipo === 'error' ? '#ffebeb' : '#ebffeb';
-            mensajeFeedback.style.borderColor = '#000';
+            mensajeFeedback.className = `mensaje ${tipo === 'error' ? 'mensaje-error' : 'mensaje-exito'}`;
+            mensajeFeedback.classList.remove('oculto');
             setTimeout(() => {
-                mensajeFeedback.style.display = 'none';
+                mensajeFeedback.classList.add('oculto');
             }, 4000);
         }
 
         // ---------- INICIALIZAR ----------
-        renderizarLugares();
-        renderizarParticipantes();
+        renderizarTodo();
     })();
 </script>
 </body>
