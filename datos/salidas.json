@@ -47,7 +47,13 @@
       "precio": 0,
       "curso": "Sin curso",
       "menu": "Sin menú",
-      "id": "salida_1784120932749"
+      "id": "salida_1784120932749",
+      "transporte": {
+        "conductor": "Juan Pérez",
+        "horarios": "08:00 - 18:00",
+        "precio": "$ 120.000 CLP",
+        "descripcion": "Bus de 40 asientos con aire acondicionado"
+      }
     }
   ]
 }
