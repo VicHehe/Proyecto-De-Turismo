@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lobby - Sistema de Gestión de Salidas</title>
+    <style>
+        /* Estilos mínimos solo para posicionamiento */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, sans-serif;
+        }
+        body {
+            background: #fff;
+            color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            border: 2px solid #000;
+            padding: 2rem;
+            background: #fff;
+        }
+        h1 {
+            border-bottom: 2px solid #000;
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+        }
+        .user-info {
+            margin: 1rem 0;
+            font-weight: bold;
+        }
+        .botones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .btn {
+            background: #fff;
+            border: 2px solid #000;
+            padding: 0.7rem 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.15s;
+            text-decoration: none;
+            color: #000;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #000;
+            color: #fff;
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            border-color: #666;
+        }
+        .btn-secondary:hover {
+            background: #666;
+            color: #fff;
+        }
+        .footer {
+            border-top: 1px solid #000;
+            padding-top: 1rem;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+        }
+        .rol-badge {
+            border: 1px solid #000;
+            padding: 0.1rem 0.6rem;
+            font-size: 0.8rem;
+            background: #eaeaea;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🚌 Sistema de Gestión de Salidas</h1>
+
+    <div class="user-info" id="userInfo">
+        <span id="userNombre">Cargando...</span>
+        <span class="rol-badge" id="userRol">-</span>
+    </div>
+
+    <p>Selecciona una opción para continuar:</p>
+
+    <div class="botones" id="botonesContainer">
+        <!-- Los botones se generan con JavaScript según el rol -->
+    </div>
+
+    <div class="footer">
+        <button class="btn btn-secondary" id="btnCerrarSesion">Cerrar sesión</button>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="js/github.js"></script>
+<script src="js/auth.js"></script>
+<script>
+    (function() {
+        // Verificar sesión
+        const usuario = Auth.getSesion();
+        if (!usuario) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Mostrar datos del usuario
+        document.getElementById('userNombre').textContent = `${usuario.nombre} ${usuario.apellido || ''}`;
+        document.getElementById('userRol').textContent = usuario.rol;
+
+        // Generar botones según rol
+        const container = document.getElementById('botonesContainer');
+        let botones = [];
+
+        switch (usuario.rol) {
+            case 'admin':
+                botones.push({
+                    texto: '👑 Panel de Administración',
+                    href: 'pages/dashboard.html',
+                    class: 'btn'
+                });
+                botones.push({
+                    texto: '📋 Planificar Salida',
+                    onclick: 'alert("Módulo de planificación (próximamente)")',
+                    class: 'btn'
+                });
+                botones.push({
+                    texto: '📅 Calendario',
+                    onclick: 'alert("Calendario (próximamente)")',
+                    class: 'btn'
+                });
+                break;
+
+            case 'guia':
+                botones.push({
+                    texto: '📋 Planificar Salida',
+                    onclick: 'alert("Módulo de planificación (próximamente)")',
+                    class: 'btn'
+                });
+                botones.push({
+                    texto: '📅 Calendario',
+                    onclick: 'alert("Calendario (próximamente)")',
+                    class: 'btn'
+                });
+                break;
+
+            case 'estudiante':
+            default:
+                botones.push({
+                    texto: '📅 Calendario',
+                    onclick: 'alert("Calendario (próximamente)")',
+                    class: 'btn'
+                });
+                botones.push({
+                    texto: '🎒 Mis Salidas',
+                    onclick: 'alert("Lista de mis salidas (próximamente)")',
+                    class: 'btn'
+                });
+                break;
+        }
+
+        // Renderizar botones
+        botones.forEach(b => {
+            const btn = document.createElement('button');
+            btn.textContent = b.texto;
+            btn.className = b.class || 'btn';
+            if (b.href) {
+                btn.onclick = function() { window.location.href = b.href; };
+            } else if (b.onclick) {
+                btn.onclick = new Function(b.onclick);
+            }
+            container.appendChild(btn);
+        });
+
+        // Cerrar sesión
+        document.getElementById('btnCerrarSesion').addEventListener('click', function() {
+            Auth.cerrarSesion();
+        });
+    })();
+</script>
+</body>
+</html>
