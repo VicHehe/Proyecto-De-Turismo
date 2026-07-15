@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planificar Salida Pedagógica · Offline</title>
+    <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+<div class="contenedor">
+
+    <h1>🧭 Planificar Salida Pedagógica</h1>
+    <p class="muted" style="margin-bottom: 1.5rem;"><strong>Versión offline</strong> · sin JS ni login · todos los datos son estáticos de ejemplo</p>
+
+    <!-- ========== SECCIÓN A: GESTIÓN DE LUGARES ========== -->
+    <div class="columna" style="margin-bottom: 2rem;">
+        <h2 style="margin-top: 0;">📌 Gestión de lugares a visitar</h2>
+        <p class="muted">Selecciona un lugar de la base de datos para cargar sus datos.</p>
+
+        <div class="grid-2" style="margin-top: 0.5rem;">
+            <div>
+                <div class="grupo">
+                    <label>Seleccionar lugar</label>
+                    <select id="selectorLugar">
+                        <option value="">-- Elegir --</option>
+                    </select>
+                </div>
+                <div class="grupo">
+                    <label>Nombre del lugar</label>
+                    <input type="text" id="lugarNombre" readonly>
+                </div>
+                <div class="flex">
+                    <div class="grupo flex-item">
+                        <label>Hora inicio</label>
+                        <input type="text" id="lugarApertura" readonly>
+                    </div>
+                    <div class="grupo flex-item">
+                        <label>Hora fin</label>
+                        <input type="text" id="lugarCierre" readonly>
+                    </div>
+                </div>
+                <div class="grupo">
+                    <label>Ubicación (dirección / coordenadas)</label>
+                    <input type="text" id="lugarUbicacion" readonly>
+                </div>
+                <div class="grupo">
+                    <label>Descripción</label>
+                    <textarea id="lugarDescripcion" readonly></textarea>
+                </div>
+                <div class="fila-botones">
+                    <span class="btn">➕ Añadir lugar</span>
+                    <span class="btn">✏️ Editar</span>
+                    <span class="btn">🗑️ Eliminar</span>
+                </div>
+            </div>
+            <div>
+                <div class="grupo">
+                    <label>Lugares disponibles (base de datos)</label>
+                    <div class="tabla-mini">
+                        <table class="tabla-mini">
+                            <thead><tr><th>#</th><th>Lugar</th><th>Horario</th></tr></thead>
+                            <tbody id="tablaLugares">
+                                <!-- Se llena con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="muted" style="margin-top: 0.3rem;">⬆️ Los lugares se cargan desde <code>js/lugares.js</code>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SECCIÓN B: LISTA DE ASISTENCIAS Y ROLES ========== -->
+    <div class="columna" style="margin-bottom: 2rem;">
+        <h2 style="margin-top: 0;">👥 Lista de asistentes y roles</h2>
+        <p class="muted">El guía principal se añade automáticamente (sesión iniciada). Aquí se muestran datos de ejemplo.</p>
+
+        <div class="grid-2">
+            <div>
+                <div class="grupo">
+                    <label>Buscar participante por RUT</label>
+                    <div class="flex">
+                        <input type="text" value="12.345.678-9" style="flex:2;" readonly>
+                        <span class="btn" style="flex:0;">🔍 Buscar</span>
+                    </div>
+                </div>
+                <div class="grupo">
+                    <label>Asignar rol</label>
+                    <select disabled>
+                        <option>Asistente</option>
+                        <option selected>Visitante</option>
+                        <option>Guía</option>
+                    </select>
+                </div>
+                <div class="fila-botones">
+                    <span class="btn">➕ Agregar a la lista</span>
+                    <span class="btn">🔄 Actualizar rol</span>
+                </div>
+            </div>
+            <div>
+                <h3 style="margin:0 0 0.3rem 0;">Participantes (ejemplo)</h3>
+                <table class="tabla-mini">
+                    <thead><tr><th>RUT</th><th>Nombre</th><th>Rol</th></tr></thead>
+                    <tbody>
+                        <tr><td>11.111.111-1</td><td>Ana Profesora</td><td><span class="badge">Guía (automatic)</span></td></tr>
+                        <tr><td>22.222.222-2</td><td>Carlos Ayudante</td><td>Asistente</td></tr>
+                        <tr><td>33.333.333-3</td><td>María Estudiante</td><td>Visitante</td></tr>
+                        <tr><td>44.444.444-4</td><td>Luis Estudiante</td><td>Visitante</td></tr>
+                    </tbody>
+                </table>
+                <p class="muted" style="margin-top:0.2rem;">* Guía principal se añade automáticamente al crear la salida.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SECCIÓN C: DATOS COMPLEMENTARIOS (OPCIONALES) ========== -->
+    <div class="columna" style="margin-bottom: 2rem;">
+        <h2 style="margin-top: 0;">📎 Datos complementarios (opcionales)</h2>
+        <div class="grid-3">
+            <div class="grupo">
+                <label>Vincular a curso (pedagógica)</label>
+                <input type="text" value="4° Medio A" readonly>
+            </div>
+            <div class="grupo">
+                <label>Precio por persona (CLP)</label>
+                <input type="text" value="12.500" readonly>
+            </div>
+            <div class="grupo">
+                <label>Menú / Catering</label>
+                <input type="text" value="Box lunch + bebida" readonly>
+            </div>
+        </div>
+        <p class="muted" style="margin-top:0.2rem;">* Los campos son opcionales, se pueden dejar vacíos.</p>
+    </div>
+
+    <!-- ========== SECCIÓN D: BASE DE DATOS DE LUGARES (JS) ========== -->
+    <div class="columna" style="margin-bottom: 2rem;">
+        <h2 style="margin-top: 0;">🗂️ Base de datos de lugares (archivo JS)</h2>
+        <p class="muted">Estructura de ejemplo para cada registro (nombre, horario, ubicación, descripción).</p>
+        <div style="background: #f5f5f5; border: 1px solid #000; padding: 0.6rem 1rem; font-family: monospace; font-size: 0.9rem; white-space: pre-wrap; overflow-x: auto;" id="jsonLugares">
+        </div>
+        <div class="fila-botones" style="margin-top:0.8rem;">
+            <span class="btn">📂 Ver todos los lugares</span>
+            <span class="btn">➕ Añadir lugar a la BD</span>
+        </div>
+    </div>
+
+    <!-- ========== SECCIÓN E: GESTIÓN DEL TRANSPORTE (automático) ========== -->
+    <div class="columna" style="margin-bottom: 2rem;">
+        <h2 style="margin-top: 0;">🚌 Gestión del transporte (automático)</h2>
+        <p class="muted">Datos completados automáticamente por el sistema (ejemplo).</p>
+        <div class="info-transporte">
+            <div class="grid-2">
+                <div>
+                    <div class="grupo" style="margin-bottom:0.4rem;">
+                        <label>Conductor</label>
+                        <input type="text" value="Roberto Méndez" readonly>
+                    </div>
+                    <div class="grupo" style="margin-bottom:0.4rem;">
+                        <label>Horarios de disponibilidad</label>
+                        <input type="text" value="08:00 – 18:00" readonly>
+                    </div>
+                    <div class="grupo" style="margin-bottom:0.4rem;">
+                        <label>Patente del vehículo</label>
+                        <input type="text" value="AB-12-CD" readonly>
+                    </div>
+                </div>
+                <div>
+                    <div class="grupo" style="margin-bottom:0.4rem;">
+                        <label>Precio del servicio</label>
+                        <input type="text" value="$ 85.000 CLP" readonly>
+                    </div>
+                    <div class="grupo" style="margin-bottom:0.4rem;">
+                        <label>Descripción adicional</label>
+                        <input type="text" value="Bus 30 asientos, climatizado, con baño" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="muted" style="margin-top:0.5rem;">* Los datos de transporte se cargan automáticamente desde el perfil del proveedor.</p>
+    </div>
+
+    <!-- ========== SECCIÓN F: VISTA PREVIA DEL CALENDARIO (organizador) ========== -->
+    <div class="columna" style="margin-bottom: 2rem;">
+        <h2 style="margin-top: 0;">📅 Vista previa · Calendario (organizador)</h2>
+        <p class="muted">(Solo referencia: el guía ve todas sus salidas con desglose completo)</p>
+        <div style="border: 1px solid #000; padding: 0.8rem; background: #fafafa;">
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: space-between;">
+                <span><strong>Salida:</strong> Visita Museo + Parque</span>
+                <span><strong>Fecha:</strong> 15/07/2026</span>
+                <span><strong>Horario:</strong> 09:30 – 16:00</span>
+            </div>
+            <div style="margin-top:0.5rem; font-size:0.9rem;">
+                <span class="badge">Guía: Ana Profesora</span>
+                <span class="badge">Asistentes: 6</span>
+                <span class="badge">Visitantes: 12</span>
+                <span class="badge">Transporte: Bus 30 asientos</span>
+            </div>
+            <div style="margin-top:0.3rem; font-size:0.85rem;">
+                <strong>Lugares:</strong> Museo (10-12) · Almuerzo (12-13) · Museo (13-15) · Parque (15-16)
+            </div>
+            <div style="margin-top:0.3rem; font-size:0.85rem; border-top:1px solid #aaa; padding-top:0.3rem;">
+                <span>🍽️ Menú: Box lunch + bebida</span> · 
+                <span>💰 Costo: $12.500 por persona</span> · 
+                <span>🏫 Curso: 4° Medio A</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== BOTONES FINALES ========== -->
+    <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; border-top: 2px solid #000; padding-top: 1.5rem;">
+        <span class="btn btn-primario" style="padding: 0.6rem 2rem;">✅ Guardar salida pedagógica</span>
+        <span class="btn" style="padding: 0.6rem 1.8rem;">📋 Vista previa</span>
+        <span class="btn" style="padding: 0.6rem 1.8rem;">🔄 Restablecer</span>
+        <span class="btn" style="padding: 0.6rem 1.8rem;">📤 Publicar (modalidad)</span>
+        <span class="muted" style="margin-left: auto; align-self: center;">Versión offline · sin dependencias</span>
+    </div>
+
+    <!-- ========== NOTA FINAL ========== -->
+    <div style="margin-top: 2.5rem; border-top: 1px solid #000; padding-top: 1rem; font-size: 0.85rem;">
+        <p><strong>🧩 Especificación base:</strong> Planificación de salidas (Luciano Navarro) · Módulo pedagógico y estándar comparten lógica.</p>
+        <p>Los lugares se almacenan en archivo JS. Transporte automático. Roles: guía (automático), asistente, visitante.</p>
+        <p>Esta versión es <strong>offline</strong> y no requiere inicio de sesión ni JS activo. Todo el contenido es estático (ejemplo).</p>
+    </div>
+
+</div>
+
+<script src="js/lugares.js"></script>
+<script>
+    (function() {
+        const selector = document.getElementById('selectorLugar');
+        const tabla = document.getElementById('tablaLugares');
+
+        // Llenar select
+        lugares.forEach((l, i) => {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = l.nombre;
+            selector.appendChild(opt);
+        });
+
+        // Llenar tabla
+        lugares.forEach((l, i) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${i+1}</td><td>${l.nombre}</td><td>${l.apertura} – ${l.cierre}</td>`;
+            tabla.appendChild(tr);
+        });
+
+        // Mostrar datos al seleccionar
+        selector.addEventListener('change', function() {
+            const idx = this.value;
+            if (idx === '') {
+                document.getElementById('lugarNombre').value = '';
+                document.getElementById('lugarApertura').value = '';
+                document.getElementById('lugarCierre').value = '';
+                document.getElementById('lugarUbicacion').value = '';
+                document.getElementById('lugarDescripcion').value = '';
+                return;
+            }
+            const l = lugares[parseInt(idx)];
+            document.getElementById('lugarNombre').value = l.nombre;
+            document.getElementById('lugarApertura').value = l.apertura;
+            document.getElementById('lugarCierre').value = l.cierre;
+            document.getElementById('lugarUbicacion').value = l.ubicacion;
+            document.getElementById('lugarDescripcion').value = l.descripcion;
+        });
+
+        // Mostrar JSON en sección D
+        document.getElementById('jsonLugares').textContent = JSON.stringify(lugares, null, 2);
+    })();
+</script>
+</body>
+</html>
