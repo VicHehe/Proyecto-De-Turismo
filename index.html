@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Turismo San Fernando · Lobby</title>
+<title>Turismo Eduardo Charme · Lobby</title>
 
 <style>
 *{
@@ -224,7 +224,7 @@ footer .btn-cerrar:hover {
 <body>
 
 <header>
-    <h1>Turismo San Fernando</h1>
+    <h1>Turismo Eduardo Charme</h1>
     <p>Descubre la capital de la Provincia de Colchagua</p>
     <div class="user-badge" id="userBadge">
         <span id="userNombre">Cargando...</span>
@@ -251,7 +251,7 @@ footer .btn-cerrar:hover {
 </section>
 
 <footer>
-    © 2026 Turismo San Fernando
+    © 2026 Turismo Eduardo Charme
     <button class="btn-cerrar" id="btnCerrarSesion">Cerrar sesión</button>
 </footer>
 
@@ -282,8 +282,10 @@ footer .btn-cerrar:hover {
         osc.stop(audio.currentTime + 0.15);
     }
 
-    // Función para mostrar detalles en el modal
+    // Función para mostrar detalles en el modal (con restricción de visibilidad)
     function verDetalles(salida) {
+        const usuario = Auth.getSesion();
+        const esAdminOGuia = usuario && (usuario.rol === 'admin' || usuario.rol === 'guia');
         const modal = document.getElementById('modalDetalles');
         const body = document.getElementById('modalBody');
 
@@ -300,10 +302,19 @@ footer .btn-cerrar:hover {
             html += `</ul></div>`;
         }
 
+        // Participantes: ocultar RUT para visitantes
         if (salida.participantes && salida.participantes.length > 0) {
-            html += `<div class="detalle-item"><strong>Participantes:</strong><table class="participante-tabla"><tr><th>Nombre</th><th>RUT</th><th>Rol</th></tr>`;
+            html += `<div class="detalle-item"><strong>Participantes:</strong><table class="participante-tabla"><tr><th>Nombre</th>`;
+            if (esAdminOGuia) {
+                html += `<th>RUT</th>`;
+            }
+            html += `<th>Rol</th></tr>`;
             salida.participantes.forEach(p => {
-                html += `<tr><td>${p.nombre}</td><td>${p.rut}</td><td>${p.rol}</td></tr>`;
+                html += `<tr><td>${p.nombre}</td>`;
+                if (esAdminOGuia) {
+                    html += `<td>${p.rut}</td>`;
+                }
+                html += `<td>${p.rol}</td></tr>`;
             });
             html += `</table></div>`;
         }
@@ -314,6 +325,16 @@ footer .btn-cerrar:hover {
         if (salida.precio) html += `<div class="detalle-item"><strong>Precio:</strong> $${salida.precio}</div>`;
         if (salida.curso) html += `<div class="detalle-item"><strong>Curso:</strong> ${salida.curso}</div>`;
         if (salida.menu) html += `<div class="detalle-item"><strong>Menú:</strong> ${salida.menu}</div>`;
+
+        // Mostrar transporte si existe
+        if (salida.transporte) {
+            const t = salida.transporte;
+            html += `<div class="detalle-item"><strong>Transporte</strong></div>`;
+            if (t.conductor) html += `<div class="detalle-item">Conductor: ${t.conductor}</div>`;
+            if (t.horarios) html += `<div class="detalle-item">Horarios: ${t.horarios}</div>`;
+            if (t.precio) html += `<div class="detalle-item">Precio servicio: ${t.precio}</div>`;
+            if (t.descripcion) html += `<div class="detalle-item">Descripción: ${t.descripcion}</div>`;
+        }
 
         body.innerHTML = html;
         modal.style.display = 'flex';
@@ -357,9 +378,9 @@ footer .btn-cerrar:hover {
                 botones.push({ texto: '📋 Planificar Salida', href: 'Planificar_Salida_Pedagogica.html' });
                 botones.push({ texto: '📅 Calendario', href: 'calendario_interactivo_personal.html' });
                 break;
-            default:
+            default: // visitante o estudiante
                 botones.push({ texto: '📅 Calendario', href: 'calendario_interactivo_personal.html' });
-                botones.push({ texto: '🎒 Mis Salidas', onclick: 'alert("Lista de mis salidas (próximamente)")' });
+                // No mostramos "Mis Salidas" porque el visitante solo ve el calendario
                 break;
         }
 
@@ -396,14 +417,15 @@ footer .btn-cerrar:hover {
                 }
                 const mostradas = validas.slice(0, 3);
                 contenedor.innerHTML = mostradas.map(s => {
-                    const tituloEscapado = s.titulo.replace(/'/g, "\\'");
+                    // Escapamos comillas para pasar la salida como JSON
+                    const salidaJson = JSON.stringify(s).replace(/"/g, '&quot;');
                     return `
                         <div class="tarjeta">
                             <h3>${s.titulo}</h3>
                             <p>${s.descripcion || 'Sin descripción'}</p>
                             <p><small>📅 ${s.fecha || 'Fecha no definida'}</small></p>
                             <p><small>👤 ${s.guias && s.guias.length > 0 ? s.guias.map(g => g.nombre).join(', ') : 'Sin guía'}</small></p>
-                            <button onclick="verDetalles(${JSON.stringify(s).replace(/"/g, '&quot;')})">Ver más</button>
+                            <button onclick="verDetalles(${salidaJson})">Ver más</button>
                         </div>
                     `;
                 }).join('');
