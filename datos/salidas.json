@@ -1,3 +1,59 @@
 {
-  "salidas": []
+  "salidas": [
+    {
+      "titulo": "Termas del Flaco",
+      "fecha": "2026-07-25",
+      "duracion": "1 día",
+      "descripcion": "Ruta con 4 actividades.",
+      "ruta": [
+        {
+          "tipo": "Traslado",
+          "descripcion": "Actividad Traslado",
+          "inicio": "09:00",
+          "fin": "10:00"
+        },
+        {
+          "tipo": "Lugar",
+          "descripcion": "Termas del Flaco",
+          "inicio": "10:00",
+          "fin": "11:45"
+        },
+        {
+          "tipo": "Pausa",
+          "descripcion": "Actividad Pausa",
+          "inicio": "11:45",
+          "fin": "12:00"
+        },
+        {
+          "tipo": "Traslado",
+          "descripcion": "Actividad Traslado",
+          "inicio": "12:00",
+          "fin": "13:00"
+        }
+      ],
+      "participantes": [
+        {
+          "nombre": "Victor Tilleria",
+          "rut": "22785939-3",
+          "rol": "Guía"
+        },
+        {
+          "nombre": "Don Lisandro",
+          "rut": "12345678-9",
+          "rol": "Visitante"
+        }
+      ],
+      "guias": [
+        {
+          "nombre": "Victor Tilleria",
+          "rut": "22785939-3",
+          "rol": "Guía"
+        }
+      ],
+      "precio": 10000,
+      "curso": "Sin curso",
+      "menu": "Lo traen los visitantes",
+      "id": "salida_1784119574788"
+    }
+  ]
 }
