@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planificar Salida Pedagógica · Offline</title>
+    <title>Planificar Salida Pedagógica</title>
     <link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
 <div class="contenedor">
 
     <h1>🧭 Planificar Salida Pedagógica</h1>
-    <p class="muted" style="margin-bottom: 1.5rem;"><strong>Versión offline</strong> · sin JS ni login · todos los datos son estáticos de ejemplo</p>
+    <p class="muted" style="margin-bottom: 1.5rem;"><strong>Versión integrada</strong> · los datos se guardan en <code>datos/salidas.json</code></p>
 
     <!-- ========== SECCIÓN A: GESTIÓN DE LUGARES ========== -->
     <div class="columna" style="margin-bottom: 2rem;">
@@ -119,15 +119,15 @@
         <div class="grid-3">
             <div class="grupo">
                 <label>Vincular a curso (pedagógica)</label>
-                <input type="text" value="4° Medio A" readonly>
+                <input type="text" id="inputCurso" value="4° Medio A" readonly>
             </div>
             <div class="grupo">
                 <label>Precio por persona (CLP)</label>
-                <input type="text" value="12.500" readonly>
+                <input type="text" id="inputPrecio" value="12.500" readonly>
             </div>
             <div class="grupo">
                 <label>Menú / Catering</label>
-                <input type="text" value="Box lunch + bebida" readonly>
+                <input type="text" id="inputMenu" value="Box lunch + bebida" readonly>
             </div>
         </div>
         <p class="muted" style="margin-top:0.2rem;">* Los campos son opcionales, se pueden dejar vacíos.</p>
@@ -209,25 +209,29 @@
 
     <!-- ========== BOTONES FINALES ========== -->
     <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; border-top: 2px solid #000; padding-top: 1.5rem;">
-        <span class="btn btn-primario" style="padding: 0.6rem 2rem;">✅ Guardar salida pedagógica</span>
+        <button class="btn btn-primario" id="btnGuardarSalida" style="padding: 0.6rem 2rem;">✅ Guardar salida pedagógica</button>
         <span class="btn" style="padding: 0.6rem 1.8rem;">📋 Vista previa</span>
         <span class="btn" style="padding: 0.6rem 1.8rem;">🔄 Restablecer</span>
         <span class="btn" style="padding: 0.6rem 1.8rem;">📤 Publicar (modalidad)</span>
-        <span class="muted" style="margin-left: auto; align-self: center;">Versión offline · sin dependencias</span>
+        <span class="muted" style="margin-left: auto; align-self: center;">Versión integrada · guarda en JSON</span>
     </div>
 
     <!-- ========== NOTA FINAL ========== -->
     <div style="margin-top: 2.5rem; border-top: 1px solid #000; padding-top: 1rem; font-size: 0.85rem;">
         <p><strong>🧩 Especificación base:</strong> Planificación de salidas (Luciano Navarro) · Módulo pedagógico y estándar comparten lógica.</p>
         <p>Los lugares se almacenan en archivo JS. Transporte automático. Roles: guía (automático), asistente, visitante.</p>
-        <p>Esta versión es <strong>offline</strong> y no requiere inicio de sesión ni JS activo. Todo el contenido es estático (ejemplo).</p>
+        <p>Los datos se guardan en <code>datos/salidas.json</code> y se muestran en el lobby.</p>
     </div>
 
 </div>
 
+<!-- ===== SCRIPTS ===== -->
+<script src="js/github.js"></script>
+<script src="js/planificacion.js"></script>
 <script src="js/lugares.js"></script>
 <script>
     (function() {
+        // ========== GESTIÓN DE LUGARES ==========
         const selector = document.getElementById('selectorLugar');
         const tabla = document.getElementById('tablaLugares');
 
@@ -267,6 +271,43 @@
 
         // Mostrar JSON en sección D
         document.getElementById('jsonLugares').textContent = JSON.stringify(lugares, null, 2);
+
+        // ========== GUARDAR SALIDA ==========
+        document.getElementById('btnGuardarSalida').addEventListener('click', async function(e) {
+            e.preventDefault();
+
+            // Recopilar datos de los campos (aunque sean de solo lectura, tomamos sus valores)
+            const titulo = document.getElementById('lugarNombre').value || 'Visita sin título';
+            const apertura = document.getElementById('lugarApertura').value || '--:--';
+            const cierre = document.getElementById('lugarCierre').value || '--:--';
+            const ubicacion = document.getElementById('lugarUbicacion').value || 'Sin ubicación';
+            const descripcion = document.getElementById('lugarDescripcion').value || 'Sin descripción';
+            const curso = document.getElementById('inputCurso').value || 'Sin curso';
+            const precio = document.getElementById('inputPrecio').value || '0';
+            const menu = document.getElementById('inputMenu').value || 'Sin menú';
+
+            // Construir objeto salida
+            const salida = {
+                titulo: titulo,
+                fecha: new Date().toISOString().slice(0,10),
+                descripcion: descripcion,
+                lugares: [
+                    `${titulo} (${apertura} – ${cierre})`
+                ],
+                guia: "Ana Profesora (ejemplo)", // en futuro se tomará de la sesión
+                precio: parseInt(precio.replace(/\./g,'')) || 0,
+                curso: curso,
+                menu: menu,
+                ubicacion: ubicacion
+            };
+
+            const ok = await Planificacion.guardarSalida(salida);
+            if (ok) {
+                alert('✅ Salida guardada correctamente en datos/salidas.json');
+            } else {
+                alert('❌ Error al guardar la salida. Revisa la consola.');
+            }
+        });
     })();
 </script>
 </body>
