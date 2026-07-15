@@ -292,7 +292,6 @@
             <div class="grupo">
                 <label>Duración</label>
                 <select id="inputDuracion" class="duracion-select">
-                    <!-- Cambio: sin tildes para evitar problemas de codificación -->
                     <option value="1 dia">1 dia</option>
                     <option value="2 dias">2 dias</option>
                     <option value="3 dias">3 dias</option>
@@ -314,30 +313,30 @@
         </div>
     </div>
 
-    <!-- ===== SECCIÓN 5: TRANSPORTE ===== -->
+    <!-- ===== SECCIÓN 5: TRANSPORTE (MANUAL) ===== -->
     <div class="seccion">
-        <h2>🚌 Transporte (automático)</h2>
-        <p class="muted">Los datos del transporte se cargan automáticamente.</p>
+        <h2>🚌 Transporte</h2>
+        <p class="muted">Completa los datos del transporte para esta salida.</p>
         <div class="info-transporte">
             <div class="grid-2">
                 <div>
                     <div class="grupo" style="margin-bottom:0.4rem;">
                         <label>Conductor</label>
-                        <input type="text" value="Roberto Méndez" readonly>
+                        <input type="text" id="inputConductor" placeholder="Nombre del conductor">
                     </div>
                     <div class="grupo" style="margin-bottom:0.4rem;">
-                        <label>Horarios</label>
-                        <input type="text" value="08:00 – 18:00" readonly>
+                        <label>Horarios (ida/vuelta)</label>
+                        <input type="text" id="inputHorarios" placeholder="Ej: 08:00 – 18:00">
                     </div>
                 </div>
                 <div>
                     <div class="grupo" style="margin-bottom:0.4rem;">
-                        <label>Precio servicio</label>
-                        <input type="text" value="$ 85.000 CLP" readonly>
+                        <label>Precio del servicio</label>
+                        <input type="text" id="inputPrecioTransporte" placeholder="Ej: $ 85.000 CLP">
                     </div>
                     <div class="grupo" style="margin-bottom:0.4rem;">
-                        <label>Descripción</label>
-                        <input type="text" value="Bus 30 asientos, climatizado" readonly>
+                        <label>Descripción del vehículo</label>
+                        <input type="text" id="inputDescTransporte" placeholder="Ej: Bus 30 asientos, climatizado">
                     </div>
                 </div>
             </div>
@@ -390,6 +389,12 @@
         const inputMenu = document.getElementById('inputMenu');
         const btnGuardar = document.getElementById('btnGuardarSalida');
         const mensajeFeedback = document.getElementById('mensajeFeedback');
+
+        // Nuevos campos de transporte
+        const inputConductor = document.getElementById('inputConductor');
+        const inputHorarios = document.getElementById('inputHorarios');
+        const inputPrecioTransporte = document.getElementById('inputPrecioTransporte');
+        const inputDescTransporte = document.getElementById('inputDescTransporte');
 
         // ---------- CARGAR LUGARES ----------
         function cargarLugaresEnDatalist() {
@@ -663,6 +668,14 @@
                 return;
             }
 
+            // Recolectar datos de transporte
+            const transporte = {
+                conductor: inputConductor.value.trim() || 'No especificado',
+                horarios: inputHorarios.value.trim() || 'No especificado',
+                precio: inputPrecioTransporte.value.trim() || 'No especificado',
+                descripcion: inputDescTransporte.value.trim() || 'No especificado'
+            };
+
             const salida = {
                 titulo: ruta.filter(a => a.tipo === 'Lugar').map(a => a.descripcion).join(' + ') || 'Salida sin título',
                 fecha: inputFecha.value || new Date().toISOString().slice(0,10),
@@ -673,12 +686,14 @@
                 guias: guias,
                 precio: parseInt(inputPrecio.value.replace(/\./g,'')) || 0,
                 curso: inputCurso.value.trim() || 'Sin curso',
-                menu: inputMenu.value.trim() || 'Sin menú'
+                menu: inputMenu.value.trim() || 'Sin menú',
+                transporte: transporte  // <--- Guardamos el transporte manual
             };
 
             const ok = await Planificacion.guardarSalida(salida);
             if (ok) {
                 mostrarMensaje('✅ Salida guardada correctamente. ¡Aparecerá en el lobby!', 'exito');
+                // Limpiar todo
                 ruta = [];
                 participantes = [];
                 renderizarTodo();
@@ -686,8 +701,12 @@
                 inputPrecio.value = '';
                 inputMenu.value = '';
                 inputFecha.value = new Date().toISOString().slice(0,10);
-                // Cambio: resetear a "1 dia" sin tilde
                 inputDuracion.value = '1 dia';
+                // Limpiar transporte
+                inputConductor.value = '';
+                inputHorarios.value = '';
+                inputPrecioTransporte.value = '';
+                inputDescTransporte.value = '';
             } else {
                 mostrarMensaje('❌ Error al guardar. Revisa la consola.', 'error');
             }
