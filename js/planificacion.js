@@ -1,9 +1,4 @@
-// js/planificacion.js
 const Planificacion = {
-    /**
-     * Carga todas las salidas guardadas
-     * @returns {Promise<Array>} Lista de salidas
-     */
     async cargarSalidas() {
         try {
             const datos = await GitHub.leer('datos/salidas.json');
@@ -15,11 +10,6 @@ const Planificacion = {
         }
     },
 
-    /**
-     * Guarda una nueva salida
-     * @param {Object} salida - Datos de la salida (sin id)
-     * @returns {Promise<boolean>} true si se guardó correctamente
-     */
     async guardarSalida(salida) {
         try {
             const datos = await GitHub.leer('datos/salidas.json');
