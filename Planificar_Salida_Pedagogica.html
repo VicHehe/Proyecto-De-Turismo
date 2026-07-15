@@ -3,311 +3,460 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planificar Salida Pedagógica</title>
+    <title>Planificar Salida - Turismo</title>
     <link rel="stylesheet" href="css/estilo.css">
+    <style>
+        /* Estilos adicionales para mejorar la UX */
+        .lista-lugares {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .lugar-item {
+            border: 1px solid #000;
+            padding: 8px 15px;
+            background: #fff;
+            cursor: pointer;
+            transition: 0.1s;
+            border-radius: 0;
+        }
+        .lugar-item:hover {
+            background: #eee;
+        }
+        .lugar-item.seleccionado {
+            background: #000;
+            color: #fff;
+        }
+        .itinerario-lista {
+            border: 1px solid #000;
+            padding: 10px;
+            min-height: 100px;
+            background: #fafafa;
+            margin-top: 5px;
+        }
+        .itinerario-item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #ccc;
+            padding: 5px 0;
+        }
+        .itinerario-item:last-child {
+            border-bottom: none;
+        }
+        .btn-eliminar {
+            background: transparent;
+            border: none;
+            color: #000;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 0 5px;
+        }
+        .btn-eliminar:hover {
+            color: red;
+        }
+        .buscar-usuario {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .buscar-usuario input {
+            flex: 2;
+            min-width: 200px;
+        }
+        .resultados-busqueda {
+            border: 1px solid #000;
+            max-height: 150px;
+            overflow-y: auto;
+            background: #fff;
+            margin-top: 5px;
+            display: none;
+        }
+        .resultados-busqueda div {
+            padding: 5px 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .resultados-busqueda div:hover {
+            background: #eee;
+        }
+        .participante-agregado {
+            display: inline-block;
+            border: 1px solid #000;
+            padding: 3px 10px;
+            margin: 3px 5px 3px 0;
+            background: #f0f0f0;
+        }
+        .participante-agregado .btn-eliminar {
+            margin-left: 8px;
+            font-size: 14px;
+        }
+        .campo-grande {
+            font-size: 1.1rem;
+            padding: 0.6rem;
+        }
+        .etiqueta-ayuda {
+            font-size: 0.85rem;
+            color: #333;
+            margin-top: 3px;
+        }
+        .seccion {
+            margin-bottom: 2rem;
+            border: 1px solid #000;
+            padding: 1.2rem;
+        }
+        .seccion h2 {
+            margin-top: 0;
+            border-bottom: 1px solid #000;
+            padding-bottom: 0.3rem;
+        }
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+        .flex-row > * {
+            flex: 1 1 200px;
+        }
+        .btn-primario {
+            background: #000;
+            color: #fff;
+            border: 1px solid #000;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-primario:hover {
+            background: #222;
+        }
+        .btn-secundario {
+            background: #fff;
+            color: #000;
+            border: 1px solid #000;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-secundario:hover {
+            background: #eee;
+        }
+    </style>
 </head>
 <body>
 <div class="contenedor">
 
-    <h1>🧭 Planificar Salida Pedagógica</h1>
-    <p class="muted" style="margin-bottom: 1.5rem;"><strong>Versión integrada</strong> · los datos se guardan en <code>datos/salidas.json</code></p>
+    <h1>🧭 Planificar Nueva Salida</h1>
+    <p class="muted">Completa los pasos para crear una salida o excursión.</p>
 
-    <!-- ========== SECCIÓN A: GESTIÓN DE LUGARES ========== -->
-    <div class="columna" style="margin-bottom: 2rem;">
-        <h2 style="margin-top: 0;">📌 Gestión de lugares a visitar</h2>
-        <p class="muted">Selecciona un lugar de la base de datos para cargar sus datos.</p>
+    <!-- ========== PASO 1: LUGARES ========== -->
+    <div class="seccion">
+        <h2>1. Selecciona los lugares a visitar</h2>
+        <p class="muted">Haz clic en un lugar para añadirlo al itinerario. Puedes ordenarlos luego.</p>
 
-        <div class="grid-2" style="margin-top: 0.5rem;">
-            <div>
-                <div class="grupo">
-                    <label>Seleccionar lugar</label>
-                    <select id="selectorLugar">
-                        <option value="">-- Elegir --</option>
-                    </select>
-                </div>
-                <div class="grupo">
-                    <label>Nombre del lugar</label>
-                    <input type="text" id="lugarNombre" readonly>
-                </div>
-                <div class="flex">
-                    <div class="grupo flex-item">
-                        <label>Hora inicio</label>
-                        <input type="text" id="lugarApertura" readonly>
-                    </div>
-                    <div class="grupo flex-item">
-                        <label>Hora fin</label>
-                        <input type="text" id="lugarCierre" readonly>
-                    </div>
-                </div>
-                <div class="grupo">
-                    <label>Ubicación (dirección / coordenadas)</label>
-                    <input type="text" id="lugarUbicacion" readonly>
-                </div>
-                <div class="grupo">
-                    <label>Descripción</label>
-                    <textarea id="lugarDescripcion" readonly></textarea>
-                </div>
-                <div class="fila-botones">
-                    <span class="btn">➕ Añadir lugar</span>
-                    <span class="btn">✏️ Editar</span>
-                    <span class="btn">🗑️ Eliminar</span>
-                </div>
-            </div>
-            <div>
-                <div class="grupo">
-                    <label>Lugares disponibles (base de datos)</label>
-                    <div class="tabla-mini">
-                        <table class="tabla-mini">
-                            <thead><tr><th>#</th><th>Lugar</th><th>Horario</th></tr></thead>
-                            <tbody id="tablaLugares">
-                                <!-- Se llena con JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <p class="muted" style="margin-top: 0.3rem;">⬆️ Los lugares se cargan desde <code>js/lugares.js</code>.</p>
-                </div>
+        <div class="lista-lugares" id="listaLugares">
+            <!-- Se llena con JS desde lugares.js -->
+        </div>
+
+        <div style="margin-top: 10px;">
+            <strong>Itinerario:</strong>
+            <div class="itinerario-lista" id="itinerario">
+                <span style="color: #888;">Aún no has agregado lugares</span>
             </div>
         </div>
     </div>
 
-    <!-- ========== SECCIÓN B: LISTA DE ASISTENCIAS Y ROLES ========== -->
-    <div class="columna" style="margin-bottom: 2rem;">
-        <h2 style="margin-top: 0;">👥 Lista de asistentes y roles</h2>
-        <p class="muted">El guía principal se añade automáticamente (sesión iniciada). Aquí se muestran datos de ejemplo.</p>
+    <!-- ========== PASO 2: PARTICIPANTES ========== -->
+    <div class="seccion">
+        <h2>2. Agrega participantes</h2>
+        <p class="muted">Busca por RUT o nombre, o selecciona de la lista de usuarios.</p>
 
-        <div class="grid-2">
-            <div>
-                <div class="grupo">
-                    <label>Buscar participante por RUT</label>
-                    <div class="flex">
-                        <input type="text" value="12.345.678-9" style="flex:2;" readonly>
-                        <span class="btn" style="flex:0;">🔍 Buscar</span>
-                    </div>
-                </div>
-                <div class="grupo">
-                    <label>Asignar rol</label>
-                    <select disabled>
-                        <option>Asistente</option>
-                        <option selected>Visitante</option>
-                        <option>Guía</option>
-                    </select>
-                </div>
-                <div class="fila-botones">
-                    <span class="btn">➕ Agregar a la lista</span>
-                    <span class="btn">🔄 Actualizar rol</span>
-                </div>
-            </div>
-            <div>
-                <h3 style="margin:0 0 0.3rem 0;">Participantes (ejemplo)</h3>
-                <table class="tabla-mini">
-                    <thead><tr><th>RUT</th><th>Nombre</th><th>Rol</th></tr></thead>
-                    <tbody>
-                        <tr><td>11.111.111-1</td><td>Ana Profesora</td><td><span class="badge">Guía (automatic)</span></td></tr>
-                        <tr><td>22.222.222-2</td><td>Carlos Ayudante</td><td>Asistente</td></tr>
-                        <tr><td>33.333.333-3</td><td>María Estudiante</td><td>Visitante</td></tr>
-                        <tr><td>44.444.444-4</td><td>Luis Estudiante</td><td>Visitante</td></tr>
-                    </tbody>
-                </table>
-                <p class="muted" style="margin-top:0.2rem;">* Guía principal se añade automáticamente al crear la salida.</p>
+        <div class="buscar-usuario">
+            <input type="text" id="buscarUsuario" placeholder="Escribe RUT o nombre...">
+            <button class="btn-secundario" id="btnBuscar">Buscar</button>
+            <button class="btn-secundario" id="btnMostrarTodos">Mostrar todos</button>
+        </div>
+        <div class="resultados-busqueda" id="resultadosBusqueda"></div>
+
+        <div style="margin-top: 10px;">
+            <strong>Participantes asignados:</strong>
+            <div id="listaParticipantes" style="border:1px solid #000; padding:10px; min-height:50px; background:#fafafa; margin-top:5px;">
+                <span style="color: #888;">No hay participantes aún</span>
             </div>
         </div>
+        <p class="etiqueta-ayuda">* El guía principal se agrega automáticamente al guardar.</p>
     </div>
 
-    <!-- ========== SECCIÓN C: DATOS COMPLEMENTARIOS (OPCIONALES) ========== -->
-    <div class="columna" style="margin-bottom: 2rem;">
-        <h2 style="margin-top: 0;">📎 Datos complementarios (opcionales)</h2>
-        <div class="grid-3">
-            <div class="grupo">
-                <label>Vincular a curso (pedagógica)</label>
-                <input type="text" id="inputCurso" value="4° Medio A" readonly>
+    <!-- ========== PASO 3: DATOS COMPLEMENTARIOS ========== -->
+    <div class="seccion">
+        <h2>3. Datos adicionales (opcional)</h2>
+        <div class="flex-row">
+            <div>
+                <label>Curso o grupo</label>
+                <input type="text" id="inputCurso" placeholder="Ej: 4° Medio A" value="4° Medio A">
             </div>
-            <div class="grupo">
+            <div>
                 <label>Precio por persona (CLP)</label>
-                <input type="text" id="inputPrecio" value="12.500" readonly>
+                <input type="text" id="inputPrecio" placeholder="Ej: 12500" value="12.500">
             </div>
-            <div class="grupo">
+            <div>
                 <label>Menú / Catering</label>
-                <input type="text" id="inputMenu" value="Box lunch + bebida" readonly>
+                <input type="text" id="inputMenu" placeholder="Box lunch, etc." value="Box lunch + bebida">
             </div>
         </div>
-        <p class="muted" style="margin-top:0.2rem;">* Los campos son opcionales, se pueden dejar vacíos.</p>
     </div>
 
-    <!-- ========== SECCIÓN D: BASE DE DATOS DE LUGARES (JS) ========== -->
-    <div class="columna" style="margin-bottom: 2rem;">
-        <h2 style="margin-top: 0;">🗂️ Base de datos de lugares (archivo JS)</h2>
-        <p class="muted">Estructura de ejemplo para cada registro (nombre, horario, ubicación, descripción).</p>
-        <div style="background: #f5f5f5; border: 1px solid #000; padding: 0.6rem 1rem; font-family: monospace; font-size: 0.9rem; white-space: pre-wrap; overflow-x: auto;" id="jsonLugares">
-        </div>
-        <div class="fila-botones" style="margin-top:0.8rem;">
-            <span class="btn">📂 Ver todos los lugares</span>
-            <span class="btn">➕ Añadir lugar a la BD</span>
-        </div>
-    </div>
-
-    <!-- ========== SECCIÓN E: GESTIÓN DEL TRANSPORTE (automático) ========== -->
-    <div class="columna" style="margin-bottom: 2rem;">
-        <h2 style="margin-top: 0;">🚌 Gestión del transporte (automático)</h2>
-        <p class="muted">Datos completados automáticamente por el sistema (ejemplo).</p>
+    <!-- ========== PASO 4: TRANSPORTE (automático) ========== -->
+    <div class="seccion">
+        <h2>4. Transporte asignado (automático)</h2>
         <div class="info-transporte">
-            <div class="grid-2">
-                <div>
-                    <div class="grupo" style="margin-bottom:0.4rem;">
-                        <label>Conductor</label>
-                        <input type="text" value="Roberto Méndez" readonly>
-                    </div>
-                    <div class="grupo" style="margin-bottom:0.4rem;">
-                        <label>Horarios de disponibilidad</label>
-                        <input type="text" value="08:00 – 18:00" readonly>
-                    </div>
-                    <div class="grupo" style="margin-bottom:0.4rem;">
-                        <label>Patente del vehículo</label>
-                        <input type="text" value="AB-12-CD" readonly>
-                    </div>
-                </div>
-                <div>
-                    <div class="grupo" style="margin-bottom:0.4rem;">
-                        <label>Precio del servicio</label>
-                        <input type="text" value="$ 85.000 CLP" readonly>
-                    </div>
-                    <div class="grupo" style="margin-bottom:0.4rem;">
-                        <label>Descripción adicional</label>
-                        <input type="text" value="Bus 30 asientos, climatizado, con baño" readonly>
-                    </div>
-                </div>
+            <div class="flex-row">
+                <div><strong>Conductor:</strong> Roberto Méndez</div>
+                <div><strong>Horario:</strong> 08:00 – 18:00</div>
+                <div><strong>Vehículo:</strong> Bus 30 asientos, climatizado</div>
+                <div><strong>Precio:</strong> $85.000 CLP</div>
             </div>
         </div>
-        <p class="muted" style="margin-top:0.5rem;">* Los datos de transporte se cargan automáticamente desde el perfil del proveedor.</p>
-    </div>
-
-    <!-- ========== SECCIÓN F: VISTA PREVIA DEL CALENDARIO (organizador) ========== -->
-    <div class="columna" style="margin-bottom: 2rem;">
-        <h2 style="margin-top: 0;">📅 Vista previa · Calendario (organizador)</h2>
-        <p class="muted">(Solo referencia: el guía ve todas sus salidas con desglose completo)</p>
-        <div style="border: 1px solid #000; padding: 0.8rem; background: #fafafa;">
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: space-between;">
-                <span><strong>Salida:</strong> Visita Museo + Parque</span>
-                <span><strong>Fecha:</strong> 15/07/2026</span>
-                <span><strong>Horario:</strong> 09:30 – 16:00</span>
-            </div>
-            <div style="margin-top:0.5rem; font-size:0.9rem;">
-                <span class="badge">Guía: Ana Profesora</span>
-                <span class="badge">Asistentes: 6</span>
-                <span class="badge">Visitantes: 12</span>
-                <span class="badge">Transporte: Bus 30 asientos</span>
-            </div>
-            <div style="margin-top:0.3rem; font-size:0.85rem;">
-                <strong>Lugares:</strong> Museo (10-12) · Almuerzo (12-13) · Museo (13-15) · Parque (15-16)
-            </div>
-            <div style="margin-top:0.3rem; font-size:0.85rem; border-top:1px solid #aaa; padding-top:0.3rem;">
-                <span>🍽️ Menú: Box lunch + bebida</span> · 
-                <span>💰 Costo: $12.500 por persona</span> · 
-                <span>🏫 Curso: 4° Medio A</span>
-            </div>
-        </div>
+        <p class="etiqueta-ayuda">* Los datos de transporte se cargan automáticamente desde el perfil del proveedor.</p>
     </div>
 
     <!-- ========== BOTONES FINALES ========== -->
     <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; border-top: 2px solid #000; padding-top: 1.5rem;">
-        <button class="btn btn-primario" id="btnGuardarSalida" style="padding: 0.6rem 2rem;">✅ Guardar salida pedagógica</button>
-        <span class="btn" style="padding: 0.6rem 1.8rem;">📋 Vista previa</span>
-        <span class="btn" style="padding: 0.6rem 1.8rem;">🔄 Restablecer</span>
-        <span class="btn" style="padding: 0.6rem 1.8rem;">📤 Publicar (modalidad)</span>
-        <span class="muted" style="margin-left: auto; align-self: center;">Versión integrada · guarda en JSON</span>
+        <button class="btn-primario" id="btnGuardarSalida">✅ Guardar Salida</button>
+        <button class="btn-secundario" id="btnLimpiar">🔄 Limpiar todo</button>
+        <span class="muted" style="margin-left: auto; align-self: center;">Versión amigable para estudiantes</span>
     </div>
 
-    <!-- ========== NOTA FINAL ========== -->
+    <!-- ========== NOTA ========== -->
     <div style="margin-top: 2.5rem; border-top: 1px solid #000; padding-top: 1rem; font-size: 0.85rem;">
-        <p><strong>🧩 Especificación base:</strong> Planificación de salidas (Luciano Navarro) · Módulo pedagógico y estándar comparten lógica.</p>
-        <p>Los lugares se almacenan en archivo JS. Transporte automático. Roles: guía (automático), asistente, visitante.</p>
-        <p>Los datos se guardan en <code>datos/salidas.json</code> y se muestran en el lobby.</p>
+        <p>Los lugares se guardan en <code>datos/salidas.json</code> al presionar "Guardar".</p>
     </div>
 
 </div>
 
-<!-- ===== SCRIPTS ===== -->
 <script src="js/github.js"></script>
 <script src="js/planificacion.js"></script>
 <script src="js/lugares.js"></script>
 <script>
     (function() {
-        // ========== GESTIÓN DE LUGARES ==========
-        const selector = document.getElementById('selectorLugar');
-        const tabla = document.getElementById('tablaLugares');
+        // ========== VARIABLES GLOBALES ==========
+        let lugaresSeleccionados = [];  // lista de objetos lugar
+        let participantes = [];        // lista de {rut, nombre, rol}
 
-        // Llenar select
-        lugares.forEach((l, i) => {
-            const opt = document.createElement('option');
-            opt.value = i;
-            opt.textContent = l.nombre;
-            selector.appendChild(opt);
+        // ========== RENDERIZAR LUGARES DISPONIBLES ==========
+        const listaLugaresDiv = document.getElementById('listaLugares');
+        lugares.forEach(l => {
+            const span = document.createElement('span');
+            span.className = 'lugar-item';
+            span.textContent = l.nombre;
+            span.dataset.id = l.nombre;
+            span.addEventListener('click', function() {
+                // Agregar al itinerario
+                const yaExiste = lugaresSeleccionados.some(item => item.nombre === l.nombre);
+                if (!yaExiste) {
+                    lugaresSeleccionados.push({ ...l });
+                    renderizarItinerario();
+                } else {
+                    alert('Este lugar ya está en el itinerario.');
+                }
+            });
+            listaLugaresDiv.appendChild(span);
         });
 
-        // Llenar tabla
-        lugares.forEach((l, i) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${i+1}</td><td>${l.nombre}</td><td>${l.apertura} – ${l.cierre}</td>`;
-            tabla.appendChild(tr);
-        });
-
-        // Mostrar datos al seleccionar
-        selector.addEventListener('change', function() {
-            const idx = this.value;
-            if (idx === '') {
-                document.getElementById('lugarNombre').value = '';
-                document.getElementById('lugarApertura').value = '';
-                document.getElementById('lugarCierre').value = '';
-                document.getElementById('lugarUbicacion').value = '';
-                document.getElementById('lugarDescripcion').value = '';
+        // ========== RENDERIZAR ITINERARIO ==========
+        function renderizarItinerario() {
+            const container = document.getElementById('itinerario');
+            if (lugaresSeleccionados.length === 0) {
+                container.innerHTML = '<span style="color: #888;">Aún no has agregado lugares</span>';
                 return;
             }
-            const l = lugares[parseInt(idx)];
-            document.getElementById('lugarNombre').value = l.nombre;
-            document.getElementById('lugarApertura').value = l.apertura;
-            document.getElementById('lugarCierre').value = l.cierre;
-            document.getElementById('lugarUbicacion').value = l.ubicacion;
-            document.getElementById('lugarDescripcion').value = l.descripcion;
+            container.innerHTML = lugaresSeleccionados.map((l, index) => `
+                <div class="itinerario-item">
+                    <span><strong>${index+1}.</strong> ${l.nombre} (${l.apertura} - ${l.cierre})</span>
+                    <button class="btn-eliminar" data-index="${index}">✕</button>
+                </div>
+            `).join('');
+            // Eventos para eliminar
+            document.querySelectorAll('.itinerario-item .btn-eliminar').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.index);
+                    lugaresSeleccionados.splice(idx, 1);
+                    renderizarItinerario();
+                });
+            });
+        }
+
+        // ========== BUSCAR PARTICIPANTES (simulado) ==========
+        // Datos de ejemplo (en un futuro vendrán de usuarios.json)
+        const usuariosEjemplo = [
+            { rut: '11.111.111-1', nombre: 'Ana Profesora', rol: 'guia' },
+            { rut: '22.222.222-2', nombre: 'Carlos Ayudante', rol: 'asistente' },
+            { rut: '33.333.333-3', nombre: 'María Estudiante', rol: 'visitante' },
+            { rut: '44.444.444-4', nombre: 'Luis Estudiante', rol: 'visitante' },
+            { rut: '55.555.555-5', nombre: 'Pedro González', rol: 'visitante' },
+        ];
+
+        const inputBuscar = document.getElementById('buscarUsuario');
+        const resultadosDiv = document.getElementById('resultadosBusqueda');
+        const listaParticipantesDiv = document.getElementById('listaParticipantes');
+
+        function buscarUsuarios(termino) {
+            const terminoLower = termino.toLowerCase().trim();
+            if (!terminoLower) {
+                resultadosDiv.style.display = 'none';
+                return;
+            }
+            const resultados = usuariosEjemplo.filter(u =>
+                u.rut.includes(termino) ||
+                u.nombre.toLowerCase().includes(terminoLower)
+            );
+            if (resultados.length === 0) {
+                resultadosDiv.innerHTML = '<div style="padding:8px; color:#888;">No se encontraron usuarios</div>';
+            } else {
+                resultadosDiv.innerHTML = resultados.map(u => `
+                    <div data-rut="${u.rut}" data-nombre="${u.nombre}" data-rol="${u.rol}">
+                        ${u.nombre} (${u.rut}) - ${u.rol}
+                    </div>
+                `).join('');
+                // Evento para agregar
+                resultadosDiv.querySelectorAll('div[data-rut]').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const rut = this.dataset.rut;
+                        const nombre = this.dataset.nombre;
+                        const rol = this.dataset.rol;
+                        // Evitar duplicados
+                        if (!participantes.some(p => p.rut === rut)) {
+                            participantes.push({ rut, nombre, rol });
+                            renderizarParticipantes();
+                        } else {
+                            alert('Este usuario ya está en la lista.');
+                        }
+                        inputBuscar.value = '';
+                        resultadosDiv.style.display = 'none';
+                    });
+                });
+            }
+            resultadosDiv.style.display = 'block';
+        }
+
+        function renderizarParticipantes() {
+            if (participantes.length === 0) {
+                listaParticipantesDiv.innerHTML = '<span style="color: #888;">No hay participantes aún</span>';
+                return;
+            }
+            listaParticipantesDiv.innerHTML = participantes.map((p, idx) => `
+                <span class="participante-agregado">
+                    ${p.nombre} (${p.rut}) - ${p.rol}
+                    <button class="btn-eliminar" data-idx="${idx}">✕</button>
+                </span>
+            `).join('');
+            // Eliminar participantes
+            listaParticipantesDiv.querySelectorAll('.btn-eliminar').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.idx);
+                    participantes.splice(idx, 1);
+                    renderizarParticipantes();
+                });
+            });
+        }
+
+        // Eventos de búsqueda
+        document.getElementById('btnBuscar').addEventListener('click', function() {
+            buscarUsuarios(inputBuscar.value);
+        });
+        inputBuscar.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                buscarUsuarios(this.value);
+            } else {
+                // Búsqueda en tiempo real (opcional)
+                if (this.value.length >= 2) {
+                    buscarUsuarios(this.value);
+                } else {
+                    resultadosDiv.style.display = 'none';
+                }
+            }
+        });
+        document.getElementById('btnMostrarTodos').addEventListener('click', function() {
+            // Mostrar todos los usuarios en resultados
+            const todos = usuariosEjemplo;
+            resultadosDiv.innerHTML = todos.map(u => `
+                <div data-rut="${u.rut}" data-nombre="${u.nombre}" data-rol="${u.rol}">
+                    ${u.nombre} (${u.rut}) - ${u.rol}
+                </div>
+            `).join('');
+            resultadosDiv.querySelectorAll('div[data-rut]').forEach(el => {
+                el.addEventListener('click', function() {
+                    const rut = this.dataset.rut;
+                    const nombre = this.dataset.nombre;
+                    const rol = this.dataset.rol;
+                    if (!participantes.some(p => p.rut === rut)) {
+                        participantes.push({ rut, nombre, rol });
+                        renderizarParticipantes();
+                    } else {
+                        alert('Este usuario ya está en la lista.');
+                    }
+                    resultadosDiv.style.display = 'none';
+                });
+            });
+            resultadosDiv.style.display = 'block';
         });
 
-        // Mostrar JSON en sección D
-        document.getElementById('jsonLugares').textContent = JSON.stringify(lugares, null, 2);
-
         // ========== GUARDAR SALIDA ==========
-        document.getElementById('btnGuardarSalida').addEventListener('click', async function(e) {
-            e.preventDefault();
+        document.getElementById('btnGuardarSalida').addEventListener('click', async function() {
+            if (lugaresSeleccionados.length === 0) {
+                alert('Debes agregar al menos un lugar al itinerario.');
+                return;
+            }
 
-            // Recopilar datos de los campos (aunque sean de solo lectura, tomamos sus valores)
-            const titulo = document.getElementById('lugarNombre').value || 'Visita sin título';
-            const apertura = document.getElementById('lugarApertura').value || '--:--';
-            const cierre = document.getElementById('lugarCierre').value || '--:--';
-            const ubicacion = document.getElementById('lugarUbicacion').value || 'Sin ubicación';
-            const descripcion = document.getElementById('lugarDescripcion').value || 'Sin descripción';
             const curso = document.getElementById('inputCurso').value || 'Sin curso';
             const precio = document.getElementById('inputPrecio').value || '0';
             const menu = document.getElementById('inputMenu').value || 'Sin menú';
 
-            // Construir objeto salida
+            // Construir salida
             const salida = {
-                titulo: titulo,
+                titulo: lugaresSeleccionados[0].nombre + ' y más', // Título simple
                 fecha: new Date().toISOString().slice(0,10),
-                descripcion: descripcion,
-                lugares: [
-                    `${titulo} (${apertura} – ${cierre})`
-                ],
-                guia: "Ana Profesora (ejemplo)", // en futuro se tomará de la sesión
+                descripcion: `Itinerario: ${lugaresSeleccionados.map(l => l.nombre).join(', ')}`,
+                lugares: lugaresSeleccionados.map(l => `${l.nombre} (${l.apertura} - ${l.cierre})`),
+                guia: participantes.find(p => p.rol === 'guia')?.nombre || 'Sin guía asignado',
                 precio: parseInt(precio.replace(/\./g,'')) || 0,
                 curso: curso,
                 menu: menu,
-                ubicacion: ubicacion
+                ubicacion: lugaresSeleccionados[0].ubicacion || 'Sin ubicación'
             };
 
             const ok = await Planificacion.guardarSalida(salida);
             if (ok) {
-                alert('✅ Salida guardada correctamente en datos/salidas.json');
+                alert('✅ Salida guardada correctamente.');
+                // Limpiar todo (opcional)
+                // lugaresSeleccionados = [];
+                // participantes = [];
+                // renderizarItinerario();
+                // renderizarParticipantes();
             } else {
-                alert('❌ Error al guardar la salida. Revisa la consola.');
+                alert('❌ Error al guardar. Revisa la consola.');
             }
         });
+
+        // ========== LIMPIAR TODO ==========
+        document.getElementById('btnLimpiar').addEventListener('click', function() {
+            if (confirm('¿Limpiar todos los datos?')) {
+                lugaresSeleccionados = [];
+                participantes = [];
+                renderizarItinerario();
+                renderizarParticipantes();
+                document.getElementById('inputCurso').value = '';
+                document.getElementById('inputPrecio').value = '';
+                document.getElementById('inputMenu').value = '';
+            }
+        });
+
+        // ========== INICIALIZAR ==========
+        renderizarItinerario();
+        renderizarParticipantes();
     })();
 </script>
 </body>
