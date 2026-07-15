@@ -165,6 +165,59 @@ footer .btn-cerrar:hover {
     border: 1px solid #000;
     background: #fafafa;
 }
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0; top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: #fff;
+    border: 2px solid #000;
+    max-width: 700px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 2rem;
+    position: relative;
+}
+.modal-close {
+    position: absolute;
+    top: 10px; right: 15px;
+    font-size: 1.8rem;
+    cursor: pointer;
+}
+.modal-content h2 {
+    border-bottom: 1px solid #000;
+    padding-bottom: 0.3rem;
+}
+.modal-content .detalle-item {
+    margin-bottom: 0.5rem;
+}
+.modal-content .ruta-lista {
+    margin-left: 1rem;
+}
+.modal-content .participante-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0;
+}
+.modal-content .participante-tabla th,
+.modal-content .participante-tabla td {
+    border: 1px solid #000;
+    padding: 0.2rem 0.5rem;
+    text-align: left;
+}
+.modal-content .participante-tabla th {
+    background: #f0f0f0;
+}
 </style>
 
 </head>
@@ -202,11 +255,19 @@ footer .btn-cerrar:hover {
     <button class="btn-cerrar" id="btnCerrarSesion">Cerrar sesión</button>
 </footer>
 
+<!-- MODAL DE DETALLES -->
+<div id="modalDetalles" class="modal">
+    <div class="modal-content">
+        <span class="modal-close" id="modalCerrar">&times;</span>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
 <script src="js/github.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/planificacion.js"></script>
 <script>
-    // Función de sonido original (se conserva)
+    // Función de sonido original
     function sonido(){
         const audio = new (window.AudioContext || window.webkitAudioContext)();
         const osc = audio.createOscillator();
@@ -221,63 +282,87 @@ footer .btn-cerrar:hover {
         osc.stop(audio.currentTime + 0.15);
     }
 
+    // Función para mostrar detalles en el modal
+    function verDetalles(salida) {
+        const modal = document.getElementById('modalDetalles');
+        const body = document.getElementById('modalBody');
+
+        let html = `<h2>${salida.titulo}</h2>`;
+        html += `<div class="detalle-item"><strong>Fecha:</strong> ${salida.fecha || 'No definida'}</div>`;
+        html += `<div class="detalle-item"><strong>Duración:</strong> ${salida.duracion || 'No especificada'}</div>`;
+        html += `<div class="detalle-item"><strong>Descripción:</strong> ${salida.descripcion || 'Sin descripción'}</div>`;
+
+        if (salida.ruta && salida.ruta.length > 0) {
+            html += `<div class="detalle-item"><strong>Ruta:</strong><ul class="ruta-lista">`;
+            salida.ruta.forEach(act => {
+                html += `<li>${act.tipo}: ${act.descripcion} (${act.inicio} - ${act.fin})</li>`;
+            });
+            html += `</ul></div>`;
+        }
+
+        if (salida.participantes && salida.participantes.length > 0) {
+            html += `<div class="detalle-item"><strong>Participantes:</strong><table class="participante-tabla"><tr><th>Nombre</th><th>RUT</th><th>Rol</th></tr>`;
+            salida.participantes.forEach(p => {
+                html += `<tr><td>${p.nombre}</td><td>${p.rut}</td><td>${p.rol}</td></tr>`;
+            });
+            html += `</table></div>`;
+        }
+
+        if (salida.guias && salida.guias.length > 0) {
+            html += `<div class="detalle-item"><strong>Guía(s):</strong> ${salida.guias.map(g => g.nombre).join(', ')}</div>`;
+        }
+        if (salida.precio) html += `<div class="detalle-item"><strong>Precio:</strong> $${salida.precio}</div>`;
+        if (salida.curso) html += `<div class="detalle-item"><strong>Curso:</strong> ${salida.curso}</div>`;
+        if (salida.menu) html += `<div class="detalle-item"><strong>Menú:</strong> ${salida.menu}</div>`;
+
+        body.innerHTML = html;
+        modal.style.display = 'flex';
+    }
+
+    // Exponer función globalmente
+    window.verDetalles = verDetalles;
+
+    // Cerrar modal
+    document.getElementById('modalCerrar').addEventListener('click', function() {
+        document.getElementById('modalDetalles').style.display = 'none';
+    });
+    window.addEventListener('click', function(e) {
+        if (e.target === document.getElementById('modalDetalles')) {
+            document.getElementById('modalDetalles').style.display = 'none';
+        }
+    });
+
+    // ===== MAIN =====
     (function() {
-        // ===== VERIFICAR SESIÓN =====
         const usuario = Auth.getSesion();
         if (!usuario) {
             window.location.href = 'login.html';
             return;
         }
 
-        // Mostrar datos del usuario en el badge
         document.getElementById('userNombre').textContent = `${usuario.nombre} ${usuario.apellido || ''}`;
         document.getElementById('userRol').textContent = usuario.rol;
 
-        // ===== GENERAR BOTONES DEL NAV =====
+        // Botones del nav
         const nav = document.getElementById('navBotones');
         let botones = [];
 
         switch (usuario.rol) {
             case 'admin':
-                botones.push({
-                    texto: '👑 Panel de Administración',
-                    href: 'pages/dashboard.html'
-                });
-                botones.push({
-                    texto: '📋 Planificar Salida',
-                    href: 'Planificar_Salida_Pedagogica.html'
-                });
-                botones.push({
-                    texto: '📅 Calendario',
-                    onclick: 'alert("Calendario (próximamente)")'
-                });
+                botones.push({ texto: '👑 Panel de Administración', href: 'pages/dashboard.html' });
+                botones.push({ texto: '📋 Planificar Salida', href: 'Planificar_Salida_Pedagogica.html' });
+                botones.push({ texto: '📅 Calendario', onclick: 'alert("Calendario (próximamente)")' });
                 break;
-
             case 'guia':
-                botones.push({
-                    texto: '📋 Planificar Salida',
-                    href: 'Planificar_Salida_Pedagogica.html'
-                });
-                botones.push({
-                    texto: '📅 Calendario',
-                    onclick: 'alert("Calendario (próximamente)")'
-                });
+                botones.push({ texto: '📋 Planificar Salida', href: 'Planificar_Salida_Pedagogica.html' });
+                botones.push({ texto: '📅 Calendario', onclick: 'alert("Calendario (próximamente)")' });
                 break;
-
-            case 'estudiante':
             default:
-                botones.push({
-                    texto: '📅 Calendario',
-                    onclick: 'alert("Calendario (próximamente)")'
-                });
-                botones.push({
-                    texto: '🎒 Mis Salidas',
-                    onclick: 'alert("Lista de mis salidas (próximamente)")'
-                });
+                botones.push({ texto: '📅 Calendario', onclick: 'alert("Calendario (próximamente)")' });
+                botones.push({ texto: '🎒 Mis Salidas', onclick: 'alert("Lista de mis salidas (próximamente)")' });
                 break;
         }
 
-        // Renderizar botones en el nav
         botones.forEach(b => {
             const btn = document.createElement('button');
             btn.textContent = b.texto;
@@ -289,36 +374,39 @@ footer .btn-cerrar:hover {
             nav.appendChild(btn);
         });
 
-        // ===== CARGAR Y MOSTRAR SALIDAS =====
+        // Cargar y mostrar salidas (solo las válidas)
         async function cargarYMostrarSalidas() {
             const contenedor = document.getElementById('contenedorSalidas');
             try {
                 const salidas = await Planificacion.cargarSalidas();
-                if (!salidas || salidas.length === 0) {
+                // Filtrar solo las que tienen estructura nueva (ruta y participantes)
+                const validas = salidas.filter(s => s.ruta && s.participantes);
+                if (validas.length === 0) {
                     contenedor.innerHTML = `
                         <div class="mensaje-vacio">
                             <p>📭 No hay salidas planificadas para este mes/semana.</p>
                             <p style="margin-top:10px; font-size:0.9rem;">
-                                ${usuario.rol === 'admin' || usuario.rol === 'guia' 
-                                    ? 'Puedes crear una desde "Planificar Salida".' 
+                                ${usuario.rol === 'admin' || usuario.rol === 'guia'
+                                    ? 'Puedes crear una desde "Planificar Salida".'
                                     : 'Vuelve más tarde.'}
                             </p>
                         </div>
                     `;
                     return;
                 }
-
-                // Mostrar hasta 3 salidas
-                const mostradas = salidas.slice(0, 3);
-                contenedor.innerHTML = mostradas.map(s => `
-                    <div class="tarjeta">
-                        <h3>${s.titulo}</h3>
-                        <p>${s.descripcion || 'Sin descripción'}</p>
-                        <p><small>📅 ${s.fecha || 'Fecha no definida'}</small></p>
-                        <p><small>👤 ${s.guia || 'Sin guía'}</small></p>
-                        <button onclick="alert('Detalles de: ${s.titulo.replace(/'/g, "\\'")}')">Ver más</button>
-                    </div>
-                `).join('');
+                const mostradas = validas.slice(0, 3);
+                contenedor.innerHTML = mostradas.map(s => {
+                    const tituloEscapado = s.titulo.replace(/'/g, "\\'");
+                    return `
+                        <div class="tarjeta">
+                            <h3>${s.titulo}</h3>
+                            <p>${s.descripcion || 'Sin descripción'}</p>
+                            <p><small>📅 ${s.fecha || 'Fecha no definida'}</small></p>
+                            <p><small>👤 ${s.guias && s.guias.length > 0 ? s.guias.map(g => g.nombre).join(', ') : 'Sin guía'}</small></p>
+                            <button onclick="verDetalles(${JSON.stringify(s).replace(/"/g, '&quot;')})">Ver más</button>
+                        </div>
+                    `;
+                }).join('');
             } catch (error) {
                 console.error('Error al cargar salidas:', error);
                 contenedor.innerHTML = `<div class="mensaje-vacio"><p>⚠️ Error al cargar las salidas.</p></div>`;
@@ -327,7 +415,7 @@ footer .btn-cerrar:hover {
 
         cargarYMostrarSalidas();
 
-        // ===== CERRAR SESIÓN =====
+        // Cerrar sesión
         document.getElementById('btnCerrarSesion').addEventListener('click', function() {
             Auth.cerrarSesion();
         });
