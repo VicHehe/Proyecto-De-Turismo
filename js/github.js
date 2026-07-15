@@ -25,13 +25,17 @@ const GitHub = {
             
             const data = await res.json();
             
-            // Si el archivo existe, decodificar el contenido base64
             if (data.content) {
-                // Limpiar el contenido base64 (quitar saltos de línea)
+                // Decodificar Base64 a texto UTF-8 correctamente
                 const base64 = data.content.replace(/\n/g, '').replace(/\r/g, '');
-                // Decodificar base64 a texto
-                const decoded = atob(base64);
-                // Parsear JSON
+                const binaryString = atob(base64);
+                // Convertir a Uint8Array para decodificar como UTF-8
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                const decoder = new TextDecoder('utf-8');
+                const decoded = decoder.decode(bytes);
                 return JSON.parse(decoded);
             }
             
@@ -51,9 +55,16 @@ const GitHub = {
      */
     async escribir(path, contenido, sha = null) {
         try {
-            // Convertir contenido a JSON y luego a base64
+            // Convertir contenido a JSON y luego a base64 (UTF-8)
             const jsonString = JSON.stringify(contenido, null, 2);
-            const base64 = btoa(unescape(encodeURIComponent(jsonString)));
+            const encoder = new TextEncoder();
+            const data = encoder.encode(jsonString);
+            // Convertir a cadena Base64
+            let binary = '';
+            for (let i = 0; i < data.length; i++) {
+                binary += String.fromCharCode(data[i]);
+            }
+            const base64 = btoa(binary);
             
             const body = {
                 message: `Actualización de ${path} desde sistema de turismo`,
