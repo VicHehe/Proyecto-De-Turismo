@@ -1,0 +1,168 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    background-color: white;
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    padding: 2rem 1.5rem;
+    color: #111;
+    line-height: 1.5;
+}
+.contenedor {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border-bottom: 2px solid #000;
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+}
+h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 1.8rem 0 0.8rem 0;
+    border-bottom: 1px solid #000;
+    padding-bottom: 0.3rem;
+}
+h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1rem 0 0.3rem 0;
+}
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+.columna {
+    border: 1px solid #000;
+    padding: 1.2rem 1.2rem 1.5rem;
+    background: white;
+}
+.columna-sin-borde {
+    border: none;
+    padding: 0;
+}
+.grupo {
+    margin-bottom: 1.2rem;
+}
+.grupo label {
+    display: block;
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+}
+.grupo input, .grupo select, .grupo textarea {
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #222;
+    background: white;
+    font-size: 0.95rem;
+    border-radius: 0;
+}
+.grupo textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+.btn {
+    background: white;
+    border: 1px solid #000;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: default;
+    transition: none;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+    color: #000;
+}
+.btn:hover {
+    background: #f0f0f0;
+}
+.btn-primario {
+    background: #000;
+    color: white;
+    border: 1px solid #000;
+}
+.btn-primario:hover {
+    background: #222;
+}
+.fila-botones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+}
+.tabla-mini {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.6rem 0;
+    font-size: 0.9rem;
+}
+.tabla-mini th, .tabla-mini td {
+    border: 1px solid #000;
+    padding: 0.4rem 0.5rem;
+    text-align: left;
+    vertical-align: top;
+}
+.tabla-mini th {
+    background: #f5f5f5;
+    font-weight: 600;
+}
+.badge {
+    border: 1px solid #000;
+    padding: 0.15rem 0.6rem;
+    font-size: 0.75rem;
+    background: white;
+    display: inline-block;
+}
+.separador {
+    border-top: 1px solid #000;
+    margin: 1.8rem 0 1rem 0;
+}
+.info-transporte {
+    background: #fafafa;
+    border: 1px solid #000;
+    padding: 0.8rem 1rem;
+    margin-top: 0.5rem;
+}
+.lugar-item {
+    border-bottom: 1px solid #ccc;
+    padding: 0.6rem 0;
+}
+.lugar-item:last-child {
+    border-bottom: none;
+}
+.flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem 1.5rem;
+}
+.flex-item {
+    flex: 1 0 180px;
+}
+.muted {
+    font-size: 0.85rem;
+    color: #222;
+}
+.dato-fijo {
+    background: #f5f5f5;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid #aaa;
+    display: inline-block;
+}
+.mt-1 { margin-top: 0.8rem; }
+.mb-1 { margin-bottom: 0.8rem; }
+.text-center { text-align: center; }
