@@ -115,9 +115,22 @@
             flex: 2;
             min-width: 150px;
         }
-        .ruta-item .horario {
+        .ruta-item .horario-editable {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
             font-size: 0.9rem;
-            color: #333;
+        }
+        .ruta-item .horario-editable input[type="time"] {
+            padding: 0.2rem;
+            border: 1px solid #000;
+            width: 100px;
+            background: #fff;
+        }
+        .ruta-item .horario-referencia {
+            font-size: 0.75rem;
+            color: #666;
+            margin-left: 0.3rem;
         }
         .ruta-item .acciones {
             margin-left: auto;
@@ -145,6 +158,10 @@
         }
         .mensaje-exito { background: #ebffeb; }
         .mensaje-error { background: #ffebeb; }
+        .horario-fijo {
+            font-weight: normal;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -194,7 +211,7 @@
     <!-- ===== SECCIÓN 3: PLAN DE RUTA ===== -->
     <div class="seccion">
         <h2>🗺️ Plan de Ruta</h2>
-        <p class="muted">Define el itinerario en orden: lugares, traslados y pausas.</p>
+        <p class="muted">Define el itinerario en orden: lugares, traslados y pausas. Puedes editar los horarios de cada actividad.</p>
         <div class="busqueda" style="margin-bottom: 0.5rem;">
             <select id="tipoActividad">
                 <option value="Lugar">📍 Lugar</option>
@@ -340,7 +357,6 @@
 
         // Renderizar lugares (solo muestra los ya seleccionados para la ruta)
         function renderizarLugaresSeleccionados() {
-            // Mostramos los lugares que ya están en la ruta (tipo 'Lugar')
             const lugaresEnRuta = ruta.filter(a => a.tipo === 'Lugar');
             if (lugaresEnRuta.length === 0) {
                 contenedorLugares.innerHTML = `<p class="muted" style="text-align:center; width:100%;">No hay lugares añadidos aún.</p>`;
@@ -349,19 +365,16 @@
             contenedorLugares.innerHTML = lugaresEnRuta.map((act, idx) => `
                 <div class="item">
                     <span><strong>${act.descripcion}</strong> (${act.inicio} - ${act.fin})</span>
-                    <span class="item-eliminar" data-index="${idx}" style="cursor:pointer; color:#d00;">✖</span>
+                    <span class="item-eliminar" data-lugar="${act.descripcion}" style="cursor:pointer; color:#d00;">✖</span>
                 </div>
             `).join('');
 
-            // Eventos eliminar (elimina de la ruta)
             document.querySelectorAll('#listaLugaresSeleccionados .item-eliminar').forEach(el => {
                 el.addEventListener('click', function() {
-                    const idx = parseInt(this.dataset.index);
-                    // Encontrar el índice real en la ruta (buscamos el elemento)
-                    const lugarNombre = this.parentElement.querySelector('strong').textContent;
-                    const realIdx = ruta.findIndex(a => a.tipo === 'Lugar' && a.descripcion === lugarNombre);
-                    if (realIdx !== -1) {
-                        ruta.splice(realIdx, 1);
+                    const nombre = this.dataset.lugar;
+                    const idx = ruta.findIndex(a => a.tipo === 'Lugar' && a.descripcion === nombre);
+                    if (idx !== -1) {
+                        ruta.splice(idx, 1);
                         renderizarTodo();
                     }
                 });
@@ -389,7 +402,6 @@
                 </tr>
             `).join('');
 
-            // Eventos cambio de rol
             document.querySelectorAll('.cambiar-rol').forEach(select => {
                 select.addEventListener('change', function() {
                     const idx = parseInt(this.dataset.index);
@@ -399,7 +411,6 @@
                 });
             });
 
-            // Eventos eliminar
             document.querySelectorAll('.btn-eliminar').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const idx = parseInt(this.dataset.index);
@@ -411,26 +422,58 @@
             });
         }
 
-        // Renderizar ruta completa
+        // Renderizar ruta completa con horarios editables
         function renderizarRuta() {
             if (ruta.length === 0) {
                 contenedorRuta.innerHTML = `<p class="muted" style="text-align:center; width:100%;">No hay actividades en la ruta.</p>`;
                 return;
             }
-            contenedorRuta.innerHTML = ruta.map((act, idx) => `
-                <div class="ruta-item">
+            contenedorRuta.innerHTML = ruta.map((act, idx) => {
+                // Para lugares, mostrar referencia del horario original del lugar (si existe)
+                let referencia = '';
+                if (act.tipo === 'Lugar') {
+                    const lugarEncontrado = lugares.find(l => l.nombre === act.descripcion);
+                    if (lugarEncontrado) {
+                        referencia = `<span class="horario-referencia">(Apertura: ${lugarEncontrado.apertura} - Cierre: ${lugarEncontrado.cierre})</span>`;
+                    }
+                }
+                return `
+                <div class="ruta-item" data-index="${idx}">
                     <span class="tipo">${act.tipo}</span>
                     <span class="desc">${act.descripcion}</span>
-                    <span class="horario">${act.inicio} - ${act.fin}</span>
+                    <div class="horario-editable">
+                        <input type="time" class="hora-inicio" value="${act.inicio}" data-index="${idx}">
+                        <span> - </span>
+                        <input type="time" class="hora-fin" value="${act.fin}" data-index="${idx}">
+                        ${referencia}
+                    </div>
                     <div class="acciones">
                         <button class="btn-ruta btn-subir" data-index="${idx}" ${idx === 0 ? 'disabled' : ''}>▲</button>
                         <button class="btn-ruta btn-bajar" data-index="${idx}" ${idx === ruta.length-1 ? 'disabled' : ''}>▼</button>
                         <button class="btn-ruta btn-eliminar" data-index="${idx}">✖</button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
 
-            // Eventos para mover
+            // Eventos para actualizar horas
+            document.querySelectorAll('.hora-inicio').forEach(input => {
+                input.addEventListener('change', function() {
+                    const idx = parseInt(this.dataset.index);
+                    if (!isNaN(idx) && ruta[idx]) {
+                        ruta[idx].inicio = this.value;
+                    }
+                });
+            });
+            document.querySelectorAll('.hora-fin').forEach(input => {
+                input.addEventListener('change', function() {
+                    const idx = parseInt(this.dataset.index);
+                    if (!isNaN(idx) && ruta[idx]) {
+                        ruta[idx].fin = this.value;
+                    }
+                });
+            });
+
+            // Eventos para mover/eliminar
             document.querySelectorAll('.btn-subir').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const idx = parseInt(this.dataset.index);
@@ -479,7 +522,7 @@
                 mostrarMensaje('Lugar no encontrado en la base de datos.', 'error');
                 return;
             }
-            // Añadir a la ruta como actividad tipo "Lugar"
+            // Añadir a la ruta con horarios del lugar (el guía luego los editará)
             ruta.push({
                 tipo: 'Lugar',
                 descripcion: lugarEncontrado.nombre,
@@ -553,7 +596,6 @@
                 return;
             }
 
-            // Validar que haya al menos un guía
             const guias = participantes.filter(p => p.rol === 'Guía');
             if (guias.length === 0) {
                 mostrarMensaje('⚠️ Debes asignar al menos un participante como Guía.', 'error');
@@ -575,7 +617,6 @@
             const ok = await Planificacion.guardarSalida(salida);
             if (ok) {
                 mostrarMensaje('✅ Salida guardada correctamente. ¡Aparecerá en el lobby!', 'exito');
-                // Limpiar formulario (opcional)
                 ruta = [];
                 participantes = [];
                 renderizarTodo();
