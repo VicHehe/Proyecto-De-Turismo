@@ -6,7 +6,6 @@
     <title>Planificar Salida</title>
     <link rel="stylesheet" href="css/estilo.css">
     <style>
-        /* Estilos adicionales */
         .seccion {
             margin-bottom: 2rem;
             border: 1px solid #000;
@@ -56,17 +55,6 @@
             font-weight: bold;
             color: #d00;
             margin-left: 0.5rem;
-        }
-        .item-rol select {
-            margin-left: 0.5rem;
-            padding: 0.2rem;
-            border: 1px solid #000;
-        }
-        .guia-automatico {
-            background: #f0f0f0;
-            border: 1px solid #aaa;
-            padding: 0.2rem 0.5rem;
-            font-size: 0.8rem;
         }
         .tabla-participantes {
             width: 100%;
@@ -137,10 +125,6 @@
             display: flex;
             gap: 0.3rem;
         }
-        .ruta-item select {
-            padding: 0.2rem;
-            border: 1px solid #000;
-        }
         .btn-ruta {
             background: #fff;
             border: 1px solid #000;
@@ -158,9 +142,78 @@
         }
         .mensaje-exito { background: #ebffeb; }
         .mensaje-error { background: #ffebeb; }
-        .horario-fijo {
-            font-weight: normal;
-            color: #555;
+        .duracion-select { width: auto; min-width: 120px; }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        .grupo {
+            margin-bottom: 1.2rem;
+        }
+        .grupo label {
+            display: block;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+        }
+        .grupo input, .grupo select {
+            width: 100%;
+            padding: 0.45rem 0.6rem;
+            border: 1px solid #222;
+            background: white;
+            font-size: 0.95rem;
+            border-radius: 0;
+        }
+        .btn {
+            background: white;
+            border: 1px solid #000;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: default;
+            transition: none;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            color: #000;
+        }
+        .btn:hover {
+            background: #f0f0f0;
+        }
+        .btn-primario {
+            background: #000;
+            color: white;
+            border: 1px solid #000;
+        }
+        .btn-primario:hover {
+            background: #222;
+        }
+        .info-transporte {
+            background: #fafafa;
+            border: 1px solid #000;
+            padding: 0.8rem 1rem;
+            margin-top: 0.5rem;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        .muted {
+            font-size: 0.85rem;
+            color: #222;
+        }
+        .contenedor {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            border-bottom: 2px solid #000;
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
         }
     </style>
 </head>
@@ -230,8 +283,21 @@
 
     <!-- ===== SECCIÓN 4: DATOS COMPLEMENTARIOS ===== -->
     <div class="seccion">
-        <h2>📎 Datos complementarios (opcionales)</h2>
+        <h2>📎 Datos complementarios</h2>
         <div class="grid-3">
+            <div class="grupo">
+                <label>Fecha de la salida</label>
+                <input type="date" id="inputFecha" value="2026-07-20">
+            </div>
+            <div class="grupo">
+                <label>Duración</label>
+                <select id="inputDuracion" class="duracion-select">
+                    <option value="1 día">1 día</option>
+                    <option value="2 días">2 días</option>
+                    <option value="3 días">3 días</option>
+                    <option value="Más de 3 días">Más de 3 días</option>
+                </select>
+            </div>
             <div class="grupo">
                 <label>Curso (si es pedagógica)</label>
                 <input type="text" id="inputCurso" placeholder="Ej: 4° Medio A">
@@ -294,8 +360,8 @@
 <script>
     (function() {
         // ---------- ESTADO ----------
-        let participantes = []; // {nombre, rut, rol}
-        let ruta = []; // {tipo, descripcion, inicio, fin} (inicio/fin son strings "HH:MM")
+        let participantes = [];
+        let ruta = [];
 
         // Referencias DOM
         const inputLugar = document.getElementById('buscarLugar');
@@ -316,13 +382,15 @@
         const btnAgregarActividad = document.getElementById('btnAgregarActividad');
         const contenedorRuta = document.getElementById('contenedorRuta');
 
+        const inputFecha = document.getElementById('inputFecha');
+        const inputDuracion = document.getElementById('inputDuracion');
         const inputCurso = document.getElementById('inputCurso');
         const inputPrecio = document.getElementById('inputPrecio');
         const inputMenu = document.getElementById('inputMenu');
         const btnGuardar = document.getElementById('btnGuardarSalida');
         const mensajeFeedback = document.getElementById('mensajeFeedback');
 
-        // ---------- CARGAR LUGARES EN DATALIST ----------
+        // ---------- CARGAR LUGARES ----------
         function cargarLugaresEnDatalist() {
             const fragment = document.createDocumentFragment();
             lugares.forEach(l => {
@@ -353,9 +421,7 @@
         }
         cargarParticipantesDesdeUsuarios();
 
-        // ---------- FUNCIONES DE RENDERIZADO ----------
-
-        // Renderizar lugares (solo muestra los ya seleccionados para la ruta)
+        // ---------- RENDERIZADOS ----------
         function renderizarLugaresSeleccionados() {
             const lugaresEnRuta = ruta.filter(a => a.tipo === 'Lugar');
             if (lugaresEnRuta.length === 0) {
@@ -381,7 +447,6 @@
             });
         }
 
-        // Renderizar participantes
         function renderizarParticipantes() {
             if (participantes.length === 0) {
                 tablaParticipantes.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#666;">No hay participantes añadidos</td></tr>`;
@@ -422,14 +487,12 @@
             });
         }
 
-        // Renderizar ruta completa con horarios editables
         function renderizarRuta() {
             if (ruta.length === 0) {
                 contenedorRuta.innerHTML = `<p class="muted" style="text-align:center; width:100%;">No hay actividades en la ruta.</p>`;
                 return;
             }
             contenedorRuta.innerHTML = ruta.map((act, idx) => {
-                // Para lugares, mostrar referencia del horario original del lugar (si existe)
                 let referencia = '';
                 if (act.tipo === 'Lugar') {
                     const lugarEncontrado = lugares.find(l => l.nombre === act.descripcion);
@@ -455,7 +518,6 @@
                 </div>
             `}).join('');
 
-            // Eventos para actualizar horas
             document.querySelectorAll('.hora-inicio').forEach(input => {
                 input.addEventListener('change', function() {
                     const idx = parseInt(this.dataset.index);
@@ -473,7 +535,6 @@
                 });
             });
 
-            // Eventos para mover/eliminar
             document.querySelectorAll('.btn-subir').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const idx = parseInt(this.dataset.index);
@@ -510,7 +571,7 @@
             renderizarRuta();
         }
 
-        // ---------- AGREGAR LUGAR A LA RUTA ----------
+        // ---------- AGREGAR LUGAR ----------
         btnAgregarLugarARuta.addEventListener('click', function() {
             const nombre = inputLugar.value.trim();
             if (!nombre) {
@@ -522,7 +583,6 @@
                 mostrarMensaje('Lugar no encontrado en la base de datos.', 'error');
                 return;
             }
-            // Añadir a la ruta con horarios del lugar (el guía luego los editará)
             ruta.push({
                 tipo: 'Lugar',
                 descripcion: lugarEncontrado.nombre,
@@ -541,7 +601,7 @@
             }
         });
 
-        // ---------- AGREGAR ACTIVIDAD A LA RUTA (manual) ----------
+        // ---------- AGREGAR ACTIVIDAD MANUAL ----------
         btnAgregarActividad.addEventListener('click', function() {
             const tipo = tipoActividad.value;
             const desc = descActividad.value.trim() || `Actividad ${tipo}`;
@@ -604,7 +664,8 @@
 
             const salida = {
                 titulo: ruta.filter(a => a.tipo === 'Lugar').map(a => a.descripcion).join(' + ') || 'Salida sin título',
-                fecha: new Date().toISOString().slice(0,10),
+                fecha: inputFecha.value || new Date().toISOString().slice(0,10),
+                duracion: inputDuracion.value,
                 descripcion: `Ruta con ${ruta.length} actividades.`,
                 ruta: ruta,
                 participantes: participantes,
@@ -623,12 +684,14 @@
                 inputCurso.value = '';
                 inputPrecio.value = '';
                 inputMenu.value = '';
+                inputFecha.value = new Date().toISOString().slice(0,10);
+                inputDuracion.value = '1 día';
             } else {
                 mostrarMensaje('❌ Error al guardar. Revisa la consola.', 'error');
             }
         });
 
-        // ---------- MOSTRAR MENSAJE ----------
+        // ---------- MENSAJES ----------
         function mostrarMensaje(texto, tipo) {
             mensajeFeedback.textContent = texto;
             mensajeFeedback.className = `mensaje ${tipo === 'error' ? 'mensaje-error' : 'mensaje-exito'}`;
