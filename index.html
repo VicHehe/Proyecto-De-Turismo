@@ -1,111 +1,225 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lobby - Sistema de Gestión de Salidas</title>
-    <style>
-        /* Estilos mínimos solo para posicionamiento */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, sans-serif;
-        }
-        body {
-            background: #fff;
-            color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 2rem;
-        }
-        .container {
-            max-width: 800px;
-            width: 100%;
-            border: 2px solid #000;
-            padding: 2rem;
-            background: #fff;
-        }
-        h1 {
-            border-bottom: 2px solid #000;
-            padding-bottom: 0.5rem;
-            margin-top: 0;
-        }
-        .user-info {
-            margin: 1rem 0;
-            font-weight: bold;
-        }
-        .botones {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-        .btn {
-            background: #fff;
-            border: 2px solid #000;
-            padding: 0.7rem 1.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.15s;
-            text-decoration: none;
-            color: #000;
-            display: inline-block;
-        }
-        .btn:hover {
-            background: #000;
-            color: #fff;
-        }
-        .btn-secondary {
-            background: #f0f0f0;
-            border-color: #666;
-        }
-        .btn-secondary:hover {
-            background: #666;
-            color: #fff;
-        }
-        .footer {
-            border-top: 1px solid #000;
-            padding-top: 1rem;
-            margin-top: 2rem;
-            font-size: 0.9rem;
-        }
-        .rol-badge {
-            border: 1px solid #000;
-            padding: 0.1rem 0.6rem;
-            font-size: 0.8rem;
-            background: #eaeaea;
-            margin-left: 0.5rem;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turismo San Fernando · Lobby</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:#fff;
+    color:#000;
+}
+
+header{
+    background:#000;
+    color:#fff;
+    text-align:center;
+    padding:30px;
+    position: relative;
+}
+
+header .user-badge {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: #fff;
+    color: #000;
+    padding: 6px 14px;
+    border: 1px solid #000;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+header .user-badge .rol {
+    background: #333;
+    color: #fff;
+    padding: 2px 10px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+nav{
+    background:#333;
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    padding:15px;
+    flex-wrap:wrap;
+}
+
+nav button{
+    padding:10px 20px;
+    border:1px solid #000;
+    background:#fff;
+    color:#000;
+    cursor:pointer;
+    font-weight: bold;
+}
+
+nav button:hover{
+    background:#ddd;
+}
+
+.hero{
+    text-align:center;
+    padding:60px 20px;
+}
+
+.hero h2{
+    margin-bottom:20px;
+}
+
+.hero p{
+    max-width:700px;
+    margin:auto;
+    line-height:1.6;
+}
+
+.hero button{
+    margin-top:25px;
+    padding:12px 25px;
+    background:#000;
+    color:#fff;
+    border:1px solid #000;
+    cursor:pointer;
+}
+
+.lugares{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+    margin:40px;
+}
+
+.tarjeta{
+    width:280px;
+    border:1px solid #000;
+    padding:20px;
+    text-align:center;
+    background:#f5f5f5;
+}
+
+.tarjeta h3{
+    margin-bottom:15px;
+}
+
+.tarjeta p{
+    margin-bottom:20px;
+}
+
+.tarjeta button{
+    padding:10px 20px;
+    background:#000;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+}
+
+footer{
+    background:#000;
+    color:#fff;
+    text-align:center;
+    padding:20px;
+    margin-top:40px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+}
+
+footer .btn-cerrar {
+    background: #fff;
+    color: #000;
+    border: 1px solid #fff;
+    padding: 5px 15px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+footer .btn-cerrar:hover {
+    background: #ddd;
+}
+</style>
+
 </head>
 <body>
 
-<div class="container">
-    <h1>🚌 Sistema de Gestión de Salidas</h1>
-
-    <div class="user-info" id="userInfo">
+<header>
+    <h1>Turismo San Fernando</h1>
+    <p>Descubre la capital de la Provincia de Colchagua</p>
+    <div class="user-badge" id="userBadge">
         <span id="userNombre">Cargando...</span>
-        <span class="rol-badge" id="userRol">-</span>
+        <span class="rol" id="userRol">-</span>
     </div>
+</header>
 
-    <p>Selecciona una opción para continuar:</p>
+<nav id="navBotones">
+    <!-- Los botones se generan con JavaScript según el rol -->
+</nav>
 
-    <div class="botones" id="botonesContainer">
-        <!-- Se genera con JavaScript según el rol -->
+<section class="hero">
+    <h2>Bienvenido a San Fernando</h2>
+    <p>
+        San Fernando es una ciudad ubicada en la Región de O'Higgins, reconocida
+        por su patrimonio, sus viñas, su historia y los atractivos naturales que
+        la rodean.
+    </p>
+    <button onclick="sonido()">Comenzar recorrido</button>
+</section>
+
+<section class="lugares">
+    <div class="tarjeta">
+        <h3>Plaza de Armas</h3>
+        <p>Principal punto de encuentro y centro histórico de la ciudad.</p>
+        <button onclick="sonido()">Ver más</button>
     </div>
-
-    <div class="footer">
-        <button class="btn btn-secondary" id="btnCerrarSesion">Cerrar sesión</button>
+    <div class="tarjeta">
+        <h3>Ruta del Vino</h3>
+        <p>Recorre las viñas del Valle de Colchagua y conoce su tradición.</p>
+        <button onclick="sonido()">Ver más</button>
     </div>
-</div>
+    <div class="tarjeta">
+        <h3>Cordillera</h3>
+        <p>Disfruta de paisajes naturales y actividades al aire libre.</p>
+        <button onclick="sonido()">Ver más</button>
+    </div>
+</section>
 
-<!-- Scripts -->
+<footer>
+    © 2026 Turismo San Fernando
+    <button class="btn-cerrar" id="btnCerrarSesion">Cerrar sesión</button>
+</footer>
+
 <script src="js/github.js"></script>
 <script src="js/auth.js"></script>
 <script>
+    // Función de sonido original (se conserva)
+    function sonido(){
+        const audio = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audio.createOscillator();
+        const gain = audio.createGain();
+        osc.type = "triangle";
+        osc.frequency.value = 700;
+        osc.connect(gain);
+        gain.connect(audio.destination);
+        gain.gain.setValueAtTime(0.15, audio.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + 0.15);
+        osc.start();
+        osc.stop(audio.currentTime + 0.15);
+    }
+
     (function() {
         // Verificar sesión
         const usuario = Auth.getSesion();
@@ -114,43 +228,38 @@
             return;
         }
 
-        // Mostrar datos del usuario
+        // Mostrar datos del usuario en el badge
         document.getElementById('userNombre').textContent = `${usuario.nombre} ${usuario.apellido || ''}`;
         document.getElementById('userRol').textContent = usuario.rol;
 
         // Generar botones según rol
-        const container = document.getElementById('botonesContainer');
+        const nav = document.getElementById('navBotones');
         let botones = [];
 
         switch (usuario.rol) {
             case 'admin':
                 botones.push({
                     texto: '👑 Panel de Administración',
-                    href: 'pages/dashboard.html',
-                    class: 'btn'
+                    href: 'pages/dashboard.html'
                 });
                 botones.push({
                     texto: '📋 Planificar Salida',
-                    href: 'Planificar_Salida_Pedagogica.html',
-                    class: 'btn'
+                    href: 'Planificar_Salida_Pedagogica.html'
                 });
                 botones.push({
                     texto: '📅 Calendario',
-                    onclick: 'alert("Calendario (próximamente)")',
-                    class: 'btn'
+                    onclick: 'alert("Calendario (próximamente)")'
                 });
                 break;
 
             case 'guia':
                 botones.push({
                     texto: '📋 Planificar Salida',
-                    href: 'Planificar_Salida_Pedagogica.html',
-                    class: 'btn'
+                    href: 'Planificar_Salida_Pedagogica.html'
                 });
                 botones.push({
                     texto: '📅 Calendario',
-                    onclick: 'alert("Calendario (próximamente)")',
-                    class: 'btn'
+                    onclick: 'alert("Calendario (próximamente)")'
                 });
                 break;
 
@@ -158,28 +267,25 @@
             default:
                 botones.push({
                     texto: '📅 Calendario',
-                    onclick: 'alert("Calendario (próximamente)")',
-                    class: 'btn'
+                    onclick: 'alert("Calendario (próximamente)")'
                 });
                 botones.push({
                     texto: '🎒 Mis Salidas',
-                    onclick: 'alert("Lista de mis salidas (próximamente)")',
-                    class: 'btn'
+                    onclick: 'alert("Lista de mis salidas (próximamente)")'
                 });
                 break;
         }
 
-        // Renderizar botones
+        // Renderizar botones en el nav
         botones.forEach(b => {
             const btn = document.createElement('button');
             btn.textContent = b.texto;
-            btn.className = b.class || 'btn';
             if (b.href) {
                 btn.onclick = function() { window.location.href = b.href; };
             } else if (b.onclick) {
                 btn.onclick = new Function(b.onclick);
             }
-            container.appendChild(btn);
+            nav.appendChild(btn);
         });
 
         // Cerrar sesión
@@ -188,5 +294,6 @@
         });
     })();
 </script>
+
 </body>
 </html>
