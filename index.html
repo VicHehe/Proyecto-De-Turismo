@@ -109,6 +109,10 @@ nav button:hover{
     padding:20px;
     text-align:center;
     background:#f5f5f5;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .tarjeta h3{
@@ -117,6 +121,7 @@ nav button:hover{
 
 .tarjeta p{
     margin-bottom:20px;
+    flex-grow: 1;
 }
 
 .tarjeta button{
@@ -137,6 +142,7 @@ footer{
     justify-content: center;
     gap: 20px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 footer .btn-cerrar {
@@ -150,6 +156,14 @@ footer .btn-cerrar {
 
 footer .btn-cerrar:hover {
     background: #ddd;
+}
+
+.mensaje-vacio {
+    width: 100%;
+    text-align: center;
+    padding: 40px;
+    border: 1px solid #000;
+    background: #fafafa;
 }
 </style>
 
@@ -179,22 +193,8 @@ footer .btn-cerrar:hover {
     <button onclick="sonido()">Comenzar recorrido</button>
 </section>
 
-<section class="lugares">
-    <div class="tarjeta">
-        <h3>Plaza de Armas</h3>
-        <p>Principal punto de encuentro y centro histórico de la ciudad.</p>
-        <button onclick="sonido()">Ver más</button>
-    </div>
-    <div class="tarjeta">
-        <h3>Ruta del Vino</h3>
-        <p>Recorre las viñas del Valle de Colchagua y conoce su tradición.</p>
-        <button onclick="sonido()">Ver más</button>
-    </div>
-    <div class="tarjeta">
-        <h3>Cordillera</h3>
-        <p>Disfruta de paisajes naturales y actividades al aire libre.</p>
-        <button onclick="sonido()">Ver más</button>
-    </div>
+<section class="lugares" id="contenedorSalidas">
+    <!-- Se llena dinámicamente con las salidas guardadas -->
 </section>
 
 <footer>
@@ -204,6 +204,7 @@ footer .btn-cerrar:hover {
 
 <script src="js/github.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/planificacion.js"></script>
 <script>
     // Función de sonido original (se conserva)
     function sonido(){
@@ -221,7 +222,7 @@ footer .btn-cerrar:hover {
     }
 
     (function() {
-        // Verificar sesión
+        // ===== VERIFICAR SESIÓN =====
         const usuario = Auth.getSesion();
         if (!usuario) {
             window.location.href = 'login.html';
@@ -232,7 +233,7 @@ footer .btn-cerrar:hover {
         document.getElementById('userNombre').textContent = `${usuario.nombre} ${usuario.apellido || ''}`;
         document.getElementById('userRol').textContent = usuario.rol;
 
-        // Generar botones según rol
+        // ===== GENERAR BOTONES DEL NAV =====
         const nav = document.getElementById('navBotones');
         let botones = [];
 
@@ -288,12 +289,49 @@ footer .btn-cerrar:hover {
             nav.appendChild(btn);
         });
 
-        // Cerrar sesión
+        // ===== CARGAR Y MOSTRAR SALIDAS =====
+        async function cargarYMostrarSalidas() {
+            const contenedor = document.getElementById('contenedorSalidas');
+            try {
+                const salidas = await Planificacion.cargarSalidas();
+                if (!salidas || salidas.length === 0) {
+                    contenedor.innerHTML = `
+                        <div class="mensaje-vacio">
+                            <p>📭 No hay salidas planificadas para este mes/semana.</p>
+                            <p style="margin-top:10px; font-size:0.9rem;">
+                                ${usuario.rol === 'admin' || usuario.rol === 'guia' 
+                                    ? 'Puedes crear una desde "Planificar Salida".' 
+                                    : 'Vuelve más tarde.'}
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Mostrar hasta 3 salidas
+                const mostradas = salidas.slice(0, 3);
+                contenedor.innerHTML = mostradas.map(s => `
+                    <div class="tarjeta">
+                        <h3>${s.titulo}</h3>
+                        <p>${s.descripcion || 'Sin descripción'}</p>
+                        <p><small>📅 ${s.fecha || 'Fecha no definida'}</small></p>
+                        <p><small>👤 ${s.guia || 'Sin guía'}</small></p>
+                        <button onclick="alert('Detalles de: ${s.titulo.replace(/'/g, "\\'")}')">Ver más</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error al cargar salidas:', error);
+                contenedor.innerHTML = `<div class="mensaje-vacio"><p>⚠️ Error al cargar las salidas.</p></div>`;
+            }
+        }
+
+        cargarYMostrarSalidas();
+
+        // ===== CERRAR SESIÓN =====
         document.getElementById('btnCerrarSesion').addEventListener('click', function() {
             Auth.cerrarSesion();
         });
     })();
 </script>
-
 </body>
 </html>
