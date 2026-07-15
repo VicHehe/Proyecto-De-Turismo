@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario Personal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #fff;
+            color: #000;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 20px;
+        }
+        header {
+            border: 1px solid #000;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        header h1 {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        header .user-badge {
+            border: 1px solid #000;
+            padding: 4px 12px;
+            font-size: 13px;
+        }
+        .calendario-wrap {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .calendario {
+            border: 1px solid #000;
+            flex: 2;
+            min-width: 320px;
+        }
+        .cal-header {
+            border-bottom: 1px solid #000;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cal-header button {
+            background: #fff;
+            border: 1px solid #000;
+            padding: 2px 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .cal-header button:hover {
+            background: #eee;
+        }
+        .dias-semana {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            border-bottom: 1px solid #000;
+        }
+        .dias-semana div {
+            text-align: center;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 6px 0;
+            border-right: 1px solid #000;
+        }
+        .dias-semana div:last-child {
+            border-right: none;
+        }
+        .dias-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-auto-rows: 70px;
+        }
+        .dia {
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            padding: 4px;
+            font-size: 11px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .dia:nth-child(7n) {
+            border-right: none;
+        }
+        .dia.vacio {
+            background: repeating-linear-gradient(45deg, #fff, #fff 4px, #f5f5f5 4px, #f5f5f5 5px);
+        }
+        .dia .num-dia {
+            font-weight: bold;
+        }
+        .dia .evento {
+            margin-top: 2px;
+            font-size: 8.5px;
+            border: 1px solid #000;
+            padding: 1px 3px;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .dia .evento.multiple {
+            background: #f0f0f0;
+        }
+        .dia:hover {
+            background: #fafafa;
+        }
+        .detalle {
+            flex: 1;
+            min-width: 260px;
+            border: 1px solid #000;
+            padding: 12px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .detalle h2 {
+            font-size: 15px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 6px;
+            margin-bottom: 10px;
+        }
+        .tarjeta {
+            border: 1px solid #000;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+            font-size: 12.5px;
+        }
+        .tarjeta .titulo {
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        .tarjeta ul {
+            margin: 6px 0 0 16px;
+            list-style-type: disc;
+        }
+        .tarjeta .etiqueta {
+            display: inline-block;
+            border: 1px solid #000;
+            font-size: 9.5px;
+            padding: 0 4px;
+            margin-bottom: 4px;
+        }
+        .nota {
+            font-size: 11px;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid #000;
+        }
+        footer {
+            margin-top: 16px;
+            border: 1px solid #000;
+            padding: 8px 12px;
+            font-size: 11px;
+        }
+        .no-eventos {
+            color: #666;
+            font-style: italic;
+        }
+        .volver {
+            border: 1px solid #000;
+            padding: 4px 12px;
+            background: #fff;
+            cursor: pointer;
+            text-decoration: none;
+            color: #000;
+            font-size: 13px;
+        }
+        .volver:hover {
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>📅 Calendario Personal</h1>
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <span class="user-badge" id="userBadge">Cargando...</span>
+        <a href="index.html" class="volver">← Volver</a>
+    </div>
+</header>
+
+<div class="calendario-wrap">
+    <div class="calendario">
+        <div class="cal-header">
+            <button id="btnMesAnterior">◀</button>
+            <span id="mesTitulo">Julio 2026</span>
+            <button id="btnMesSiguiente">▶</button>
+        </div>
+        <div class="dias-semana">
+            <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
+        </div>
+        <div class="dias-grid" id="diasGrid">
+            <!-- Se llena con JS -->
+        </div>
+    </div>
+
+    <div class="detalle" id="panelDetalle">
+        <h2>Detalle del día</h2>
+        <div id="contenidoDetalle">
+            <p class="no-eventos">Selecciona un día con eventos para ver los detalles.</p>
+        </div>
+    </div>
+</div>
+
+<footer>
+    Nota: El calendario muestra las salidas guardadas en el sistema. Los roles determinan qué salidas ves.
+</footer>
+
+<script src="js/github.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/planificacion.js"></script>
+<script>
+    (function() {
+        // ---------- Estado ----------
+        let usuario = null;
+        let salidas = [];
+        let mesActual = new Date().getMonth();
+        let anioActual = new Date().getFullYear();
+        let eventosPorDia = {}; // clave "YYYY-MM-DD" -> array de salidas
+
+        // Referencias DOM
+        const mesTitulo = document.getElementById('mesTitulo');
+        const diasGrid = document.getElementById('diasGrid');
+        const panelDetalle = document.getElementById('contenidoDetalle');
+        const userBadge = document.getElementById('userBadge');
+
+        // ---------- Autenticación ----------
+        usuario = Auth.getSesion();
+        if (!usuario) {
+            window.location.href = 'login.html';
+            return;
+        }
+        userBadge.textContent = `${usuario.nombre} ${usuario.apellido || ''} (${usuario.rol})`;
+
+        // ---------- Cargar salidas ----------
+        async function cargarSalidas() {
+            try {
+                const todas = await Planificacion.cargarSalidas();
+                // Filtrar según rol
+                let filtradas = [];
+                if (usuario.rol === 'admin') {
+                    filtradas = todas;
+                } else if (usuario.rol === 'guia') {
+                    // El guía ve las salidas donde aparece como guía
+                    filtradas = todas.filter(s => s.guias && s.guias.some(g => g.rut === usuario.rut));
+                } else {
+                    // Visitante / estudiante: ve las salidas donde es participante
+                    filtradas = todas.filter(s => s.participantes && s.participantes.some(p => p.rut === usuario.rut));
+                }
+                return filtradas;
+            } catch (error) {
+                console.error('Error cargando salidas:', error);
+                return [];
+            }
+        }
+
+        // ---------- Construir eventos por día ----------
+        function construirEventos(salidas) {
+            const mapa = {};
+            salidas.forEach(s => {
+                if (!s.fecha) return;
+                const key = s.fecha; // formato YYYY-MM-DD
+                if (!mapa[key]) mapa[key] = [];
+                mapa[key].push(s);
+            });
+            return mapa;
+        }
+
+        // ---------- Renderizar calendario ----------
+        function renderizarCalendario(mes, anio) {
+            const primerDia = new Date(anio, mes, 1).getDay(); // 0=domingo
+            const diasEnMes = new Date(anio, mes + 1, 0).getDate();
+            const hoy = new Date();
+            const hoyStr = hoy.toISOString().slice(0,10);
+
+            // Ajustar para que la semana empiece en lunes (en JS domingo=0, lunes=1)
+            let offset = primerDia === 0 ? 6 : primerDia - 1; // cantidad de celdas vacías al inicio
+
+            const nombresMeses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            mesTitulo.textContent = `${nombresMeses[mes]} ${anio}`;
+
+            let html = '';
+            // Celdas vacías iniciales
+            for (let i = 0; i < offset; i++) {
+                html += `<div class="dia vacio"></div>`;
+            }
+
+            // Días del mes
+            for (let d = 1; d <= diasEnMes; d++) {
+                const fechaStr = `${anio}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const eventos = eventosPorDia[fechaStr] || [];
+                const esHoy = fechaStr === hoyStr;
+
+                let eventoHtml = '';
+                if (eventos.length > 0) {
+                    // Mostrar hasta 2 eventos, si hay más poner " +N"
+                    const mostrar = eventos.slice(0, 2);
+                    eventoHtml = mostrar.map(e => `<span class="evento">${e.titulo}</span>`).join('');
+                    if (eventos.length > 2) {
+                        eventoHtml += `<span class="evento multiple">+${eventos.length-2} más</span>`;
+                    }
+                }
+
+                const claseHoy = esHoy ? ' style="background:#f0f0f0;"' : '';
+                html += `<div class="dia" data-fecha="${fechaStr}"${claseHoy}>
+                    <span class="num-dia">${d}</span>
+                    ${eventoHtml}
+                </div>`;
+            }
+
+            // Rellenar celdas vacías al final
+            const totalCeldas = offset + diasEnMes;
+            const sobrante = (7 - (totalCeldas % 7)) % 7;
+            for (let i = 0; i < sobrante; i++) {
+                html += `<div class="dia vacio"></div>`;
+            }
+
+            diasGrid.innerHTML = html;
+
+            // Asignar eventos de clic a los días con eventos
+            document.querySelectorAll('.dia[data-fecha]').forEach(el => {
+                const fecha = el.dataset.fecha;
+                const eventos = eventosPorDia[fecha] || [];
+                if (eventos.length > 0) {
+                    el.style.cursor = 'pointer';
+                    el.addEventListener('click', function() {
+                        mostrarDetalle(fecha, eventos);
+                    });
+                }
+            });
+        }
+
+        // ---------- Mostrar detalle ----------
+        function mostrarDetalle(fecha, eventos) {
+            const fechaFormateada = fecha.split('-').reverse().join('/');
+            let html = `<h3>${fechaFormateada}</h3>`;
+            if (eventos.length === 0) {
+                html += `<p class="no-eventos">No hay eventos este día.</p>`;
+            } else {
+                eventos.forEach(s => {
+                    html += `<div class="tarjeta">
+                        <span class="etiqueta">${s.guias && s.guias.some(g => g.rut === usuario.rut) ? 'Tu guía' : 'Participante'}</span>
+                        <div class="titulo">${s.titulo}</div>
+                        <p><strong>Fecha:</strong> ${s.fecha}</p>
+                        <p><strong>Duración:</strong> ${s.duracion || 'No especificada'}</p>
+                        <p><strong>Descripción:</strong> ${s.descripcion || 'Sin descripción'}</p>
+                        <p><strong>Ruta:</strong></p>
+                        <ul>`;
+                    if (s.ruta && s.ruta.length > 0) {
+                        s.ruta.forEach(act => {
+                            html += `<li>${act.tipo}: ${act.descripcion} (${act.inicio} - ${act.fin})</li>`;
+                        });
+                    } else {
+                        html += `<li>No hay ruta definida</li>`;
+                    }
+                    html += `</ul>
+                        <p><strong>Participantes:</strong> ${s.participantes ? s.participantes.map(p => p.nombre).join(', ') : 'Ninguno'}</p>
+                        <p><strong>Guía(s):</strong> ${s.guias ? s.guias.map(g => g.nombre).join(', ') : 'Sin guía'}</p>
+                        <p><strong>Precio:</strong> $${s.precio || 0}</p>
+                        <p><strong>Curso:</strong> ${s.curso || 'Sin curso'}</p>
+                        <p><strong>Menú:</strong> ${s.menu || 'Sin menú'}</p>
+                    </div>`;
+                });
+            }
+            panelDetalle.innerHTML = html;
+        }
+
+        // ---------- Cambiar mes ----------
+        function cambiarMes(delta) {
+            mesActual += delta;
+            if (mesActual < 0) { mesActual = 11; anioActual--; }
+            if (mesActual > 11) { mesActual = 0; anioActual++; }
+            renderizarCalendario(mesActual, anioActual);
+            // Limpiar detalle
+            panelDetalle.innerHTML = `<p class="no-eventos">Selecciona un día con eventos para ver los detalles.</p>`;
+        }
+
+        // ---------- Inicializar ----------
+        async function iniciar() {
+            const salidasFiltradas = await cargarSalidas();
+            salidas = salidasFiltradas;
+            eventosPorDia = construirEventos(salidas);
+
+            // Ajustar mes al de la primera salida si existe
+            if (salidas.length > 0 && salidas[0].fecha) {
+                const fecha = new Date(salidas[0].fecha);
+                if (!isNaN(fecha.getTime())) {
+                    mesActual = fecha.getMonth();
+                    anioActual = fecha.getFullYear();
+                }
+            }
+
+            renderizarCalendario(mesActual, anioActual);
+
+            // Eventos de botones
+            document.getElementById('btnMesAnterior').addEventListener('click', () => cambiarMes(-1));
+            document.getElementById('btnMesSiguiente').addEventListener('click', () => cambiarMes(1));
+        }
+
+        iniciar();
+    })();
+</script>
+</body>
+</html>
