@@ -28,14 +28,17 @@ const GitHub = {
             if (data.content) {
                 // Decodificar Base64 a texto UTF-8 correctamente
                 const base64 = data.content.replace(/\n/g, '').replace(/\r/g, '');
+                // Paso 1: Decodificar Base64 a string binaria
                 const binaryString = atob(base64);
-                // Convertir a Uint8Array para decodificar como UTF-8
+                // Paso 2: Convertir a Uint8Array
                 const bytes = new Uint8Array(binaryString.length);
                 for (let i = 0; i < binaryString.length; i++) {
                     bytes[i] = binaryString.charCodeAt(i);
                 }
+                // Paso 3: Decodificar como UTF-8
                 const decoder = new TextDecoder('utf-8');
                 const decoded = decoder.decode(bytes);
+                // Paso 4: Parsear JSON
                 return JSON.parse(decoded);
             }
             
