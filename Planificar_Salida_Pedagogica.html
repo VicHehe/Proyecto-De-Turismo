@@ -292,10 +292,11 @@
             <div class="grupo">
                 <label>Duración</label>
                 <select id="inputDuracion" class="duracion-select">
-                    <option value="1 día">1 día</option>
-                    <option value="2 días">2 días</option>
-                    <option value="3 días">3 días</option>
-                    <option value="Más de 3 días">Más de 3 días</option>
+                    <!-- Cambio: sin tildes para evitar problemas de codificación -->
+                    <option value="1 dia">1 dia</option>
+                    <option value="2 dias">2 dias</option>
+                    <option value="3 dias">3 dias</option>
+                    <option value="Mas de 3 dias">Mas de 3 dias</option>
                 </select>
             </div>
             <div class="grupo">
@@ -685,7 +686,8 @@
                 inputPrecio.value = '';
                 inputMenu.value = '';
                 inputFecha.value = new Date().toISOString().slice(0,10);
-                inputDuracion.value = '1 día';
+                // Cambio: resetear a "1 dia" sin tilde
+                inputDuracion.value = '1 dia';
             } else {
                 mostrarMensaje('❌ Error al guardar. Revisa la consola.', 'error');
             }
