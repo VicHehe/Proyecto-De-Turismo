@@ -54,6 +54,55 @@
         "precio": "$ 120.000 CLP",
         "descripcion": "Bus de 40 asientos con aire acondicionado"
       }
+    },
+    {
+      "titulo": "Termas del Flaco + Santuario Alto Huemul",
+      "fecha": "2026-07-20",
+      "duracion": "1 dia",
+      "descripcion": "Ruta con 2 actividades.",
+      "ruta": [
+        {
+          "tipo": "Lugar",
+          "descripcion": "Termas del Flaco",
+          "inicio": "14:29",
+          "fin": "16:30"
+        },
+        {
+          "tipo": "Lugar",
+          "descripcion": "Santuario Alto Huemul",
+          "inicio": "16:30",
+          "fin": "17:30"
+        }
+      ],
+      "participantes": [
+        {
+          "nombre": "Victor Tilleria",
+          "rut": "22785939-3",
+          "rol": "Guía"
+        },
+        {
+          "nombre": "Don Lisandro",
+          "rut": "12345678-9",
+          "rol": "Visitante"
+        }
+      ],
+      "guias": [
+        {
+          "nombre": "Victor Tilleria",
+          "rut": "22785939-3",
+          "rol": "Guía"
+        }
+      ],
+      "precio": 0,
+      "curso": "Sin curso",
+      "menu": "Sin menú",
+      "transporte": {
+        "conductor": "hsahdkashkid",
+        "horarios": "No especificado",
+        "precio": "No especificado",
+        "descripcion": "No especificado"
+      },
+      "id": "salida_1784737904415"
     }
   ]
 }
