@@ -129,6 +129,19 @@
       "rol": "visitante",
       "estado": "activo",
       "fechaRegistro": "2026-07-23T16:07:14.535Z"
+    },
+    {
+      "rut": "23218190-7",
+      "nombre": "Arelis",
+      "apellido": "Díaz",
+      "edad": 16,
+      "telefono": "966912432",
+      "gmail": "arelis309diaz@gmail.com",
+      "historial": "Asma",
+      "password": "d97dc19d8528fd2a6f7e0b29560beb0b6722d3277329b700581ea3db84383983",
+      "rol": "visitante",
+      "estado": "activo",
+      "fechaRegistro": "2026-07-23T16:07:50.437Z"
     }
   ],
   "ruts_autorizados": [
