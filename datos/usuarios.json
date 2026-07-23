@@ -103,6 +103,19 @@
       "rol": "visitante",
       "estado": "activo",
       "fechaRegistro": "2026-07-23T16:06:20.993Z"
+    },
+    {
+      "rut": "23197199-8",
+      "nombre": "Sebastián Eduardo",
+      "apellido": "Uribe Aguilera",
+      "edad": 16,
+      "telefono": "926061647",
+      "gmail": "emisebaguilera@gmail.com",
+      "historial": "sin alergias",
+      "password": "312ce71e81599a435c5c25658ff58995b7227a5e2b9386b7f875537223129fdc",
+      "rol": "visitante",
+      "estado": "activo",
+      "fechaRegistro": "2026-07-23T16:06:29.334Z"
     }
   ],
   "ruts_autorizados": [
