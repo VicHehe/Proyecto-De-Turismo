@@ -142,6 +142,19 @@
       "rol": "visitante",
       "estado": "activo",
       "fechaRegistro": "2026-07-23T16:07:50.437Z"
+    },
+    {
+      "rut": "11743974-7",
+      "nombre": "María",
+      "apellido": "Pérez",
+      "edad": 16,
+      "telefono": "040877338",
+      "gmail": "monseperezvidal123@gmail.com",
+      "historial": "Nada",
+      "password": "d99f62cb9f5647aad02c99acd4d53bb7c85af32df16ff13222718ae38aec7ac2",
+      "rol": "visitante",
+      "estado": "activo",
+      "fechaRegistro": "2026-07-23T16:08:42.325Z"
     }
   ],
   "ruts_autorizados": [
