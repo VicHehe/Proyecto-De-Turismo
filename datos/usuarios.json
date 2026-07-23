@@ -168,6 +168,19 @@
       "rol": "visitante",
       "estado": "activo",
       "fechaRegistro": "2026-07-23T16:09:27.396Z"
+    },
+    {
+      "rut": "22811913-K",
+      "nombre": "ayleen",
+      "apellido": "millan",
+      "edad": 17,
+      "telefono": "+56995847435",
+      "gmail": "ayleencarrasco097@gmail.com",
+      "historial": "nada",
+      "password": "dab88259d1326417f7caa7bcad70f2665cf60f2bebe0ac6458baa2f0e16352c8",
+      "rol": "visitante",
+      "estado": "activo",
+      "fechaRegistro": "2026-07-23T16:09:31.611Z"
     }
   ],
   "ruts_autorizados": [
