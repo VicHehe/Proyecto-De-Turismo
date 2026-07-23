@@ -38,6 +38,19 @@
       "rol": "visitante",
       "estado": "activo",
       "fechaRegistro": "2026-07-23T16:02:26.765Z"
+    },
+    {
+      "rut": "232353309",
+      "nombre": "Diego",
+      "apellido": "Bastidas",
+      "edad": 16,
+      "telefono": "997057505",
+      "gmail": "diegob.bastidas@gmail.com",
+      "historial": "Alergia leve al pescado y palta",
+      "password": "445ca32cc1d3b7f25d8eab400cc75a2e1a23b9658bd3a8389aef561d08bd092c",
+      "rol": "visitante",
+      "estado": "activo",
+      "fechaRegistro": "2026-07-23T16:02:58.205Z"
     }
   ],
   "ruts_autorizados": [
