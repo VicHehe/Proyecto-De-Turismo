@@ -181,6 +181,19 @@
       "rol": "visitante",
       "estado": "activo",
       "fechaRegistro": "2026-07-23T16:09:31.611Z"
+    },
+    {
+      "rut": "23007659-6",
+      "nombre": "tomas",
+      "apellido": "cabrera",
+      "edad": 17,
+      "telefono": "961823300",
+      "gmail": "cabrera.corvalan.tomas123@gmail.com",
+      "historial": "ninguno",
+      "password": "eb12528818e908031f7fb3aeebe3a5e8679ccf46d60fd3cfc910c6200b862945",
+      "rol": "visitante",
+      "estado": "activo",
+      "fechaRegistro": "2026-07-23T16:12:30.486Z"
     }
   ],
   "ruts_autorizados": [
