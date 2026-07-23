@@ -64,6 +64,19 @@
       "rol": "visitante",
       "estado": "activo",
       "fechaRegistro": "2026-07-23T16:04:59.302Z"
+    },
+    {
+      "rut": "29261833-6",
+      "nombre": "Camila",
+      "apellido": "Torrico",
+      "edad": 17,
+      "telefono": "+56 9 2168 3077",
+      "gmail": "camilatorrico100@gmail.com",
+      "historial": "Ninguno",
+      "password": "813f24a0424d87dd85ceb55f852165185eae6ea0ef87ebffbb320b2d65d4a460",
+      "rol": "visitante",
+      "estado": "activo",
+      "fechaRegistro": "2026-07-23T16:05:16.728Z"
     }
   ],
   "ruts_autorizados": [
