@@ -51,6 +51,19 @@
       "rol": "visitante",
       "estado": "activo",
       "fechaRegistro": "2026-07-23T16:02:58.205Z"
+    },
+    {
+      "rut": "22957671-2",
+      "nombre": "Sophya",
+      "apellido": "Martinez",
+      "edad": 17,
+      "telefono": "9 4442 1943",
+      "gmail": "samantayshiroi.14@gmail.com",
+      "historial": "Ninguna",
+      "password": "766da1e28896a6dfc1ec60770336db5235202f81bc17f9ca54fbf9c15cba3de7",
+      "rol": "visitante",
+      "estado": "activo",
+      "fechaRegistro": "2026-07-23T16:04:59.302Z"
     }
   ],
   "ruts_autorizados": [
