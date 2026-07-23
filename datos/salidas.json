@@ -152,6 +152,50 @@
         "descripcion": "No especificado"
       },
       "id": "salida_1784821840282"
+    },
+    {
+      "titulo": "Museo de Colchagua + Actividad Lugar",
+      "fecha": "2026-08-11",
+      "duracion": "1 dia",
+      "descripcion": "Ruta con 2 actividades.",
+      "ruta": [
+        {
+          "tipo": "Lugar",
+          "descripcion": "Museo de Colchagua",
+          "inicio": "08:00",
+          "fin": "15:13"
+        },
+        {
+          "tipo": "Lugar",
+          "descripcion": "Actividad Lugar",
+          "inicio": "09:00",
+          "fin": "14:00"
+        }
+      ],
+      "participantes": [
+        {
+          "nombre": "francisco Lillo",
+          "rut": "16665701-6",
+          "rol": "Guía"
+        }
+      ],
+      "guias": [
+        {
+          "nombre": "francisco Lillo",
+          "rut": "16665701-6",
+          "rol": "Guía"
+        }
+      ],
+      "precio": 5000,
+      "curso": "3 c",
+      "menu": "almuerzo/ colación",
+      "transporte": {
+        "conductor": "juan",
+        "horarios": "No especificado",
+        "precio": "No especificado",
+        "descripcion": "No especificado"
+      },
+      "id": "salida_1784823428750"
     }
   ]
 }
