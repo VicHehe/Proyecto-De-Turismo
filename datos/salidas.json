@@ -103,6 +103,55 @@
         "descripcion": "No especificado"
       },
       "id": "salida_1784737904415"
+    },
+    {
+      "titulo": "Museo Lircunlauta",
+      "fecha": "2026-07-20",
+      "duracion": "1 dia",
+      "descripcion": "Ruta con 2 actividades.",
+      "ruta": [
+        {
+          "tipo": "Traslado",
+          "descripcion": "Actividad Traslado",
+          "inicio": "09:00",
+          "fin": "10:00"
+        },
+        {
+          "tipo": "Lugar",
+          "descripcion": "Museo Lircunlauta",
+          "inicio": "09:00 (mar-vie)",
+          "fin": "13:00 y 14:30-18:30 (mar-vie); 14:00-19:00 (fin de semana)"
+        }
+      ],
+      "participantes": [
+        {
+          "nombre": "Victor Tilleria",
+          "rut": "22785939-3",
+          "rol": "Guía"
+        },
+        {
+          "nombre": "Don Lisandro",
+          "rut": "12345678-9",
+          "rol": "Visitante"
+        }
+      ],
+      "guias": [
+        {
+          "nombre": "Victor Tilleria",
+          "rut": "22785939-3",
+          "rol": "Guía"
+        }
+      ],
+      "precio": 0,
+      "curso": "Sin curso",
+      "menu": "Sin menú",
+      "transporte": {
+        "conductor": "julio",
+        "horarios": "No especificado",
+        "precio": "100000",
+        "descripcion": "No especificado"
+      },
+      "id": "salida_1784821835223"
     }
   ]
 }
