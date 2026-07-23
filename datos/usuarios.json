@@ -25,6 +25,19 @@
       "rol": "estudiante",
       "estado": "activo",
       "fechaRegistro": "2026-07-13T19:42:32.625Z"
+    },
+    {
+      "rut": "23223531-4",
+      "nombre": "Agustín Adolfo",
+      "apellido": "Díaz Vergara",
+      "edad": 16,
+      "telefono": "922391906",
+      "gmail": "agustinadolfodiazvergara@gmail.com",
+      "historial": "Alergico a la eritromicina",
+      "password": "3cdf84af7771bd284ddf2a5a5601f3dde33b391f2d6de46a96fd7eee63e165a1",
+      "rol": "visitante",
+      "estado": "activo",
+      "fechaRegistro": "2026-07-23T16:02:26.765Z"
     }
   ],
   "ruts_autorizados": [
