@@ -77,6 +77,19 @@
       "rol": "visitante",
       "estado": "activo",
       "fechaRegistro": "2026-07-23T16:05:16.728Z"
+    },
+    {
+      "rut": "16665701-6",
+      "nombre": "francisco",
+      "apellido": "Lillo",
+      "edad": 39,
+      "telefono": "948772963",
+      "gmail": "francisco.lillo@slepcolchagua.cl",
+      "historial": "picaduras de abeja",
+      "password": "c3edb5b98e71a9a139f78b5f18fc0a4067db186fa6dfe052e9b92f9af12c78c0",
+      "rol": "visitante",
+      "estado": "activo",
+      "fechaRegistro": "2026-07-23T16:06:03.048Z"
     }
   ],
   "ruts_autorizados": [
