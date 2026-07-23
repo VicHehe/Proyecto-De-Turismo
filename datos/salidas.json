@@ -196,6 +196,54 @@
         "descripcion": "No especificado"
       },
       "id": "salida_1784823428750"
+    },
+    {
+      "titulo": "Ruta del Vino",
+      "fecha": "2026-08-11",
+      "duracion": "1 dia",
+      "descripcion": "Ruta con 1 actividades.",
+      "ruta": [
+        {
+          "tipo": "Lugar",
+          "descripcion": "Ruta del Vino",
+          "inicio": "9:30",
+          "fin": "17:30"
+        }
+      ],
+      "participantes": [
+        {
+          "nombre": "Agustín Adolfo Díaz Vergara",
+          "rut": "23223531-4",
+          "rol": "Visitante"
+        },
+        {
+          "nombre": "Diego Bastidas",
+          "rut": "232353309",
+          "rol": "Visitante"
+        },
+        {
+          "nombre": "francisco Lillo",
+          "rut": "16665701-6",
+          "rol": "Guía"
+        }
+      ],
+      "guias": [
+        {
+          "nombre": "francisco Lillo",
+          "rut": "16665701-6",
+          "rol": "Guía"
+        }
+      ],
+      "precio": 5000,
+      "curso": "Sin curso",
+      "menu": "Sin menú",
+      "transporte": {
+        "conductor": "No especificado",
+        "horarios": "No especificado",
+        "precio": "No especificado",
+        "descripcion": "No especificado"
+      },
+      "id": "salida_1784824517149"
     }
   ]
 }
