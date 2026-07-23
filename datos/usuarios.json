@@ -116,6 +116,19 @@
       "rol": "visitante",
       "estado": "activo",
       "fechaRegistro": "2026-07-23T16:06:29.334Z"
+    },
+    {
+      "rut": "23104322-5",
+      "nombre": "Diego ignacio",
+      "apellido": "Valenzuela Gomez",
+      "edad": 17,
+      "telefono": "989949237",
+      "gmail": "dv9987450@gmail.com",
+      "historial": "no",
+      "password": "7656f7b8676257c918820337deceec11b8ffdb2ba558d0c1ed6e0d8eea2d8264",
+      "rol": "visitante",
+      "estado": "activo",
+      "fechaRegistro": "2026-07-23T16:07:14.535Z"
     }
   ],
   "ruts_autorizados": [
