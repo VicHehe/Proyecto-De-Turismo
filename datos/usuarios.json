@@ -155,6 +155,19 @@
       "rol": "visitante",
       "estado": "activo",
       "fechaRegistro": "2026-07-23T16:08:42.325Z"
+    },
+    {
+      "rut": "23254908-4",
+      "nombre": "Sabrina",
+      "apellido": "Silva",
+      "edad": 16,
+      "telefono": "975595305",
+      "gmail": "sabrina.nataly1515@icloud.com",
+      "historial": "Nada",
+      "password": "5d2bbb64f58e32cdd5deb0c777063d1026c0d965cccbce9cdf73396ff95bda7e",
+      "rol": "visitante",
+      "estado": "activo",
+      "fechaRegistro": "2026-07-23T16:09:27.396Z"
     }
   ],
   "ruts_autorizados": [
