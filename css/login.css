@@ -1,4 +1,4 @@
-/* Estilos mínimos solo para posicionamiento */
+/* Estilos originales que ya existían */
 body {
     font-family: system-ui, -apple-system, sans-serif;
     background: white;
@@ -10,7 +10,6 @@ body {
     align-items: center;
     min-height: 100vh;
 }
-
 .container {
     max-width: 800px;
     width: 100%;
@@ -18,49 +17,41 @@ body {
     padding: 2rem;
     background: #fff;
 }
-
 h1 {
     border-bottom: 2px solid #000;
     padding-bottom: 0.5rem;
     margin-top: 0;
 }
-
 .form-group {
     margin-bottom: 1rem;
     display: flex;
     flex-direction: column;
 }
-
 .form-group label {
     font-weight: bold;
     margin-bottom: 0.25rem;
 }
-
 .form-group input {
     padding: 0.5rem;
     border: 1px solid #000;
     background: #fff;
     font-size: 1rem;
 }
-
 .form-row {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
 }
-
 .form-row .form-group {
     flex: 1;
     min-width: 200px;
 }
-
 .botones {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
     margin-top: 1.5rem;
 }
-
 .btn {
     background: #fff;
     border: 2px solid #000;
@@ -69,19 +60,92 @@ h1 {
     cursor: pointer;
     transition: 0.15s;
 }
-
 .btn:hover {
     background: #000;
     color: #fff;
 }
-
 .mensaje {
     border: 1px solid #000;
     padding: 0.5rem;
     margin: 1rem 0;
     background: #f0f0f0;
 }
-
 .hidden {
+    display: none !important;
+}
+
+/* Nuevos estilos que estaban en el <style> de login.html */
+.login-box {
+    max-width: 500px;
+    width: 100%;
+    border: 2px solid #000;
+    padding: 2rem;
+    background: #fff;
+}
+.field {
+    margin-bottom: 1rem;
+}
+.field label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+.field input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #000;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+.tab-btns {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+.tab-btn {
+    flex: 1;
+    padding: 0.5rem;
+    border: 2px solid #000;
+    background: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+.tab-btn.active {
+    background: #000;
+    color: #fff;
+}
+.btn-submit {
+    width: 100%;
+    padding: 0.7rem;
+    background: #000;
+    color: #fff;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+.btn-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.msg {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #000;
+    display: none;
+}
+.msg.error {
+    display: block;
+    background: #ffebeb;
+}
+.msg.success {
+    display: block;
+    background: #ebffeb;
+}
+.rol-info {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+.panel-hidden {
     display: none !important;
 }
