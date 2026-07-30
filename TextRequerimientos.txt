@@ -23,6 +23,10 @@
 
 - La pagina debe verse natural como la naturaleza y formal sin exagerar
 
+- En el Js con info de lugares debe añadirse mas zonas turisticas (Trabajo especifico de belen)
+ 
+- Se le puede poner nombres a las salidas
+
 --- Extras (opcionales que solo se haran al finalizar todo lo demas.) ---
 - Poner el logo de fondo como marca de agua (transparente).
 - Agregar un fondo con fotos de paisajes que roten automáticamente (usando JavaScript).
