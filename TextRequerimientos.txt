@@ -1,0 +1,29 @@
+-Visual:colores naturales,no colores fuertes,
+
+Emblema del liceo,logo de turismo, botónes (cambiar color)
+
+-Adaptar el apartado de planificación para teléfonos móviles 
+
+-Arreglar la posición de los nombres de los usuarios
+
+-!!Cuando inicias sesión no debe parecer rut de Víctor!! 
+
+-Especificar que la lupa de búsqueda está al fondo
+
+-Lugares,personas, transporte,plan de ruta,datos complementarios.
+
+-Sacar el clip
+
+-idea: fotos de lugares(tipo gallería cuando se haya concretado un viaje)
+
+-Poder subir fotos y comentarios y que el resto de personas que puedan poner votación 
+
+- Votar y el icono de calificación sean piñas de el árbol de pino
+
+-que el administrador pueda cambiar los datos de los usuarios y poder editar salidas ya planificadas
+
+---Extras---------------
+
+-Tal ves poner fondo de el logo
+
+-Fondo de paisajes agregados al js
