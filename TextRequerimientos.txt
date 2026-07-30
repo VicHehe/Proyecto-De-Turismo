@@ -1,29 +1,28 @@
--Visual:colores naturales,no colores fuertes,
+- Visual: usar colores suaves (verdes, cafés, azules suaves). Poner el emblema del liceo y el logo de turismo. Los botones deben cambiar de color al pasar el mouse.
 
-Emblema del liceo,logo de turismo, botónes (cambiar color)
+- Adaptar la sección "Plan de Ruta" para que se vea bien y sea fácil de usar en teléfonos móviles.
 
--Adaptar el apartado de planificación para teléfonos móviles 
+- Arreglar la posición de los nombres de los usuarios para que no se vean desordenados o corridos. en el index.
 
--Arreglar la posición de los nombres de los usuarios
+- Al iniciar sesión, mostrar los datos del usuario que entró. NO debe aparecer el RUT de Víctor (eso es datos de prueba).
 
--!!Cuando inicias sesión no debe parecer rut de Víctor!! 
+- El menú principal debe tener solo estas 5 secciones en este orden: Lugares, Personas, Transporte, Plan de Ruta y Datos Complementarios.
 
--Especificar que la lupa de búsqueda está al fondo
+- Quitar el ícono de "clipy" y remplazarlo por otro en el apartado de planificar salida
 
--Lugares,personas, transporte,plan de ruta,datos complementarios.
+- Sistema de galería de viajes: 
+  - Solo los Guías y el Administrador pueden subir 1 o varias fotos + una descripción del viaje (los estudiantes NO pueden subir).
+  - Todos los usuarios (estudiantes, guías y admin) pueden votar esas fotos usando piñas de pino (en vez de estrellas), del 1 al 5.
+  - Las fotos que suba el Administrador deben aparecer en la página de inicio (Index) para promocionar la página.
 
--Sacar el clip
+- El Administrador puede editar los datos de cualquier usuario (nombre, correo, etc.) y el guia y admin puede puede modificar las salidas propias que ya estaban planificadas (fechas, rutas, etc.).
 
--idea: fotos de lugares(tipo gallería cuando se haya concretado un viaje)
+- Cambiar el texto de bienvenida de la página principal. Quitar el texto largo que habla de San Fernando y poner algo más corto como: "Bienvenido a Turismo Eduardo Charm. Aquí puedes inscribirte en guías turísticas y gestionar tus viajes."
 
--Poder subir fotos y comentarios y que el resto de personas que puedan poner votación 
+- El texto debe sonar natural pero formal a la vez (que no sea muy poético ni muy relajado).
 
-- Votar y el icono de calificación sean piñas de el árbol de pino
+- La pagina debe verse natural como la naturaleza y formal sin exagerar
 
--que el administrador pueda cambiar los datos de los usuarios y poder editar salidas ya planificadas
-
----Extras---------------
-
--Tal ves poner fondo de el logo
-
--Fondo de paisajes agregados al js
+--- Extras (opcionales que solo se haran al finalizar todo lo demas.) ---
+- Poner el logo de fondo como marca de agua (transparente).
+- Agregar un fondo con fotos de paisajes que roten automáticamente (usando JavaScript).
