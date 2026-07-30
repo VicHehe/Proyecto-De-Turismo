@@ -21,11 +21,11 @@
     <div id="panelLogin">
         <div class="field">
             <label>RUT (con guión)</label>
-            <input type="text" id="loginRut" placeholder="Ej: 12345678-9" value="22785939-3">
+            <input type="text" id="loginRut" placeholder="Ej: 12345678-9">
         </div>
         <div class="field">
             <label>Contraseña</label>
-            <input type="password" id="loginPass" placeholder="********" value="Devictor.">
+            <input type="password" id="loginPass" placeholder="********">
         </div>
         <button class="btn-submit" id="btnLogin" onclick="login()">Iniciar sesión</button>
         <div class="msg" id="loginMsg"></div>
@@ -86,7 +86,131 @@
 <script src="js/auth.js"></script>
 
 <script>
-    // ... (el mismo JavaScript que ya tenías) ...
+    // ============================================================
+    // CÓDIGO DE LOGIN Y REGISTRO
+    // ============================================================
+
+    if (typeof Auth === 'undefined') {
+        document.body.innerHTML = '<h1>Error: Auth no está definido</h1><p>Revisa que auth.js se haya cargado correctamente.</p>';
+        console.error('❌ Auth no está definido');
+    } else {
+        console.log('✅ Auth cargado correctamente');
+    }
+
+    function switchTab(tab) {
+        const esLogin = tab === 'login';
+        document.getElementById('panelLogin').style.display = esLogin ? 'block' : 'none';
+        document.getElementById('panelRegistro').style.display = esLogin ? 'none' : 'block';
+        document.querySelectorAll('.tab-btn').forEach((b, i) => {
+            b.classList.toggle('active', esLogin ? i === 0 : i === 1);
+        });
+        document.getElementById('loginMsg').className = 'msg';
+        document.getElementById('loginMsg').style.display = 'none';
+        document.getElementById('registroMsg').className = 'msg';
+        document.getElementById('registroMsg').style.display = 'none';
+    }
+
+    function mostrarMsg(id, texto, tipo) {
+        const el = document.getElementById(id);
+        el.textContent = texto;
+        el.className = `msg ${tipo}`;
+        el.style.display = 'block';
+    }
+
+    function setLoading(btnId, loading) {
+        const btn = document.getElementById(btnId);
+        btn.disabled = loading;
+        btn.textContent = loading ? 'Cargando...' : btnId === 'btnLogin' ? 'Iniciar sesión' : 'Crear cuenta';
+    }
+
+    // ===== LOGIN =====
+    async function login() {
+        const rut = document.getElementById('loginRut').value.trim();
+        const pass = document.getElementById('loginPass').value;
+        
+        if (!rut || !pass) {
+            return mostrarMsg('loginMsg', 'Completá todos los campos', 'error');
+        }
+
+        if (typeof Auth === 'undefined') {
+            return mostrarMsg('loginMsg', 'Error: Auth no está definido', 'error');
+        }
+
+        setLoading('btnLogin', true);
+        try {
+            const res = await Auth.login(rut, pass);
+            setLoading('btnLogin', false);
+            if (!res.ok) {
+                return mostrarMsg('loginMsg', res.error, 'error');
+            }
+        } catch (error) {
+            setLoading('btnLogin', false);
+            mostrarMsg('loginMsg', 'Error: ' + error.message, 'error');
+        }
+    }
+
+    // ===== REGISTRO =====
+    async function registro() {
+        const nombre = document.getElementById('regNombre').value.trim();
+        const apellido = document.getElementById('regApellido').value.trim();
+        const edad = document.getElementById('regEdad').value.trim();
+        const rut = document.getElementById('regRut').value.trim();
+        const telefono = document.getElementById('regTelefono').value.trim();
+        const gmail = document.getElementById('regGmail').value.trim();
+        const historial = document.getElementById('regHistorial').value.trim();
+        const pass = document.getElementById('regPass').value;
+        const pass2 = document.getElementById('regPass2').value;
+
+        if (!nombre || !apellido || !edad || !rut || !telefono || !gmail || !historial || !pass || !pass2) {
+            return mostrarMsg('registroMsg', 'Todos los campos son obligatorios', 'error');
+        }
+        if (pass !== pass2) {
+            return mostrarMsg('registroMsg', 'Las contraseñas no coinciden', 'error');
+        }
+        if (pass.length < 6) {
+            return mostrarMsg('registroMsg', 'La contraseña debe tener al menos 6 caracteres', 'error');
+        }
+        if (isNaN(edad) || parseInt(edad) < 1) {
+            return mostrarMsg('registroMsg', 'Edad inválida', 'error');
+        }
+
+        if (typeof Auth === 'undefined') {
+            return mostrarMsg('registroMsg', 'Error: Auth no está definido', 'error');
+        }
+
+        setLoading('btnRegistro', true);
+        try {
+            const res = await Auth.registro(rut, nombre, apellido, edad, telefono, gmail, historial, pass);
+            setLoading('btnRegistro', false);
+            if (!res.ok) {
+                return mostrarMsg('registroMsg', res.error, 'error');
+            }
+
+            const mensajeRol = res.rol === 'visitante' 
+                ? '✅ Cuenta creada como Visitante. Un administrador puede cambiar tu rol.' 
+                : `✅ Cuenta creada como ${res.rol.toUpperCase()}`;
+            
+            mostrarMsg('registroMsg', mensajeRol, 'success');
+            document.querySelectorAll('#panelRegistro input').forEach(input => input.value = '');
+            
+            setTimeout(() => {
+                switchTab('login');
+                mostrarMsg('loginMsg', '✅ Registro exitoso. Inicia sesión.', 'success');
+            }, 2000);
+        } catch (error) {
+            setLoading('btnRegistro', false);
+            mostrarMsg('registroMsg', 'Error: ' + error.message, 'error');
+        }
+    }
+
+    document.getElementById('loginPass').addEventListener('keydown', e => {
+        if (e.key === 'Enter') login();
+    });
+    document.getElementById('regPass2').addEventListener('keydown', e => {
+        if (e.key === 'Enter') registro();
+    });
+
+    console.log('✅ login.html cargado correctamente');
 </script>
 </body>
 </html>
