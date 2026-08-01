@@ -95,20 +95,18 @@
             const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
             titulo.textContent = `${meses[mes]} ${año}`;
 
-            const primerDia = new Date(año, mes, 1).getDay(); // 0 domingo
+            const primerDia = new Date(año, mes, 1).getDay();
             const diasEnMes = new Date(año, mes + 1, 0).getDate();
             const diasEnMesAnterior = new Date(año, mes, 0).getDate();
 
             let inicio = primerDia === 0 ? 6 : primerDia - 1;
             let html = '';
 
-            // Días vacíos
             for (let i = 0; i < inicio; i++) {
                 const diaAnterior = diasEnMesAnterior - inicio + 1 + i;
                 html += `<div class="dia vacio"><span class="num-dia">${diaAnterior}</span></div>`;
             }
 
-            // Días del mes
             for (let d = 1; d <= diasEnMes; d++) {
                 const fecha = `${año}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                 const eventos = salidas.filter(s => s.fecha === fecha);
@@ -129,7 +127,6 @@
                 </div>`;
             }
 
-            // Completar última semana
             const totalCeldas = inicio + diasEnMes;
             const sobrante = (7 - (totalCeldas % 7)) % 7;
             for (let i = 1; i <= sobrante; i++) {
@@ -138,7 +135,6 @@
 
             grid.innerHTML = html;
 
-            // Eventos de clic en días con eventos
             document.querySelectorAll('.dia:not(.vacio)').forEach(el => {
                 const fecha = el.dataset.fecha;
                 if (fecha) {
@@ -181,7 +177,6 @@
             panel.innerHTML = html;
         }
 
-        // Función para ver fichas médicas de todos los participantes (solo admin/guia/asistente)
         async function verFichaMedica(salidaId) {
             const todas = await Planificacion.cargarSalidas();
             const salida = todas.find(s => s.id === salidaId);
@@ -200,7 +195,6 @@
         }
         window.verFichaMedica = verFichaMedica;
 
-        // Navegación meses
         document.getElementById('btnMesAnterior').addEventListener('click', () => {
             mesActual--;
             if (mesActual < 0) { mesActual = 11; añoActual--; }
