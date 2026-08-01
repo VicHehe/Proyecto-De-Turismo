@@ -52,7 +52,9 @@
 <script src="js/auth.js"></script>
 <script src="js/planificacion.js"></script>
 <script>
-    // Función de sonido original
+    // ============================================================
+    // SONIDO (efecto "Comenzar recorrido")
+    // ============================================================
     function sonido(){
         const audio = new (window.AudioContext || window.webkitAudioContext)();
         const osc = audio.createOscillator();
@@ -67,12 +69,19 @@
         osc.stop(audio.currentTime + 0.15);
     }
 
-    // Función para mostrar detalles en el modal (con restricción de visibilidad)
+    // ============================================================
+    // MOSTRAR DETALLES (MODAL) + BOTÓN INSCRIPCIÓN
+    // ============================================================
     function verDetalles(salida) {
         const usuario = Auth.getSesion();
         const esAdminOGuia = usuario && (usuario.rol === 'admin' || usuario.rol === 'guia');
+        const esEstudiante = usuario && (usuario.rol === 'visitante' || usuario.rol === 'estudiante');
         const modal = document.getElementById('modalDetalles');
         const body = document.getElementById('modalBody');
+
+        // Asegurar arrays
+        if (!salida.guias) salida.guias = [];
+        if (!salida.participantes) salida.participantes = [];
 
         let html = `<h2>${salida.titulo}</h2>`;
         html += `<div class="detalle-item"><strong>Fecha:</strong> ${salida.fecha || 'No definida'}</div>`;
@@ -88,7 +97,7 @@
         }
 
         // Participantes: ocultar RUT para visitantes
-        if (salida.participantes && salida.participantes.length > 0) {
+        if (salida.participantes.length > 0) {
             html += `<div class="detalle-item"><strong>Participantes:</strong><table class="participante-tabla"><tr><th>Nombre</th>`;
             if (esAdminOGuia) {
                 html += `<th>RUT</th>`;
@@ -104,14 +113,13 @@
             html += `</table></div>`;
         }
 
-        if (salida.guias && salida.guias.length > 0) {
+        if (salida.guias.length > 0) {
             html += `<div class="detalle-item"><strong>Guía(s):</strong> ${salida.guias.map(g => g.nombre).join(', ')}</div>`;
         }
         if (salida.precio) html += `<div class="detalle-item"><strong>Precio:</strong> $${salida.precio}</div>`;
         if (salida.curso) html += `<div class="detalle-item"><strong>Curso:</strong> ${salida.curso}</div>`;
         if (salida.menu) html += `<div class="detalle-item"><strong>Menú:</strong> ${salida.menu}</div>`;
 
-        // Mostrar transporte si existe
         if (salida.transporte) {
             const t = salida.transporte;
             html += `<div class="detalle-item"><strong>Transporte</strong></div>`;
@@ -121,14 +129,63 @@
             if (t.descripcion) html += `<div class="detalle-item">Descripción: ${t.descripcion}</div>`;
         }
 
+        // Botón de inscripción para estudiantes
+        if (esEstudiante) {
+            const yaInscrito = salida.participantes.some(p => p.rut === usuario.rut);
+            if (!yaInscrito) {
+                html += `<button class="btn" id="btnInscribir" onclick="inscribirEnSalida('${salida.id}')" style="margin-top:10px; background:#000; color:#fff; border:1px solid #000; padding:8px 20px; cursor:pointer;">✅ Inscribirme</button>`;
+            } else {
+                html += `<p style="margin-top:10px; color:green; font-weight:bold;">✅ Ya estás inscrito en esta salida.</p>`;
+            }
+        }
+
         body.innerHTML = html;
         modal.style.display = 'flex';
     }
 
-    // Exponer función globalmente
-    window.verDetalles = verDetalles;
+    // ============================================================
+    // INSCRIPCIÓN EN SALIDA
+    // ============================================================
+    async function inscribirEnSalida(id) {
+        const usuario = Auth.getSesion();
+        if (!usuario) return;
+        const salidas = await Planificacion.cargarSalidas();
+        const salida = salidas.find(s => s.id === id);
+        if (!salida) {
+            alert('Salida no encontrada');
+            return;
+        }
+        // Verificar duplicado
+        if (salida.participantes && salida.participantes.some(p => p.rut === usuario.rut)) {
+            alert('Ya estás inscrito');
+            return;
+        }
+        const nuevoParticipante = {
+            nombre: `${usuario.nombre} ${usuario.apellido || ''}`.trim(),
+            rut: usuario.rut,
+            rol: usuario.rol === 'estudiante' ? 'Estudiante' : 'Visitante'
+        };
+        if (!salida.participantes) salida.participantes = [];
+        salida.participantes.push(nuevoParticipante);
+        // También actualizar guías si es necesario (no se toca)
+        const ok = await Planificacion.actualizarSalida(id, { participantes: salida.participantes });
+        if (ok) {
+            alert('✅ Inscripción exitosa');
+            document.getElementById('modalDetalles').style.display = 'none';
+            // Recargar tarjetas para actualizar estado
+            cargarYMostrarSalidas();
+        } else {
+            alert('❌ Error al inscribir');
+        }
+    }
 
-    // Cerrar modal
+    // Exponer funciones globalmente
+    window.verDetalles = verDetalles;
+    window.inscribirEnSalida = inscribirEnSalida;
+
+    // ============================================================
+    // CERRAR MODAL
+    // ============================================================
     document.getElementById('modalCerrar').addEventListener('click', function() {
         document.getElementById('modalDetalles').style.display = 'none';
     });
@@ -138,7 +195,9 @@
         }
     });
 
-    // ===== MAIN =====
+    // ============================================================
+    // MAIN
+    // ============================================================
     (function() {
         const usuario = Auth.getSesion();
         if (!usuario) {
@@ -152,7 +211,6 @@
         // Botones del nav
         const nav = document.getElementById('navBotones');
         let botones = [];
-
         switch (usuario.rol) {
             case 'admin':
                 botones.push({ texto: '👑 Panel de Administración', href: 'pages/dashboard.html' });
@@ -165,32 +223,29 @@
                 break;
             default: // visitante o estudiante
                 botones.push({ texto: '📅 Calendario', href: 'calendario_interactivo_personal.html' });
-                // No mostramos "Mis Salidas" porque el visitante solo ve el calendario
                 break;
         }
-
         botones.forEach(b => {
             const btn = document.createElement('button');
             btn.textContent = b.texto;
             if (b.href) {
                 btn.onclick = function() { window.location.href = b.href; };
-            } else if (b.onclick) {
-                btn.onclick = new Function(b.onclick);
             }
             nav.appendChild(btn);
         });
 
-        // Cargar y mostrar salidas (solo las válidas)
-        async function cargarYMostrarSalidas() {
+        // Cargar y mostrar salidas (función global para recargar)
+        window.cargarYMostrarSalidas = async function() {
             const contenedor = document.getElementById('contenedorSalidas');
             try {
                 const salidas = await Planificacion.cargarSalidas();
-                // Filtrar solo las que tienen estructura nueva (ruta y participantes)
-                const validas = salidas.filter(s => s.ruta && s.participantes);
+                // Filtrar salidas válidas (con ruta y participantes) y asegurar guias
+                let validas = salidas.filter(s => s.ruta && s.participantes);
+                validas.forEach(s => { if (!s.guias) s.guias = []; });
                 if (validas.length === 0) {
                     contenedor.innerHTML = `
                         <div class="mensaje-vacio">
-                            <p>📭 No hay salidas planificadas para este mes/semana.</p>
+                            <p>📭 No hay salidas planificadas.</p>
                             <p style="margin-top:10px; font-size:0.9rem;">
                                 ${usuario.rol === 'admin' || usuario.rol === 'guia'
                                     ? 'Puedes crear una desde "Planificar Salida".'
@@ -202,14 +257,13 @@
                 }
                 const mostradas = validas.slice(0, 3);
                 contenedor.innerHTML = mostradas.map(s => {
-                    // Escapamos comillas para pasar la salida como JSON
                     const salidaJson = JSON.stringify(s).replace(/"/g, '&quot;');
                     return `
                         <div class="tarjeta">
                             <h3>${s.titulo}</h3>
                             <p>${s.descripcion || 'Sin descripción'}</p>
                             <p><small>📅 ${s.fecha || 'Fecha no definida'}</small></p>
-                            <p><small>👤 ${s.guias && s.guias.length > 0 ? s.guias.map(g => g.nombre).join(', ') : 'Sin guía'}</small></p>
+                            <p><small>👤 ${s.guias.length > 0 ? s.guias.map(g => g.nombre).join(', ') : 'Sin guía'}</small></p>
                             <button onclick="verDetalles(${salidaJson})">Ver más</button>
                         </div>
                     `;
@@ -218,7 +272,7 @@
                 console.error('Error al cargar salidas:', error);
                 contenedor.innerHTML = `<div class="mensaje-vacio"><p>⚠️ Error al cargar las salidas.</p></div>`;
             }
-        }
+        };
 
         cargarYMostrarSalidas();
 
