@@ -133,8 +133,6 @@
             salida.participantes.forEach(p => {
                 html += `<tr><td>${p.nombre}</td>`;
                 if (esAdminOGuia) {
-                    // Buscar ficha médica en usuarios.json (simulamos con una función async)
-                    // Para simplificar, aquí solo mostramos un placeholder, pero en la práctica se debe obtener del usuario.
                     html += `<td>${p.rut}</td>`;
                     html += `<td><button onclick="verFichaMedica('${p.rut}')" style="background:none;border:1px solid #000;cursor:pointer;">Ver</button></td>`;
                 }
@@ -175,7 +173,6 @@
 
     // Función para ver ficha médica (solo para admin/guia/asistente)
     async function verFichaMedica(rut) {
-        // Cargar usuarios y buscar ficha médica
         const datos = await GitHub.leer('datos/usuarios.json');
         if (!datos) return alert('No se pudo cargar la información');
         const usuario = datos.usuarios.find(u => u.rut === rut);
@@ -203,7 +200,6 @@
             alert('Salida no encontrada');
             return;
         }
-        // Verificar duplicado
         if (salida.participantes && salida.participantes.some(p => p.rut === usuario.rut)) {
             alert('Ya estás inscrito');
             return;
@@ -264,7 +260,7 @@
                 botones.push({ texto: '📋 Planificar Salida', href: 'Planificar_Salida_Pedagogica.html' });
                 botones.push({ texto: '📅 Calendario', href: 'calendario_interactivo_personal.html' });
                 break;
-            default: // visitante o estudiante
+            default:
                 botones.push({ texto: '📅 Calendario', href: 'calendario_interactivo_personal.html' });
                 break;
         }
@@ -282,7 +278,6 @@
             const contenedor = document.getElementById('contenedorSalidas');
             try {
                 const todas = await Planificacion.cargarSalidas();
-                // Aplicar filtros de visibilidad según rol y fecha
                 const salidasVisibles = getSalidasVisibles(todas, usuario);
                 if (salidasVisibles.length === 0) {
                     contenedor.innerHTML = `
@@ -297,7 +292,6 @@
                     `;
                     return;
                 }
-                // Mostrar solo las 3 más recientes (por fecha)
                 const ordenadas = salidasVisibles.sort((a,b) => (a.fecha > b.fecha) ? 1 : -1);
                 const mostradas = ordenadas.slice(0, 3);
                 contenedor.innerHTML = mostradas.map(s => {
@@ -320,7 +314,6 @@
 
         cargarYMostrarSalidas();
 
-        // Cerrar sesión
         document.getElementById('btnCerrarSesion').addEventListener('click', function() {
             Auth.cerrarSesion();
         });
