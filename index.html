@@ -70,20 +70,47 @@
     }
 
     // ============================================================
+    // FUNCIÓN PARA OBTENER SALIDAS SEGÚN PERMISOS
+    // ============================================================
+    function getSalidasVisibles(todas, usuario) {
+        const hoy = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        // Asegurar que todas tengan guias y participantes como arrays
+        todas.forEach(s => {
+            if (!s.guias) s.guias = [];
+            if (!s.participantes) s.participantes = [];
+        });
+
+        if (usuario.rol === 'admin') {
+            // Admin ve todas (pasadas y futuras)
+            return todas;
+        } else if (usuario.rol === 'guia' || usuario.rol === 'asistente') {
+            // Guías/Asistentes ven solo salidas futuras donde estén como guía o participante
+            return todas.filter(s => {
+                const esGuia = s.guias.some(g => g.rut === usuario.rut);
+                const esParticipante = s.participantes.some(p => p.rut === usuario.rut);
+                return (esGuia || esParticipante) && s.fecha >= hoy;
+            });
+        } else {
+            // Estudiantes/Visitantes: solo salidas futuras donde estén como participantes
+            return todas.filter(s => {
+                const esParticipante = s.participantes.some(p => p.rut === usuario.rut);
+                return esParticipante && s.fecha >= hoy;
+            });
+        }
+    }
+
+    // ============================================================
     // MOSTRAR DETALLES (MODAL) + BOTÓN INSCRIPCIÓN
     // ============================================================
     function verDetalles(salida) {
         const usuario = Auth.getSesion();
-        const esAdminOGuia = usuario && (usuario.rol === 'admin' || usuario.rol === 'guia');
-        const esEstudiante = usuario && (usuario.rol === 'visitante' || usuario.rol === 'estudiante');
+        if (!usuario) return;
+        const esAdminOGuia = usuario.rol === 'admin' || usuario.rol === 'guia' || usuario.rol === 'asistente';
+        const esEstudiante = usuario.rol === 'visitante' || usuario.rol === 'estudiante';
         const modal = document.getElementById('modalDetalles');
         const body = document.getElementById('modalBody');
 
-        // Asegurar arrays
-        if (!salida.guias) salida.guias = [];
-        if (!salida.participantes) salida.participantes = [];
-
-        let html = `<h2>${salida.titulo}</h2>`;
+        let html = `<h2>${salida.titulo || 'Salida sin título'}</h2>`;
         html += `<div class="detalle-item"><strong>Fecha:</strong> ${salida.fecha || 'No definida'}</div>`;
         html += `<div class="detalle-item"><strong>Duración:</strong> ${salida.duracion || 'No especificada'}</div>`;
         html += `<div class="detalle-item"><strong>Descripción:</strong> ${salida.descripcion || 'Sin descripción'}</div>`;
@@ -96,17 +123,20 @@
             html += `</ul></div>`;
         }
 
-        // Participantes: ocultar RUT para visitantes
+        // Participantes: mostrar RUT solo a admin/guia/asistente
         if (salida.participantes.length > 0) {
             html += `<div class="detalle-item"><strong>Participantes:</strong><table class="participante-tabla"><tr><th>Nombre</th>`;
             if (esAdminOGuia) {
-                html += `<th>RUT</th>`;
+                html += `<th>RUT</th><th>Ficha Médica</th>`;
             }
             html += `<th>Rol</th></tr>`;
             salida.participantes.forEach(p => {
                 html += `<tr><td>${p.nombre}</td>`;
                 if (esAdminOGuia) {
+                    // Buscar ficha médica en usuarios.json (simulamos con una función async)
+                    // Para simplificar, aquí solo mostramos un placeholder, pero en la práctica se debe obtener del usuario.
                     html += `<td>${p.rut}</td>`;
+                    html += `<td><button onclick="verFichaMedica('${p.rut}')" style="background:none;border:1px solid #000;cursor:pointer;">Ver</button></td>`;
                 }
                 html += `<td>${p.rol}</td></tr>`;
             });
@@ -129,12 +159,12 @@
             if (t.descripcion) html += `<div class="detalle-item">Descripción: ${t.descripcion}</div>`;
         }
 
-        // Botón de inscripción para estudiantes
+        // Botón de inscripción para estudiantes (si no están inscritos)
         if (esEstudiante) {
             const yaInscrito = salida.participantes.some(p => p.rut === usuario.rut);
-            if (!yaInscrito) {
+            if (!yaInscrito && salida.fecha >= new Date().toISOString().split('T')[0]) {
                 html += `<button class="btn" id="btnInscribir" onclick="inscribirEnSalida('${salida.id}')" style="margin-top:10px; background:#000; color:#fff; border:1px solid #000; padding:8px 20px; cursor:pointer;">✅ Inscribirme</button>`;
-            } else {
+            } else if (yaInscrito) {
                 html += `<p style="margin-top:10px; color:green; font-weight:bold;">✅ Ya estás inscrito en esta salida.</p>`;
             }
         }
@@ -142,6 +172,24 @@
         body.innerHTML = html;
         modal.style.display = 'flex';
     }
+
+    // Función para ver ficha médica (solo para admin/guia/asistente)
+    async function verFichaMedica(rut) {
+        // Cargar usuarios y buscar ficha médica
+        const datos = await GitHub.leer('datos/usuarios.json');
+        if (!datos) return alert('No se pudo cargar la información');
+        const usuario = datos.usuarios.find(u => u.rut === rut);
+        if (usuario) {
+            alert(`Ficha médica de ${usuario.nombre} ${usuario.apellido}:\n${usuario.historial || 'Sin información'}`);
+        } else {
+            alert('Usuario no encontrado');
+        }
+    }
+
+    // Exponer funciones globalmente
+    window.verDetalles = verDetalles;
+    window.inscribirEnSalida = inscribirEnSalida;
+    window.verFichaMedica = verFichaMedica;
 
     // ============================================================
     // INSCRIPCIÓN EN SALIDA
@@ -167,21 +215,15 @@
         };
         if (!salida.participantes) salida.participantes = [];
         salida.participantes.push(nuevoParticipante);
-        // También actualizar guías si es necesario (no se toca)
         const ok = await Planificacion.actualizarSalida(id, { participantes: salida.participantes });
         if (ok) {
             alert('✅ Inscripción exitosa');
             document.getElementById('modalDetalles').style.display = 'none';
-            // Recargar tarjetas para actualizar estado
             cargarYMostrarSalidas();
         } else {
             alert('❌ Error al inscribir');
         }
     }
-
-    // Exponer funciones globalmente
-    window.verDetalles = verDetalles;
-    window.inscribirEnSalida = inscribirEnSalida;
 
     // ============================================================
     // CERRAR MODAL
@@ -218,6 +260,7 @@
                 botones.push({ texto: '📅 Calendario', href: 'calendario_interactivo_personal.html' });
                 break;
             case 'guia':
+            case 'asistente':
                 botones.push({ texto: '📋 Planificar Salida', href: 'Planificar_Salida_Pedagogica.html' });
                 botones.push({ texto: '📅 Calendario', href: 'calendario_interactivo_personal.html' });
                 break;
@@ -238,29 +281,30 @@
         window.cargarYMostrarSalidas = async function() {
             const contenedor = document.getElementById('contenedorSalidas');
             try {
-                const salidas = await Planificacion.cargarSalidas();
-                // Filtrar salidas válidas (con ruta y participantes) y asegurar guias
-                let validas = salidas.filter(s => s.ruta && s.participantes);
-                validas.forEach(s => { if (!s.guias) s.guias = []; });
-                if (validas.length === 0) {
+                const todas = await Planificacion.cargarSalidas();
+                // Aplicar filtros de visibilidad según rol y fecha
+                const salidasVisibles = getSalidasVisibles(todas, usuario);
+                if (salidasVisibles.length === 0) {
                     contenedor.innerHTML = `
                         <div class="mensaje-vacio">
-                            <p>📭 No hay salidas planificadas.</p>
+                            <p>📭 No hay salidas disponibles para ti.</p>
                             <p style="margin-top:10px; font-size:0.9rem;">
-                                ${usuario.rol === 'admin' || usuario.rol === 'guia'
-                                    ? 'Puedes crear una desde "Planificar Salida".'
-                                    : 'Vuelve más tarde.'}
+                                ${usuario.rol === 'admin' || usuario.rol === 'guia' || usuario.rol === 'asistente'
+                                    ? 'Puedes crear una desde "Planificar Salida" o esperar a que te inviten.'
+                                    : 'Espera a que un guía te inscriba en una salida.'}
                             </p>
                         </div>
                     `;
                     return;
                 }
-                const mostradas = validas.slice(0, 3);
+                // Mostrar solo las 3 más recientes (por fecha)
+                const ordenadas = salidasVisibles.sort((a,b) => (a.fecha > b.fecha) ? 1 : -1);
+                const mostradas = ordenadas.slice(0, 3);
                 contenedor.innerHTML = mostradas.map(s => {
                     const salidaJson = JSON.stringify(s).replace(/"/g, '&quot;');
                     return `
                         <div class="tarjeta">
-                            <h3>${s.titulo}</h3>
+                            <h3>${s.titulo || 'Sin título'}</h3>
                             <p>${s.descripcion || 'Sin descripción'}</p>
                             <p><small>📅 ${s.fecha || 'Fecha no definida'}</small></p>
                             <p><small>👤 ${s.guias.length > 0 ? s.guias.map(g => g.nombre).join(', ') : 'Sin guía'}</small></p>
