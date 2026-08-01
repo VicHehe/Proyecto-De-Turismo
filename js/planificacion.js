@@ -1,11 +1,4 @@
-// ============================================================
-// planificacion.js - Gestión de salidas
-// ============================================================
-
 const Planificacion = {
-    /**
-     * Cargar todas las salidas desde salidas.json
-     */
     async cargarSalidas() {
         try {
             const datos = await GitHub.leer('datos/salidas.json');
@@ -17,9 +10,6 @@ const Planificacion = {
         }
     },
 
-    /**
-     * Guardar una nueva salida
-     */
     async guardarSalida(salida) {
         try {
             const datos = await GitHub.leer('datos/salidas.json');
@@ -35,46 +25,19 @@ const Planificacion = {
         }
     },
 
-    /**
-     * Actualizar una salida existente por su ID
-     * @param {string} id - ID de la salida
-     * @param {object} nuevosDatos - Datos a actualizar (se fusionan con los existentes)
-     */
+    // NUEVA FUNCIÓN PARA ACTUALIZAR SALIDA
     async actualizarSalida(id, nuevosDatos) {
         try {
             const datos = await GitHub.leer('datos/salidas.json');
             if (!datos || !datos.salidas) return false;
-            
             const salidas = datos.salidas;
             const index = salidas.findIndex(s => s.id === id);
             if (index === -1) return false;
-            
-            // Fusionar datos sin sobrescribir el ID
             salidas[index] = { ...salidas[index], ...nuevosDatos };
-            
             const sha = await GitHub.sha('datos/salidas.json');
             return await GitHub.escribir('datos/salidas.json', { salidas }, sha);
         } catch (error) {
             console.error('Error al actualizar salida:', error);
-            return false;
-        }
-    },
-
-    /**
-     * Eliminar una salida por su ID
-     */
-    async eliminarSalida(id) {
-        try {
-            const datos = await GitHub.leer('datos/salidas.json');
-            if (!datos || !datos.salidas) return false;
-            
-            const salidas = datos.salidas.filter(s => s.id !== id);
-            if (salidas.length === datos.salidas.length) return false;
-            
-            const sha = await GitHub.sha('datos/salidas.json');
-            return await GitHub.escribir('datos/salidas.json', { salidas }, sha);
-        } catch (error) {
-            console.error('Error al eliminar salida:', error);
             return false;
         }
     }
