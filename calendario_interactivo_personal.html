@@ -47,7 +47,135 @@
 <script src="js/auth.js"></script>
 <script src="js/planificacion.js"></script>
 <script>
-    // ... (el mismo JavaScript que ya tenías) ...
+    (function() {
+        const usuario = Auth.getSesion();
+        if (!usuario) {
+            window.location.href = 'login.html';
+            return;
+        }
+        document.getElementById('userBadge').textContent = `${usuario.nombre} ${usuario.apellido || ''} (${usuario.rol})`;
+
+        let mesActual = new Date().getMonth();
+        let añoActual = new Date().getFullYear();
+
+        async function cargarSalidas() {
+            return await Planificacion.cargarSalidas();
+        }
+
+        function renderizarCalendario(mes, año, salidas) {
+            const grid = document.getElementById('diasGrid');
+            const titulo = document.getElementById('mesTitulo');
+            const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            titulo.textContent = `${meses[mes]} ${año}`;
+
+            const primerDia = new Date(año, mes, 1).getDay(); // 0 domingo
+            const diasEnMes = new Date(año, mes + 1, 0).getDate();
+            const diasEnMesAnterior = new Date(año, mes, 0).getDate();
+
+            let inicio = primerDia === 0 ? 6 : primerDia - 1;
+            let html = '';
+
+            // Días vacíos del mes anterior
+            for (let i = 0; i < inicio; i++) {
+                const diaAnterior = diasEnMesAnterior - inicio + 1 + i;
+                html += `<div class="dia vacio"><span class="num-dia">${diaAnterior}</span></div>`;
+            }
+
+            // Días del mes actual
+            for (let d = 1; d <= diasEnMes; d++) {
+                const fecha = `${año}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const eventos = salidas.filter(s => s.fecha === fecha);
+                let eventoHtml = '';
+                if (eventos.length > 0) {
+                    const maxMostrar = 2;
+                    const mostrar = eventos.slice(0, maxMostrar);
+                    mostrar.forEach(e => {
+                        eventoHtml += `<div class="evento">${e.titulo}</div>`;
+                    });
+                    if (eventos.length > maxMostrar) {
+                        eventoHtml += `<div class="evento multiple">+${eventos.length - maxMostrar} más</div>`;
+                    }
+                }
+                html += `<div class="dia${eventoHtml ? ' tiene-evento' : ''}" data-fecha="${fecha}">
+                    <span class="num-dia">${d}</span>
+                    ${eventoHtml}
+                </div>`;
+            }
+
+            // Completar última semana
+            const totalCeldas = inicio + diasEnMes;
+            const sobrante = (7 - (totalCeldas % 7)) % 7;
+            for (let i = 1; i <= sobrante; i++) {
+                html += `<div class="dia vacio"><span class="num-dia">${i}</span></div>`;
+            }
+
+            grid.innerHTML = html;
+
+            // Eventos de clic en días con eventos
+            document.querySelectorAll('.dia:not(.vacio)').forEach(el => {
+                const fecha = el.dataset.fecha;
+                if (fecha) {
+                    const salidasDelDia = salidas.filter(s => s.fecha === fecha);
+                    if (salidasDelDia.length > 0) {
+                        el.style.cursor = 'pointer';
+                        el.addEventListener('click', function() {
+                            mostrarDetalleDia(salidasDelDia, fecha);
+                        });
+                    }
+                }
+            });
+        }
+
+        function mostrarDetalleDia(salidas, fecha) {
+            const panel = document.getElementById('contenidoDetalle');
+            if (salidas.length === 0) {
+                panel.innerHTML = `<p class="no-eventos">No hay eventos este día.</p>`;
+                return;
+            }
+            const usuario = Auth.getSesion();
+            const esAdminOGuia = usuario && (usuario.rol === 'admin' || usuario.rol === 'guia');
+            let html = `<h3>${fecha}</h3>`;
+            salidas.forEach(s => {
+                // Asegurar que existan guias y participantes
+                if (!s.guias) s.guias = [];
+                if (!s.participantes) s.participantes = [];
+                html += `
+                    <div class="tarjeta">
+                        <div class="titulo">${s.titulo}</div>
+                        <div class="etiqueta">${s.duracion || '1 día'}</div>
+                        <p>${s.descripcion || ''}</p>
+                        <ul>
+                            ${s.ruta ? s.ruta.map(r => `<li>${r.tipo}: ${r.descripcion} (${r.inicio} - ${r.fin})</li>`).join('') : '<li>Sin ruta definida</li>'}
+                        </ul>
+                        <p><strong>Guía(s):</strong> ${s.guias.length > 0 ? s.guias.map(g => g.nombre).join(', ') : 'No asignado'}</p>
+                        <p><strong>Participantes:</strong> ${s.participantes.length}</p>
+                        ${esAdminOGuia && s.participantes.length > 0 ? `<p><strong>Detalle:</strong> ${s.participantes.map(p => p.nombre).join(', ')}</p>` : ''}
+                        <button onclick="window.location.href='index.html'">Ver en el Lobby</button>
+                    </div>
+                `;
+            });
+            panel.innerHTML = html;
+        }
+
+        // Navegación meses
+        document.getElementById('btnMesAnterior').addEventListener('click', () => {
+            mesActual--;
+            if (mesActual < 0) { mesActual = 11; añoActual--; }
+            cargarYRenderizar();
+        });
+        document.getElementById('btnMesSiguiente').addEventListener('click', () => {
+            mesActual++;
+            if (mesActual > 11) { mesActual = 0; añoActual++; }
+            cargarYRenderizar();
+        });
+
+        async function cargarYRenderizar() {
+            const salidas = await cargarSalidas();
+            renderizarCalendario(mesActual, añoActual, salidas);
+        }
+
+        cargarYRenderizar();
+    })();
 </script>
 </body>
 </html>
