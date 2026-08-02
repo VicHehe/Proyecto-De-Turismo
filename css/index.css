@@ -30,8 +30,9 @@ header {
 }
 
 .logo-especialidad {
-    height: 50px; /* Ajusta la altura según el tamaño de tu imagen */
+    height: 40px; /* Reducido de 50px a 40px */
     width: auto;
+    max-height: 40px;
 }
 
 .especialidad {
@@ -270,7 +271,8 @@ footer .btn-cerrar:hover {
         margin-bottom: 5px;
     }
     .logo-especialidad {
-        height: 40px;
+        height: 30px; /* Aún más pequeño en móviles */
+        max-height: 30px;
     }
     .especialidad {
         border-left: none;
