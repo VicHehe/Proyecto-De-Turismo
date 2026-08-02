@@ -22,7 +22,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Sector del río Tinguiririca, en la comuna (acceso por rutas interiores hacia el cordón cordillerano).",
     descripcion: "Alerón rocoso con pictografías prehispánicas de estilo geométrico, evidencia arqueológica de grupos recolectores.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Petroglyphs_in_Chile.jpg/500px-Petroglyphs_in_Chile.jpg"
+    miniatura: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhuwOfjkFC4iDuekM3rToRd5Rbcc0yk22H5Qor0NOQm3_KNrcWarQ4VU2j05WnlslyZe0WT5q7l_l7NmxOiy6Xo1wg-7l6rPuIjXMV5bbnFhroKir7BxgRN_JqwQlA8EPCXSqBwjxe_FNgH/s1600/Pinturarupestre.png"
   },
   {
     nombre: "Huellas de Animales extintos (Termas del Flaco)",
