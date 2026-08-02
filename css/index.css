@@ -24,6 +24,14 @@ header {
 
 .header-left {
     flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-especialidad {
+    height: 50px; /* Ajusta la altura según el tamaño de tu imagen */
+    width: auto;
 }
 
 .especialidad {
@@ -32,9 +40,9 @@ header {
     line-height: 1.1;
     font-size: 0.7rem;
     font-weight: bold;
-    border-right: 1px solid #fff;
-    padding-right: 15px;
-    text-align: right;
+    border-left: 1px solid #fff;
+    padding-left: 10px;
+    text-align: left;
     letter-spacing: 0.5px;
     color: #fff;
 }
@@ -111,15 +119,6 @@ nav button:hover {
     max-width: 700px;
     margin: auto;
     line-height: 1.6;
-}
-
-.hero button {
-    margin-top: 25px;
-    padding: 12px 25px;
-    background: #000;
-    color: #fff;
-    border: 1px solid #000;
-    cursor: pointer;
 }
 
 .lugares {
@@ -265,13 +264,17 @@ footer .btn-cerrar:hover {
         padding: 15px;
     }
     .header-left {
+        justify-content: center;
         border-right: none;
         padding-right: 0;
         margin-bottom: 5px;
     }
+    .logo-especialidad {
+        height: 40px;
+    }
     .especialidad {
-        border-right: none;
-        padding-right: 0;
+        border-left: none;
+        padding-left: 0;
         text-align: center;
         font-size: 0.6rem;
     }
