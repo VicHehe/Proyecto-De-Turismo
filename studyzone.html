@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌍 StudyZone · Lugar de Aprendizaje</title>
+    <title>🌍 StudyZone - Aprende sobre los lugares</title>
     <link rel="stylesheet" href="css/studyzone.css">
 </head>
 <body>
@@ -16,31 +16,37 @@
     </div>
 </header>
 
-<div class="contenedor">
-    <p class="subtitulo">Explora los lugares turísticos de San Fernando y alrededores. Infórmate, inspírate y prepara tus mejores guías.</p>
+<main class="studyzone-container">
+    <h2>📍 Descubre los lugares turísticos</h2>
+    <p class="subtitulo">Información detallada para planificar tus guías y aprender sobre la región.</p>
 
-    <div id="gridLugares" class="grid-lugares">
-        <!-- Se llena con JS -->
+    <div id="contenedorLugares" class="grid-lugares">
+        <!-- Se llena con JavaScript desde lugares.js -->
+        <p class="cargando">Cargando lugares...</p>
     </div>
-</div>
+</main>
 
-<script src="js/github.js"></script>
-<script src="js/auth.js"></script>
+<footer>
+    © 2026 Turismo Eduardo Charme · StudyZone
+</footer>
+
 <script src="js/lugares.js"></script>
 <script>
     (function() {
-        const usuario = Auth.getSesion();
-        if (!usuario) {
+        // Verificar sesión
+        const usuarioStr = sessionStorage.getItem('cc_sesion');
+        if (!usuarioStr) {
             window.location.href = 'login.html';
             return;
         }
+        const usuario = JSON.parse(usuarioStr);
         document.getElementById('userBadge').textContent = `${usuario.nombre} ${usuario.apellido || ''} (${usuario.rol})`;
 
-        const grid = document.getElementById('gridLugares');
-
-        // Verificar que lugares esté definido
-        if (typeof lugares === 'undefined' || !lugares.length) {
-            grid.innerHTML = `<div class="mensaje-vacio">❌ No se encontraron lugares turísticos en la base de datos.</div>`;
+        // Renderizar lugares
+        const contenedor = document.getElementById('contenedorLugares');
+        
+        if (typeof lugares === 'undefined' || !lugares || lugares.length === 0) {
+            contenedor.innerHTML = `<p class="error">No hay lugares disponibles en la base de datos.</p>`;
             return;
         }
 
@@ -49,42 +55,56 @@
 
         let html = '';
         lugaresOrdenados.forEach(lugar => {
-            // Usar la miniatura o un placeholder si no existe
-            const imgSrc = lugar.miniatura || 'https://via.placeholder.com/400x250/cccccc/333?text=Sin+Imagen';
+            // Escapar HTML para evitar inyecciones
+            const nombre = lugar.nombre || 'Sin nombre';
+            const descripcion = lugar.descripcion || 'Sin descripción';
+            const ubicacion = lugar.ubicacion || 'Ubicación no especificada';
+            const apertura = lugar.apertura || 'N/A';
+            const cierre = lugar.cierre || 'N/A';
+            const miniatura = lugar.miniatura || '';
+
+            // Si la miniatura está vacía, usamos un placeholder de texto
+            const imgSrc = miniatura || '';
 
             html += `
                 <div class="tarjeta-lugar">
-                    <div class="tarjeta-imagen">
-                        <img src="${imgSrc}" alt="${lugar.nombre}" loading="lazy">
-                    </div>
-                    <div class="tarjeta-contenido">
-                        <h3>${lugar.nombre}</h3>
-                        <p class="descripcion">${lugar.descripcion || 'Sin descripción'}</p>
-                        <div class="datos">
-                            <span>📍 ${lugar.ubicacion || 'Ubicación no especificada'}</span>
-                            <span>🕒 ${lugar.apertura || 'N/A'} - ${lugar.cierre || 'N/A'}</span>
+                    <div class="imagen-container">
+                        <img 
+                            src="${imgSrc}" 
+                            alt="${nombre}"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        >
+                        <div class="placeholder" style="display: ${imgSrc ? 'none' : 'flex'};">
+                            <span>${nombre}</span>
                         </div>
-                        <button class="btn-ver-mas" onclick="verDetalleLugar('${lugar.nombre}')">Ver más</button>
+                    </div>
+                    <div class="info">
+                        <h3>${nombre}</h3>
+                        <p class="descripcion">${descripcion}</p>
+                        <div class="detalles">
+                            <p><strong>📍 Ubicación:</strong> ${ubicacion}</p>
+                            <p><strong>🕒 Horario:</strong> ${apertura} - ${cierre}</p>
+                        </div>
                     </div>
                 </div>
             `;
         });
 
-        grid.innerHTML = html;
+        contenedor.innerHTML = html;
 
-        // Función para ver detalle en alerta (o modal, pero con alerta es simple y funcional)
-        window.verDetalleLugar = function(nombre) {
-            const lugar = lugares.find(l => l.nombre === nombre);
-            if (!lugar) return alert('Lugar no encontrado');
+        // Manejar error de carga de imágenes (fallback)
+        document.querySelectorAll('.tarjeta-lugar img').forEach(img => {
+            img.addEventListener('error', function() {
+                this.style.display = 'none';
+                const placeholder = this.nextElementSibling;
+                if (placeholder && placeholder.classList.contains('placeholder')) {
+                    placeholder.style.display = 'flex';
+                }
+            });
+        });
 
-            let mensaje = `🌍 ${lugar.nombre}\n\n`;
-            mensaje += `📍 Ubicación: ${lugar.ubicacion || 'No especificada'}\n`;
-            mensaje += `🕒 Horario: ${lugar.apertura || 'N/A'} - ${lugar.cierre || 'N/A'}\n\n`;
-            mensaje += `📖 Descripción:\n${lugar.descripcion || 'Sin descripción'}`;
-            alert(mensaje);
-        };
+        console.log('✅ StudyZone cargado correctamente');
     })();
 </script>
-
 </body>
 </html>
