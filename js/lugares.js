@@ -22,7 +22,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Sector del río Tinguiririca, en la comuna (acceso por rutas interiores hacia el cordón cordillerano).",
     descripcion: "Alerón rocoso con pictografías prehispánicas de estilo geométrico, evidencia arqueológica de grupos recolectores.",
-    miniatura: "https://images.unsplash.com/photo-1544644181-1484b3f6c0b0?w=500&h=300&fit=crop"
+    miniatura: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhuwOfjkFC4iDuekM3rToRd5Rbcc0yk22H5Qor0NOQm3_KNrcWarQ4VU2j05WnlslyZe0WT5q7l_l7NmxOiy6Xo1wg-7l6rPuIjXMV5bbnFhroKir7BxgRN_JqwQlA8EPCXSqBwjxe_FNgH/s1600/Pinturarupestre.png"
   },
   {
     nombre: "Huellas de Animales extintos (Termas del Flaco)",
@@ -46,7 +46,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "En la ruta que une San Fernando con Termas del Flaco, siguiendo los ríos Azufre y San José.",
     descripcion: "Frente glaciar de interés para excursiones de montaña y observación glaciologica; requiere coordinación y buen tiempo.",
-    miniatura: "https://images.unsplash.com/photo-1464822759023-fea092662095?w=500&h=300&fit=crop"
+    miniatura: "https://www.wikiexplora.com/images/thumb/f/f5/Glaciar_ma%C3%B1ke.JPG/230px-Glaciar_ma%C3%B1ke.JPG"
   },
   {
     nombre: "Plaza de Armas de San Fernando",
@@ -62,7 +62,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Próxima a la Plaza de Armas, centro de San Fernando.",
     descripcion: "Iglesia histórica que alberga celebraciones religiosas y procesiones locales importantes.",
-    miniatura: "https://images.unsplash.com/photo-1548625361-f6dbbcaf2533?w=500&h=300&fit=crop"
+    miniatura: "https://xn--parroquianuestraseoradelcarmendeuoa-0ldob.cl/wp-content/uploads/2021/03/Parroquia-de-frente.jpg"
   },
   {
     nombre: "Museo de Colchagua",
