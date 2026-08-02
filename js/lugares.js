@@ -38,7 +38,7 @@ const lugares = [
     cierre: "17:30",
     ubicacion: "Viñas alrededor de San Fernando y Valle de Colchagua; alguna a 5-40 km de la ciudad.",
     descripcion: "Circuitos de enoturismo, degustaciones y visitas a bodegas; San Fernando es puerta de acceso a rutas del vino de Colchagua y Cachapoal.",
-    miniatura: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=500&h=300&fit=crop"
+    miniatura: "https://images.visitchile.com/destinos/591_img_2126_jpg_1920x807_default.jpg"
   },
   {
     nombre: "Glaciar Universidad",
@@ -54,7 +54,7 @@ const lugares = [
     cierre: "24 horas",
     ubicacion: "Centro de San Fernando, Provincia de Colchagua, Región de O'Higgins.",
     descripcion: "Plaza principal de la ciudad, punto de encuentro con monumentos, actividades comunales y acceso a comercios y la municipalidad.",
-    miniatura: "https://images.unsplash.com/photo-1513622470522-26c314a86b19?w=500&h=300&fit=crop"
+    miniatura: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/31/98/a2/vista-panoramica-de-la.jpg?w=900&h=500&s=1"
   },
   {
     nombre: "Iglesia Parroquial Nuestra Señora del Carmen",
