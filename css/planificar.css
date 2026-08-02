@@ -206,3 +206,61 @@ h1 {
     padding-bottom: 0.5rem;
     margin-bottom: 2rem;
 }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .grid-3 {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .ruta-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.3rem;
+    }
+    .ruta-item .horario-editable {
+        flex-wrap: wrap;
+    }
+    .ruta-item .horario-editable input[type="time"] {
+        width: 80px;
+        font-size: 0.8rem;
+    }
+    .ruta-item .acciones {
+        margin-left: 0;
+        justify-content: flex-end;
+    }
+    .busqueda {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .busqueda input, .busqueda select {
+        min-width: auto;
+    }
+    .busqueda button {
+        width: 100%;
+    }
+    .tabla-participantes {
+        font-size: 0.8rem;
+    }
+    .tabla-participantes th, .tabla-participantes td {
+        padding: 0.2rem 0.3rem;
+    }
+    .seccion {
+        padding: 1rem;
+    }
+    .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+    .btn-primario {
+        padding: 0.6rem 1.5rem;
+        font-size: 1rem;
+    }
+    .info-transporte {
+        padding: 0.5rem;
+    }
+}
