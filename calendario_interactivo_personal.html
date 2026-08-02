@@ -68,18 +68,21 @@
                 if (!s.participantes) s.participantes = [];
             });
 
+            // Filtrar solo salidas futuras (>= hoy) para todos
+            const futuras = todas.filter(s => s.fecha >= hoy);
+
             if (usuario.rol === 'admin') {
-                return todas;
+                return futuras;
             } else if (usuario.rol === 'guia' || usuario.rol === 'asistente') {
-                return todas.filter(s => {
+                return futuras.filter(s => {
                     const esGuia = s.guias.some(g => g.rut === usuario.rut);
                     const esParticipante = s.participantes.some(p => p.rut === usuario.rut);
-                    return (esGuia || esParticipante) && s.fecha >= hoy;
+                    return (esGuia || esParticipante);
                 });
             } else {
-                return todas.filter(s => {
+                return futuras.filter(s => {
                     const esParticipante = s.participantes.some(p => p.rut === usuario.rut);
-                    return esParticipante && s.fecha >= hoy;
+                    return esParticipante;
                 });
             }
         }
@@ -169,14 +172,14 @@
                         <p><strong>Guía(s):</strong> ${s.guias.length > 0 ? s.guias.map(g => g.nombre).join(', ') : 'No asignado'}</p>
                         <p><strong>Participantes:</strong> ${s.participantes.length}</p>
                         ${esAdminOGuia && s.participantes.length > 0 ? `<p><strong>Detalle:</strong> ${s.participantes.map(p => p.nombre).join(', ')}</p>` : ''}
-                        ${esAdminOGuia ? `<button onclick="verFichaMedica('${s.id}')" style="background:none;border:1px solid #000;cursor:pointer;">Ver fichas médicas</button>` : ''}
-                        <button onclick="window.location.href='index.html'">Ver en el Lobby</button>
+                        ${esAdminOGuia ? `<button onclick="verFichaMedica('${s.id}')" style="background:none;border:1px solid #000;cursor:pointer;padding:2px 8px;margin-top:5px;">Ver fichas médicas</button>` : ''}
                     </div>
                 `;
             });
             panel.innerHTML = html;
         }
 
+        // Función para ver fichas médicas desde el calendario
         async function verFichaMedica(salidaId) {
             const todas = await Planificacion.cargarSalidas();
             const salida = todas.find(s => s.id === salidaId);
