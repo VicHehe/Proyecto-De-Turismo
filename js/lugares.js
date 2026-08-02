@@ -6,7 +6,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Aprox. 65-77 km al este de San Fernando, en la ribera norte del río Tinguiririca; sector de montaña.",
     descripcion: "Centro termal natural en altura (1.736 msnm) con pozones y entorno andino; popular para turismo de naturaleza y trekking.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Anocheciendo.JPG/500px-Anocheciendo.JPG"
+    miniatura: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/27/5e/24/3b/las-piscinas.jpg?w=900&h=500&s=1"
   },
   {
     nombre: "Santuario Alto Huemul",
@@ -14,7 +14,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Cordillera de Colchagua, sector alto de la comuna (áreas de bosque entre 1.000 y 2.000 msnm).",
     descripcion: "Santuario de la Naturaleza que conserva bosquetes de roble y fauna nativa; apto para observación de aves y conservación.",
-    miniatura: "https://img.wikiloc.com/static/tmp/photos/16114124/16114124_1600.jpg"
+    miniatura: "https://laderasur.com/wp-content/uploads/2019/06/alto-huemul4.jpg"
   },
   {
     nombre: "Casa de las Piedras Pintadas del Tinguiririca",
@@ -22,7 +22,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Sector del río Tinguiririca, en la comuna (acceso por rutas interiores hacia el cordón cordillerano).",
     descripcion: "Alerón rocoso con pictografías prehispánicas de estilo geométrico, evidencia arqueológica de grupos recolectores.",
-    miniatura: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiHgaHJQrLcIC2TtQuo7XUQG6iUzKXKjFTO38bDYg7TH1R7u6u2q7K7uY00Ic_dD7RcK-DVQ4lsoh0RisT95M2nGJ6mAg6URH1GpUZg7Kq_-hpVbrJquEBV4FssJ-RYy1i4s_5h3P3Z3Fc/s1600/casa-pintada-tinguiririca.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Petroglyphs_in_Chile.jpg/500px-Petroglyphs_in_Chile.jpg"
   },
   {
     nombre: "Huellas de Animales extintos (Termas del Flaco)",
@@ -30,7 +30,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "localidad de Termas del Flaco, 80 km al este de San Fernando.",
     descripcion: "Impresiones fósiles (huellas de terópodos) conservadas desde hace 150 millones de años; interés paleontológico y natural.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Dinosaur_footprints.jpg/500px-Dinosaur_footprints.jpg"
+    miniatura: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHIovrYUA4hspS6EvLOnE1_vvu7z68L_BGNTg5TKNHujAw7tognChefbw&s=10"
   },
   {
     nombre: "Ruta del Vino",
@@ -38,7 +38,7 @@ const lugares = [
     cierre: "17:30",
     ubicacion: "Viñas alrededor de San Fernando y Valle de Colchagua; alguna a 5-40 km de la ciudad.",
     descripcion: "Circuitos de enoturismo, degustaciones y visitas a bodegas; San Fernando es puerta de acceso a rutas del vino de Colchagua y Cachapoal.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Vi%C3%B1a_Santa_Cruz_02.jpg/500px-Vi%C3%B1a_Santa_Cruz_02.jpg"
+    miniatura: "https://images.visitchile.com/destinos/591_img_2126_jpg_1920x807_default.jpg"
   },
   {
     nombre: "Glaciar Universidad",
@@ -46,7 +46,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "En la ruta que une San Fernando con Termas del Flaco, siguiendo los ríos Azufre y San José.",
     descripcion: "Frente glaciar de interés para excursiones de montaña y observación glaciologica; requiere coordinación y buen tiempo.",
-    miniatura: "https://www.wikiexplora.com/images/thumb/4/4d/Glaciar_Universidad.jpg/500px-Glaciar_Universidad.jpg"
+    miniatura: "https://www.wikiexplora.com/images/thumb/f/f5/Glaciar_ma%C3%B1ke.JPG/230px-Glaciar_ma%C3%B1ke.JPG"
   },
   {
     nombre: "Plaza de Armas de San Fernando",
@@ -102,7 +102,7 @@ const lugares = [
     cierre: "Consultar",
     ubicacion: "Final del camino Lircunlauta, sector La Olla.",
     descripcion: "Trekking de precordillera con flora y fauna nativa; el cerro va de 900 a 1165 msnm.",
-    miniatura: "https://img.wikiloc.com/static/tmp/photos/8710589/8710589_1600.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Cerro_en_la_cordillera_de_la_costa.jpg/500px-Cerro_en_la_cordillera_de_la_costa.jpg"
   },
   {
     nombre: "Ruta Laguna del Encanto",
@@ -110,6 +110,6 @@ const lugares = [
     cierre: "Consultar",
     ubicacion: "Desde San Fernando por ruta a Puente Negro, siguiendo el camino a Termas del Flaco y luego el cruce hacia las sierras de Bella Vista.",
     descripcion: "Ruta de acceso a una laguna cordillerana en un entorno agreste.",
-    miniatura: "https://img.wikiloc.com/static/tmp/photos/12956137/12956137_1600.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Laguna_en_los_Andes.jpg/500px-Laguna_en_los_Andes.jpg"
   }
 ];
