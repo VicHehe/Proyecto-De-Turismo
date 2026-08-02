@@ -292,6 +292,73 @@
         "descripcion": "No especificado"
       },
       "id": "salida_1784824519603"
+    },
+    {
+      "titulo": "viaje pro con horarios mensos :D",
+      "fecha": "2027-07-06",
+      "duracion": "3 dias",
+      "descripcion": "Ruta con 5 actividades.",
+      "ruta": [
+        {
+          "tipo": "Lugar",
+          "descripcion": "Plaza de Armas de San Fernando",
+          "inicio": "06:07",
+          "fin": "08:29"
+        },
+        {
+          "tipo": "Lugar",
+          "descripcion": "Santuario Alto Huemul",
+          "inicio": "09:00",
+          "fin": "11:00"
+        },
+        {
+          "tipo": "Lugar",
+          "descripcion": "Casa de las Piedras Pintadas del Tinguiririca",
+          "inicio": "12:00",
+          "fin": "16:19"
+        },
+        {
+          "tipo": "Lugar",
+          "descripcion": "Glaciar Universidad",
+          "inicio": "18:07",
+          "fin": "20:00"
+        },
+        {
+          "tipo": "Lugar",
+          "descripcion": "Huellas de Animales extintos (Termas del Flaco)",
+          "inicio": "02:00",
+          "fin": "03:00"
+        }
+      ],
+      "participantes": [
+        {
+          "nombre": "Victor Tilleria",
+          "rut": "22785939-3",
+          "rol": "Guía"
+        },
+        {
+          "nombre": "Test User",
+          "rut": "12345678-9",
+          "rol": "Asistente"
+        }
+      ],
+      "guias": [
+        {
+          "nombre": "Victor Tilleria",
+          "rut": "22785939-3",
+          "rol": "Guía"
+        }
+      ],
+      "precio": 1000,
+      "curso": "Sin curso",
+      "menu": "jokeis",
+      "transporte": {
+        "conductor": "pepe",
+        "horarios": "6:50 am / 20:10 pm",
+        "precio": "300000",
+        "descripcion": "67 asientos"
+      },
+      "id": "salida_1785635425315"
     }
   ]
 }
