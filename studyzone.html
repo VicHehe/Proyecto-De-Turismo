@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 StudyZone · Lugar de Aprendizaje</title>
+    <link rel="stylesheet" href="css/studyzone.css">
+</head>
+<body>
+
+<header>
+    <h1>🌍 StudyZone</h1>
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <span class="user-badge" id="userBadge">Cargando...</span>
+        <a href="index.html" class="volver">← Volver al Lobby</a>
+    </div>
+</header>
+
+<div class="contenedor">
+    <p class="subtitulo">Explora los lugares turísticos de San Fernando y alrededores. Infórmate, inspírate y prepara tus mejores guías.</p>
+
+    <div id="gridLugares" class="grid-lugares">
+        <!-- Se llena con JS -->
+    </div>
+</div>
+
+<script src="js/github.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/lugares.js"></script>
+<script>
+    (function() {
+        const usuario = Auth.getSesion();
+        if (!usuario) {
+            window.location.href = 'login.html';
+            return;
+        }
+        document.getElementById('userBadge').textContent = `${usuario.nombre} ${usuario.apellido || ''} (${usuario.rol})`;
+
+        const grid = document.getElementById('gridLugares');
+
+        // Verificar que lugares esté definido
+        if (typeof lugares === 'undefined' || !lugares.length) {
+            grid.innerHTML = `<div class="mensaje-vacio">❌ No se encontraron lugares turísticos en la base de datos.</div>`;
+            return;
+        }
+
+        // Ordenar alfabéticamente
+        const lugaresOrdenados = [...lugares].sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+        let html = '';
+        lugaresOrdenados.forEach(lugar => {
+            // Usar la miniatura o un placeholder si no existe
+            const imgSrc = lugar.miniatura || 'https://via.placeholder.com/400x250/cccccc/333?text=Sin+Imagen';
+
+            html += `
+                <div class="tarjeta-lugar">
+                    <div class="tarjeta-imagen">
+                        <img src="${imgSrc}" alt="${lugar.nombre}" loading="lazy">
+                    </div>
+                    <div class="tarjeta-contenido">
+                        <h3>${lugar.nombre}</h3>
+                        <p class="descripcion">${lugar.descripcion || 'Sin descripción'}</p>
+                        <div class="datos">
+                            <span>📍 ${lugar.ubicacion || 'Ubicación no especificada'}</span>
+                            <span>🕒 ${lugar.apertura || 'N/A'} - ${lugar.cierre || 'N/A'}</span>
+                        </div>
+                        <button class="btn-ver-mas" onclick="verDetalleLugar('${lugar.nombre}')">Ver más</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        grid.innerHTML = html;
+
+        // Función para ver detalle en alerta (o modal, pero con alerta es simple y funcional)
+        window.verDetalleLugar = function(nombre) {
+            const lugar = lugares.find(l => l.nombre === nombre);
+            if (!lugar) return alert('Lugar no encontrado');
+
+            let mensaje = `🌍 ${lugar.nombre}\n\n`;
+            mensaje += `📍 Ubicación: ${lugar.ubicacion || 'No especificada'}\n`;
+            mensaje += `🕒 Horario: ${lugar.apertura || 'N/A'} - ${lugar.cierre || 'N/A'}\n\n`;
+            mensaje += `📖 Descripción:\n${lugar.descripcion || 'Sin descripción'}`;
+            alert(mensaje);
+        };
+    })();
+</script>
+
+</body>
+</html>
