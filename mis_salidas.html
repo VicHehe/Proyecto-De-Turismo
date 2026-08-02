@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Salidas</title>
+    <link rel="stylesheet" href="css/mis_salidas.css">
+</head>
+<body>
+
+<header>
+    <h1>📋 Mis Salidas</h1>
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <span class="user-badge" id="userBadge">Cargando...</span>
+        <a href="index.html" class="volver">← Volver al Lobby</a>
+    </div>
+</header>
+
+<div class="contenedor-principal">
+    <!-- Panel izquierdo: listado de salidas -->
+    <aside class="panel-lista">
+        <h2>Mis salidas</h2>
+        <div id="listaSalidas">
+            <p class="cargando">Cargando salidas...</p>
+        </div>
+    </aside>
+
+    <!-- Panel derecho: detalle y edición -->
+    <main class="panel-detalle">
+        <div id="detalleSalida">
+            <div class="mensaje-inicial">
+                <p>👈 Selecciona una salida de la lista para ver sus detalles.</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- MODAL DE EDICIÓN -->
+<div id="modalEditar" class="modal">
+    <div class="modal-contenido">
+        <span class="modal-cerrar" id="modalCerrar">&times;</span>
+        <h2>✏️ Editar Salida</h2>
+        <form id="formEditarSalida">
+            <input type="hidden" id="editId" />
+
+            <div class="campo">
+                <label>Título *</label>
+                <input type="text" id="editTitulo" required>
+            </div>
+            <div class="campo">
+                <label>Fecha *</label>
+                <input type="date" id="editFecha" required>
+            </div>
+            <div class="campo">
+                <label>Duración</label>
+                <select id="editDuracion">
+                    <option value="1 dia">1 día</option>
+                    <option value="2 dias">2 días</option>
+                    <option value="3 dias">3 días</option>
+                    <option value="Mas de 3 dias">Más de 3 días</option>
+                </select>
+            </div>
+            <div class="campo">
+                <label>Descripción</label>
+                <textarea id="editDescripcion" rows="2"></textarea>
+            </div>
+
+            <h3>📍 Ruta (actividades)</h3>
+            <div id="editRutaContainer">
+                <!-- Se llena dinámicamente -->
+            </div>
+            <button type="button" class="btn-agregar-actividad" id="btnAgregarActividad">➕ Agregar actividad</button>
+
+            <h3>👥 Participantes</h3>
+            <div id="editParticipantesContainer">
+                <!-- Se llena dinámicamente -->
+            </div>
+            <div class="campo" style="display:flex; gap:0.5rem; align-items:center;">
+                <input type="text" id="editNuevoParticipante" placeholder="RUT del participante">
+                <select id="editRolParticipante">
+                    <option value="Visitante">Visitante</option>
+                    <option value="Asistente">Asistente</option>
+                    <option value="Guía">Guía</option>
+                </select>
+                <button type="button" class="btn-small" id="btnAgregarParticipante">➕ Añadir</button>
+            </div>
+
+            <h3>🚌 Transporte</h3>
+            <div class="campo">
+                <label>Conductor</label>
+                <input type="text" id="editConductor">
+            </div>
+            <div class="campo">
+                <label>Horarios (ida/vuelta)</label>
+                <input type="text" id="editHorarios" placeholder="Ej: 08:00 – 18:00">
+            </div>
+            <div class="campo">
+                <label>Precio del servicio</label>
+                <input type="text" id="editPrecioTransporte" placeholder="Ej: $ 85.000 CLP">
+            </div>
+            <div class="campo">
+                <label>Descripción del vehículo</label>
+                <input type="text" id="editDescTransporte" placeholder="Ej: Bus 30 asientos, climatizado">
+            </div>
+
+            <h3>📋 Datos complementarios</h3>
+            <div class="campo">
+                <label>Curso</label>
+                <input type="text" id="editCurso" placeholder="Ej: 4° Medio A">
+            </div>
+            <div class="campo">
+                <label>Precio por persona (CLP)</label>
+                <input type="text" id="editPrecio" placeholder="Ej: 12500">
+            </div>
+            <div class="campo">
+                <label>Menú / Catering</label>
+                <input type="text" id="editMenu" placeholder="Ej: Box lunch">
+            </div>
+
+            <div class="modal-acciones">
+                <button type="button" class="btn-cancelar" id="btnCancelarEdicion">Cancelar</button>
+                <button type="submit" class="btn-guardar">💾 Guardar cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="js/github.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/planificacion.js"></script>
+<script src="js/lugares.js"></script>
+<script>
+    // ============================================================
+    // mis_salidas.js - Todo el código aquí
+    // ============================================================
+
+    (function() {
+        const usuario = Auth.getSesion();
+        if (!usuario) {
+            window.location.href = 'login.html';
+            return;
+        }
+        // Solo admin, guía o asistente pueden acceder
+        if (!['admin', 'guia', 'asistente'].includes(usuario.rol)) {
+            alert('No tienes permiso para ver esta página.');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        document.getElementById('userBadge').textContent = `${usuario.nombre} ${usuario.apellido || ''} (${usuario.rol})`;
+
+        // Estado
+        let todasLasSalidas = [];
+        let salidaSeleccionada = null;
+        let editando = false;
+
+        // ===== FUNCIONES DE FILTRADO =====
+        function getSalidasDelUsuario(todas) {
+            if (usuario.rol === 'admin') {
+                return todas; // admin ve todas
+            }
+            // guía o asistente: solo donde participa
+            return todas.filter(s => {
+                const esGuia = s.guias.some(g => g.rut === usuario.rut);
+                const esParticipante = s.participantes.some(p => p.rut === usuario.rut);
+                return esGuia || esParticipante;
+            });
+        }
+
+        // ===== CARGAR DATOS =====
+        async function cargarDatos() {
+            try {
+                todasLasSalidas = await Planificacion.cargarSalidas();
+                const misSalidas = getSalidasDelUsuario(todasLasSalidas);
+                // Ordenar por fecha (más reciente primero)
+                misSalidas.sort((a, b) => (a.fecha > b.fecha) ? -1 : 1);
+                renderizarLista(misSalidas);
+                if (misSalidas.length > 0) {
+                    // Seleccionar la primera por defecto
+                    seleccionarSalida(misSalidas[0].id);
+                } else {
+                    document.getElementById('detalleSalida').innerHTML = `
+                        <div class="mensaje-inicial">
+                            <p>📭 No tienes salidas asignadas.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error al cargar salidas:', error);
+                document.getElementById('listaSalidas').innerHTML = `<p class="error">Error al cargar salidas.</p>`;
+            }
+        }
+
+        // ===== RENDERIZAR LISTA =====
+        function renderizarLista(salidas) {
+            const contenedor = document.getElementById('listaSalidas');
+            if (!salidas || salidas.length === 0) {
+                contenedor.innerHTML = `<p class="vacio">No hay salidas.</p>`;
+                return;
+            }
+            let html = '';
+            salidas.forEach(s => {
+                const activa = (salidaSeleccionada && salidaSeleccionada.id === s.id) ? 'activa' : '';
+                html += `
+                    <div class="item-salida ${activa}" data-id="${s.id}">
+                        <strong>${s.titulo || 'Sin título'}</strong>
+                        <span>📅 ${s.fecha || 'Sin fecha'}</span>
+                    </div>
+                `;
+            });
+            contenedor.innerHTML = html;
+
+            // Eventos de clic en cada item
+            contenedor.querySelectorAll('.item-salida').forEach(el => {
+                el.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    seleccionarSalida(id);
+                });
+            });
+        }
+
+        // ===== SELECCIONAR SALIDA =====
+        async function seleccionarSalida(id) {
+            const salida = todasLasSalidas.find(s => s.id === id);
+            if (!salida) return;
+            salidaSeleccionada = salida;
+            // Actualizar lista visual
+            document.querySelectorAll('.item-salida').forEach(el => {
+                el.classList.toggle('activa', el.dataset.id === id);
+            });
+            // Mostrar detalle
+            mostrarDetalle(salida);
+        }
+
+        // ===== MOSTRAR DETALLE (con toda la info extendida) =====
+        function mostrarDetalle(salida) {
+            const contenedor = document.getElementById('detalleSalida');
+            // Obtener info de lugares
+            const lugaresInfo = typeof lugares !== 'undefined' ? lugares : [];
+
+            // Función para enriquecer actividad con info del lugar
+            function enriquecerActividad(act) {
+                if (act.tipo === 'Lugar') {
+                    const lugar = lugaresInfo.find(l => l.nombre.toLowerCase() === act.descripcion.toLowerCase());
+                    if (lugar) {
+                        return {
+                            ...act,
+                            lugarInfo: lugar
+                        };
+                    }
+                }
+                return act;
+            }
+
+            const rutaEnriquecida = salida.ruta ? salida.ruta.map(enriquecerActividad) : [];
+
+            // Obtener datos completos de participantes desde usuarios.json
+            let participantesCompletos = [];
+            if (salida.participantes && salida.participantes.length > 0) {
+                // Cargar usuarios para obtener edad, teléfono, historial
+                // Hacemos la carga de forma asíncrona, pero la función mostrarDetalle es síncrona,
+                // así que usamos una función async y luego renderizamos.
+                // Para simplificar, llamamos a una función async desde el evento de selección.
+                // Pero mejor: hacemos la carga aquí con async/await y luego renderizamos.
+                // Cambiamos la función a async.
+                // Pero para no romper, la redefinimos como async.
+                // Mejor reescribimos: seleccionarSalida llama a mostrarDetalle, pero podemos hacer que mostrarDetalle sea async.
+                // Como es complejo, lo dejamos síncrono y hacemos una carga aparte.
+                // Lo haré en la función seleccionarSalida.
+                // Vamos a reestructurar: seleccionarSalida llama a mostrarDetalleAsync.
+                // Pero ya que estamos, mejor reescribo.
+                // Para no complicar, voy a usar una función separada.
+                // En realidad, lo más simple es que mostrarDetalle reciba el salida y también los usuarios.
+                // Pero para no hacer múltiples llamadas, lo haré con una promesa.
+            }
+
+            // Para no reescribir todo, vamos a cargar los usuarios una vez y guardarlos en una variable global.
+            // Lo haré al inicio.
+            // Voy a modificar la función principal.
+            // Mejor: creo una función renderizarDetalle que toma salida y usuarios.
+            // La llamaré desde seleccionarSalida después de obtener usuarios.
+            // Ok, reescribo.
+        }
+
+        // ===== RENDERIZAR DETALLE (async) =====
+        async function renderizarDetalle(salida) {
+            const contenedor = document.getElementById('detalleSalida');
+            // Cargar usuarios para datos completos
+            const datosUsuarios = await GitHub.leer('datos/usuarios.json');
+            const usuarios = datosUsuarios ? datosUsuarios.usuarios : [];
+
+            // Enriquecer participantes con info de usuarios
+            const participantesConInfo = salida.participantes.map(p => {
+                const user = usuarios.find(u => u.rut === p.rut);
+                return {
+                    ...p,
+                    edad: user ? user.edad : '—',
+                    telefono: user ? user.telefono : '—',
+                    historial: user ? user.historial : 'Sin información'
+                };
+            });
+
+            // Obtener info de lugares
+            const lugaresInfo = typeof lugares !== 'undefined' ? lugares : [];
+
+            // Enriquecer ruta
+            const rutaEnriquecida = salida.ruta ? salida.ruta.map(act => {
+                if (act.tipo === 'Lugar') {
+                    const lugar = lugaresInfo.find(l => l.nombre.toLowerCase() === act.descripcion.toLowerCase());
+                    if (lugar) {
+                        return { ...act, lugarInfo: lugar };
+                    }
+                }
+                return act;
+            }) : [];
+
+            const esAdmin = usuario.rol === 'admin';
+            const esGuia = usuario.rol === 'guia' || usuario.rol === 'asistente';
+            const puedeEditar = esAdmin || esGuia;
+
+            let html = `
+                <div class="detalle-header">
+                    <h2>${salida.titulo || 'Sin título'}</h2>
+                    ${puedeEditar ? `<button class="btn-editar" id="btnAbrirEditar">✏️ Editar</button>` : ''}
+                </div>
+                <div class="detalle-body">
+                    <p><strong>Fecha:</strong> ${salida.fecha || 'No definida'}</p>
+                    <p><strong>Duración:</strong> ${salida.duracion || 'No especificada'}</p>
+                    <p><strong>Descripción:</strong> ${salida.descripcion || 'Sin descripción'}</p>
+
+                    <h3>📍 Ruta</h3>
+                    ${rutaEnriquecida.length > 0 ? `
+                        <ul class="ruta-lista">
+                            ${rutaEnriquecida.map(act => `
+                                <li>
+                                    <strong>${act.tipo}:</strong> ${act.descripcion}
+                                    <span class="horario">(${act.inicio} - ${act.fin})</span>
+                                    ${act.lugarInfo ? `
+                                        <div class="lugar-info">
+                                            <div><strong>Ubicación:</strong> ${act.lugarInfo.ubicacion || 'No disponible'}</div>
+                                            <div><strong>Horario:</strong> ${act.lugarInfo.apertura || 'N/A'} - ${act.lugarInfo.cierre || 'N/A'}</div>
+                                            <div><strong>Descripción:</strong> ${act.lugarInfo.descripcion || ''}</div>
+                                        </div>
+                                    ` : ''}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : '<p>Sin ruta definida.</p>'}
+
+                    <h3>👥 Participantes (${participantesConInfo.length})</h3>
+                    ${participantesConInfo.length > 0 ? `
+                        <table class="participantes-tabla">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>RUT</th>
+                                    <th>Rol</th>
+                                    <th>Edad</th>
+                                    <th>Teléfono</th>
+                                    <th>Historial Médico</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${participantesConInfo.map(p => `
+                                    <tr>
+                                        <td>${p.nombre}</td>
+                                        <td>${p.rut}</td>
+                                        <td>${p.rol}</td>
+                                        <td>${p.edad}</td>
+                                        <td>${p.telefono}</td>
+                                        <td>${p.historial}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    ` : '<p>No hay participantes.</p>'}
+
+                    <h3>🚌 Transporte</h3>
+                    ${salida.transporte ? `
+                        <p><strong>Conductor:</strong> ${salida.transporte.conductor || 'No especificado'}</p>
+                        <p><strong>Horarios:</strong> ${salida.transporte.horarios || 'No especificado'}</p>
+                        <p><strong>Precio servicio:</strong> ${salida.transporte.precio || 'No especificado'}</p>
+                        <p><strong>Descripción:</strong> ${salida.transporte.descripcion || 'No especificado'}</p>
+                    ` : '<p>Sin información de transporte.</p>'}
+
+                    <h3>📋 Datos complementarios</h3>
+                    <p><strong>Curso:</strong> ${salida.curso || 'Sin curso'}</p>
+                    <p><strong>Precio por persona:</strong> ${salida.precio ? `$${salida.precio}` : 'No especificado'}</p>
+                    <p><strong>Menú:</strong> ${salida.menu || 'Sin menú'}</p>
+                </div>
+            `;
+
+            contenedor.innerHTML = html;
+
+            // Botón editar
+            const btnEditar = document.getElementById('btnAbrirEditar');
+            if (btnEditar) {
+                btnEditar.addEventListener('click', function() {
+                    abrirModalEdicion(salida);
+                });
+            }
+        }
+
+        // ===== ABRIR MODAL DE EDICIÓN =====
+        function abrirModalEdicion(salida) {
+            const modal = document.getElementById('modalEditar');
+            // Rellenar campos
+            document.getElementById('editId').value = salida.id;
+            document.getElementById('editTitulo').value = salida.titulo || '';
+            document.getElementById('editFecha').value = salida.fecha || '';
+            document.getElementById('editDuracion').value = salida.duracion || '1 dia';
+            document.getElementById('editDescripcion').value = salida.descripcion || '';
+
+            // Ruta
+            const rutaContainer = document.getElementById('editRutaContainer');
+            rutaContainer.innerHTML = '';
+            if (salida.ruta && salida.ruta.length > 0) {
+                salida.ruta.forEach((act, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'ruta-edit-item';
+                    div.innerHTML = `
+                        <select class="edit-tipo-actividad">
+                            <option value="Lugar" ${act.tipo === 'Lugar' ? 'selected' : ''}>📍 Lugar</option>
+                            <option value="Traslado" ${act.tipo === 'Traslado' ? 'selected' : ''}>🚌 Traslado</option>
+                            <option value="Pausa" ${act.tipo === 'Pausa' ? 'selected' : ''}>☕ Pausa</option>
+                        </select>
+                        <input type="text" class="edit-desc-actividad" value="${act.descripcion}" placeholder="Descripción">
+                        <input type="time" class="edit-hora-inicio" value="${act.inicio || '09:00'}">
+                        <input type="time" class="edit-hora-fin" value="${act.fin || '10:00'}">
+                        <button type="button" class="btn-eliminar-actividad" data-index="${index}">✕</button>
+                    `;
+                    rutaContainer.appendChild(div);
+                });
+            } else {
+                rutaContainer.innerHTML = '<p class="muted">No hay actividades.</p>';
+            }
+
+            // Participantes
+            const participantesContainer = document.getElementById('editParticipantesContainer');
+            participantesContainer.innerHTML = '';
+            if (salida.participantes && salida.participantes.length > 0) {
+                salida.participantes.forEach((p, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'participante-edit-item';
+                    div.innerHTML = `
+                        <span>${p.nombre} (${p.rut}) - ${p.rol}</span>
+                        <button type="button" class="btn-eliminar-participante" data-index="${index}">✕</button>
+                    `;
+                    participantesContainer.appendChild(div);
+                });
+            } else {
+                participantesContainer.innerHTML = '<p class="muted">No hay participantes.</p>';
+            }
+
+            // Transporte
+            document.getElementById('editConductor').value = salida.transporte?.conductor || '';
+            document.getElementById('editHorarios').value = salida.transporte?.horarios || '';
+            document.getElementById('editPrecioTransporte').value = salida.transporte?.precio || '';
+            document.getElementById('editDescTransporte').value = salida.transporte?.descripcion || '';
+
+            // Complementarios
+            document.getElementById('editCurso').value = salida.curso || '';
+            document.getElementById('editPrecio').value = salida.precio || '';
+            document.getElementById('editMenu').value = salida.menu || '';
+
+            // Guardar referencia a la salida actual
+            editando = true;
+            modal.style.display = 'flex';
+        }
+
+        // ===== CERRAR MODAL =====
+        function cerrarModalEdicion() {
+            document.getElementById('modalEditar').style.display = 'none';
+            editando = false;
+        }
+
+        // ===== GUARDAR EDICIÓN =====
+        async function guardarEdicion(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const titulo = document.getElementById('editTitulo').value.trim();
+            const fecha = document.getElementById('editFecha').value;
+            const duracion = document.getElementById('editDuracion').value;
+            const descripcion = document.getElementById('editDescripcion').value.trim();
+
+            if (!titulo || !fecha) {
+                alert('El título y la fecha son obligatorios.');
+                return;
+            }
+
+            // Recolectar ruta
+            const rutaItems = document.querySelectorAll('#editRutaContainer .ruta-edit-item');
+            const ruta = [];
+            rutaItems.forEach(item => {
+                const tipo = item.querySelector('.edit-tipo-actividad').value;
+                const desc = item.querySelector('.edit-desc-actividad').value.trim();
+                const inicio = item.querySelector('.edit-hora-inicio').value;
+                const fin = item.querySelector('.edit-hora-fin').value;
+                if (desc) {
+                    ruta.push({ tipo, descripcion: desc, inicio, fin });
+                }
+            });
+
+            // Recolectar participantes (no los editamos directamente aquí, solo los que ya estaban)
+            // Los participantes se manejan con añadir/eliminar en el modal.
+            // Pero necesitamos obtener la lista actual de participantes.
+            // La guardamos en una variable global o la leemos del DOM.
+            // Para simplificar, usaremos los participantes que ya estaban en la salida y los modificamos con los botones.
+            // Pero como no hemos implementado la adición/eliminación de participantes en el modal, lo haremos ahora.
+            // Pero para no complicar, asumiremos que los participantes se mantienen igual.
+            // Mejor: en el modal, los participantes se muestran y se pueden eliminar, y hay un campo para agregar.
+            // Pero para que funcione, necesito implementar eso. Lo haré con eventos.
+            // Por ahora, recolectamos los participantes del DOM.
+            const participantes = [];
+            document.querySelectorAll('#editParticipantesContainer .participante-edit-item').forEach(item => {
+                const texto = item.textContent.replace('✕', '').trim();
+                // formato: "Nombre (RUT) - Rol"
+                const match = texto.match(/^(.*?)\s*\(([^)]+)\)\s*-\s*(.*)$/);
+                if (match) {
+                    participantes.push({
+                        nombre: match[1].trim(),
+                        rut: match[2].trim(),
+                        rol: match[3].trim()
+                    });
+                }
+            });
+
+            // Transporte
+            const transporte = {
+                conductor: document.getElementById('editConductor').value.trim() || 'No especificado',
+                horarios: document.getElementById('editHorarios').value.trim() || 'No especificado',
+                precio: document.getElementById('editPrecioTransporte').value.trim() || 'No especificado',
+                descripcion: document.getElementById('editDescTransporte').value.trim() || 'No especificado'
+            };
+
+            const curso = document.getElementById('editCurso').value.trim() || 'Sin curso';
+            const precio = parseInt(document.getElementById('editPrecio').value) || 0;
+            const menu = document.getElementById('editMenu').value.trim() || 'Sin menú';
+
+            // Construir objeto actualizado
+            const salidaActualizada = {
+                titulo,
+                fecha,
+                duracion,
+                descripcion: descripcion || `Ruta con ${ruta.length} actividades.`,
+                ruta,
+                participantes,
+                guias: participantes.filter(p => p.rol === 'Guía'),
+                precio,
+                curso,
+                menu,
+                transporte
+            };
+
+            // Guardar
+            const ok = await Planificacion.actualizarSalida(id, salidaActualizada);
+            if (ok) {
+                alert('✅ Salida actualizada correctamente.');
+                cerrarModalEdicion();
+                // Recargar datos
+                await cargarDatos();
+                // Seleccionar la salida actualizada
+                seleccionarSalida(id);
+            } else {
+                alert('❌ Error al actualizar la salida.');
+            }
+        }
+
+        // ===== EVENTOS DEL MODAL =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cerrar modal
+            document.getElementById('modalCerrar').addEventListener('click', cerrarModalEdicion);
+            document.getElementById('btnCancelarEdicion').addEventListener('click', cerrarModalEdicion);
+            window.addEventListener('click', function(e) {
+                if (e.target === document.getElementById('modalEditar')) {
+                    cerrarModalEdicion();
+                }
+            });
+
+            // Formulario de edición
+            document.getElementById('formEditarSalida').addEventListener('submit', guardarEdicion);
+
+            // Agregar actividad
+            document.getElementById('btnAgregarActividad').addEventListener('click', function() {
+                const container = document.getElementById('editRutaContainer');
+                const div = document.createElement('div');
+                div.className = 'ruta-edit-item';
+                div.innerHTML = `
+                    <select class="edit-tipo-actividad">
+                        <option value="Lugar">📍 Lugar</option>
+                        <option value="Traslado">🚌 Traslado</option>
+                        <option value="Pausa">☕ Pausa</option>
+                    </select>
+                    <input type="text" class="edit-desc-actividad" placeholder="Descripción">
+                    <input type="time" class="edit-hora-inicio" value="09:00">
+                    <input type="time" class="edit-hora-fin" value="10:00">
+                    <button type="button" class="btn-eliminar-actividad">✕</button>
+                `;
+                container.appendChild(div);
+                // Evento eliminar
+                div.querySelector('.btn-eliminar-actividad').addEventListener('click', function() {
+                    div.remove();
+                });
+            });
+
+            // Eliminar actividad (delegado)
+            document.getElementById('editRutaContainer').addEventListener('click', function(e) {
+                if (e.target.classList.contains('btn-eliminar-actividad')) {
+                    e.target.closest('.ruta-edit-item').remove();
+                }
+            });
+
+            // Agregar participante
+            document.getElementById('btnAgregarParticipante').addEventListener('click', async function() {
+                const rutInput = document.getElementById('editNuevoParticipante');
+                const rut = rutInput.value.trim();
+                const rol = document.getElementById('editRolParticipante').value;
+                if (!rut) return alert('Ingresa un RUT');
+
+                // Buscar usuario
+                const datos = await GitHub.leer('datos/usuarios.json');
+                if (!datos) return alert('Error al cargar usuarios');
+                const usuario = datos.usuarios.find(u => u.rut === rut);
+                if (!usuario) return alert('Usuario no encontrado');
+
+                // Verificar duplicado
+                const container = document.getElementById('editParticipantesContainer');
+                const existentes = container.querySelectorAll('.participante-edit-item');
+                for (let item of existentes) {
+                    const texto = item.textContent;
+                    if (texto.includes(`(${rut})`)) {
+                        return alert('Este participante ya está en la lista.');
+                    }
+                }
+
+                const div = document.createElement('div');
+                div.className = 'participante-edit-item';
+                div.innerHTML = `
+                    <span>${usuario.nombre} ${usuario.apellido} (${rut}) - ${rol}</span>
+                    <button type="button" class="btn-eliminar-participante">✕</button>
+                `;
+                container.appendChild(div);
+                rutInput.value = '';
+            });
+
+            // Eliminar participante (delegado)
+            document.getElementById('editParticipantesContainer').addEventListener('click', function(e) {
+                if (e.target.classList.contains('btn-eliminar-participante')) {
+                    e.target.closest('.participante-edit-item').remove();
+                }
+            });
+        });
+
+        // ===== INICIALIZAR =====
+        cargarDatos();
+
+        // Exponer funciones para que el HTML las use (aunque usamos eventos)
+        window.seleccionarSalida = seleccionarSalida;
+        window.cerrarModalEdicion = cerrarModalEdicion;
+
+        // Reescribir mostrarDetalle para que sea async y use renderizarDetalle
+        // La función original mostrarDetalle la reemplazamos con renderizarDetalle
+        // Pero ya estamos usando renderizarDetalle dentro de seleccionarSalida.
+        // Modificamos seleccionarSalida para que use renderizarDetalle.
+        // Ya la he definido arriba.
+        // Vamos a redefinir seleccionarSalida para que use renderizarDetalle.
+        // Pero ya la definimos, la reemplazo.
+
+        // Reemplazo la función seleccionarSalida original
+        const seleccionarSalidaOriginal = seleccionarSalida;
+        seleccionarSalida = async function(id) {
+            const salida = todasLasSalidas.find(s => s.id === id);
+            if (!salida) return;
+            salidaSeleccionada = salida;
+            // Actualizar lista visual
+            document.querySelectorAll('.item-salida').forEach(el => {
+                el.classList.toggle('activa', el.dataset.id === id);
+            });
+            // Mostrar detalle con renderizarDetalle
+            await renderizarDetalle(salida);
+        };
+
+        // Sobrescribir la función global
+        window.seleccionarSalida = seleccionarSalida;
+
+        // También actualizar cargarDatos para que use la nueva seleccionarSalida
+        // Pero ya lo hace.
+
+        console.log('✅ mis_salidas.html cargado correctamente');
+    })();
+</script>
+</body>
+</html>
