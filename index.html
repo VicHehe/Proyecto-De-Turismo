@@ -10,6 +10,7 @@
 
 <header>
     <div class="header-left">
+        <img src="Icon.jpg" alt="Especialidad de Turismo" class="logo-especialidad">
         <div class="especialidad">
             <span>ESPECIALIDAD</span>
             <span>DE</span>
@@ -19,7 +20,7 @@
     </div>
     <div class="header-center">
         <h1>Turismo Eduardo Charme</h1>
-        <p>Descubre la capital de la Provincia de Colchagua</p>
+        <p>Explora, Aprende y Gestiona tus Viajes</p>
     </div>
     <div class="user-badge" id="userBadge">
         <span id="userNombre">Cargando...</span>
@@ -32,11 +33,13 @@
 </nav>
 
 <section class="hero">
-    <h2>Bienvenido a Turismo Eduardo Charme</h2>
+    <h2>Bienvenido a la Especialidad de Turismo</h2>
     <p>
-        Aquí puedes inscribirte en guías turísticas y gestionar tus viajes.
+        El Liceo Eduardo Charme te prepara para ser un profesional en el mundo del turismo. 
+        Aquí podrás gestionar tus salidas pedagógicas, inscribirte en experiencias únicas 
+        y descubrir los atractivos de nuestra región. ¡Conviértete en un guía experto y 
+        vive el turismo desde la práctica!
     </p>
-    <button onclick="sonido()">Comenzar recorrido</button>
 </section>
 
 <section class="lugares" id="contenedorSalidas">
@@ -61,21 +64,8 @@
 <script src="js/planificacion.js"></script>
 <script>
     // ============================================================
-    // SONIDO (efecto "Comenzar recorrido")
+    // SONIDO (efecto "Comenzar recorrido") - ELIMINADO
     // ============================================================
-    function sonido(){
-        const audio = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audio.createOscillator();
-        const gain = audio.createGain();
-        osc.type = "triangle";
-        osc.frequency.value = 700;
-        osc.connect(gain);
-        gain.connect(audio.destination);
-        gain.gain.setValueAtTime(0.15, audio.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + 0.15);
-        osc.start();
-        osc.stop(audio.currentTime + 0.15);
-    }
 
     // ============================================================
     // FUNCIÓN PARA OBTENER SALIDAS SEGÚN PERMISOS
@@ -87,18 +77,22 @@
             if (!s.participantes) s.participantes = [];
         });
 
+        // --- NUEVO: FILTRAR SALIDAS PASADAS PARA TODOS ---
+        // Solo se muestran salidas con fecha >= hoy
+        const futuras = todas.filter(s => s.fecha >= hoy);
+
         if (usuario.rol === 'admin') {
-            return todas;
+            return futuras; // Admin solo ve futuras en el lobby
         } else if (usuario.rol === 'guia' || usuario.rol === 'asistente') {
-            return todas.filter(s => {
+            return futuras.filter(s => {
                 const esGuia = s.guias.some(g => g.rut === usuario.rut);
                 const esParticipante = s.participantes.some(p => p.rut === usuario.rut);
-                return (esGuia || esParticipante) && s.fecha >= hoy;
+                return (esGuia || esParticipante);
             });
         } else {
-            return todas.filter(s => {
+            return futuras.filter(s => {
                 const esParticipante = s.participantes.some(p => p.rut === usuario.rut);
-                return esParticipante && s.fecha >= hoy;
+                return esParticipante;
             });
         }
     }
@@ -162,7 +156,8 @@
 
         if (esEstudiante) {
             const yaInscrito = salida.participantes.some(p => p.rut === usuario.rut);
-            if (!yaInscrito && salida.fecha >= new Date().toISOString().split('T')[0]) {
+            const hoy = new Date().toISOString().split('T')[0];
+            if (!yaInscrito && salida.fecha >= hoy) {
                 html += `<button class="btn" id="btnInscribir" onclick="inscribirEnSalida('${salida.id}')" style="margin-top:10px; background:#000; color:#fff; border:1px solid #000; padding:8px 20px; cursor:pointer;">✅ Inscribirme</button>`;
             } else if (yaInscrito) {
                 html += `<p style="margin-top:10px; color:green; font-weight:bold;">✅ Ya estás inscrito en esta salida.</p>`;
