@@ -76,6 +76,10 @@
         <h2>📎 Datos complementarios</h2>
         <div class="grid-3">
             <div class="grupo">
+                <label>Título de la salida *</label>
+                <input type="text" id="inputTitulo" placeholder="Ej: Excursión a Termas del Flaco" required>
+            </div>
+            <div class="grupo">
                 <label>Fecha de la salida</label>
                 <input type="date" id="inputFecha" value="2026-07-20">
             </div>
@@ -148,7 +152,289 @@
 <script src="js/planificacion.js"></script>
 <script src="js/lugares.js"></script>
 <script>
-    // ... (el mismo JavaScript que ya tenías) ...
+    // ============================================================
+    // CÓDIGO COMPLETO DE PLANIFICACIÓN
+    // ============================================================
+
+    (function() {
+        // ---- VERIFICAR SESIÓN ----
+        const usuario = Auth.getSesion();
+        if (!usuario) {
+            window.location.href = 'login.html';
+            return;
+        }
+        // Solo admin y guías/asistentes pueden acceder
+        if (!['admin', 'guia', 'asistente'].includes(usuario.rol)) {
+            alert('No tienes permiso para planificar salidas.');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        // ---- CARGA DE DATOS INICIAL ----
+        let lugaresSeleccionados = [];
+        let participantes = [];
+        let rutaActividades = [];
+
+        // ---- LUGARES: POBLAR DATALIST ----
+        const datalistLugares = document.getElementById('listaLugares');
+        if (typeof lugares !== 'undefined') {
+            lugares.forEach(l => {
+                const opt = document.createElement('option');
+                opt.value = l.nombre;
+                datalistLugares.appendChild(opt);
+            });
+        }
+
+        // ---- PARTICIPANTES: POBLAR DATALIST ----
+        async function cargarUsuariosParaDatalist() {
+            const datos = await GitHub.leer('datos/usuarios.json');
+            if (!datos) return;
+            const datalist = document.getElementById('listaParticipantes');
+            datos.usuarios.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = `${u.nombre} ${u.apellido} (${u.rut})`;
+                datalist.appendChild(opt);
+            });
+        }
+        cargarUsuariosParaDatalist();
+
+        // ---- FUNCIÓN: AGREGAR LUGAR A RUTA ----
+        document.getElementById('btnAgregarLugarARuta').addEventListener('click', function() {
+            const input = document.getElementById('buscarLugar');
+            const nombre = input.value.trim();
+            if (!nombre) return alert('Escribe un lugar');
+
+            // Buscar en la base de datos de lugares
+            let lugarInfo = null;
+            if (typeof lugares !== 'undefined') {
+                lugarInfo = lugares.find(l => l.nombre.toLowerCase() === nombre.toLowerCase());
+            }
+
+            // Añadir a la lista de lugares seleccionados
+            lugaresSeleccionados.push({
+                nombre: nombre,
+                descripcion: lugarInfo ? lugarInfo.descripcion : '',
+                ubicacion: lugarInfo ? lugarInfo.ubicacion : '',
+                apertura: lugarInfo ? lugarInfo.apertura : '',
+                cierre: lugarInfo ? lugarInfo.cierre : ''
+            });
+
+            // También añadir como actividad en la ruta
+            rutaActividades.push({
+                tipo: 'Lugar',
+                descripcion: nombre,
+                inicio: document.getElementById('horaInicio').value || '09:00',
+                fin: document.getElementById('horaFin').value || '10:00'
+            });
+
+            renderizarLugaresSeleccionados();
+            renderizarRuta();
+            input.value = '';
+        });
+
+        function renderizarLugaresSeleccionados() {
+            const contenedor = document.getElementById('listaLugaresSeleccionados');
+            if (lugaresSeleccionados.length === 0) {
+                contenedor.innerHTML = `<p class="muted" style="text-align:center; width:100%;">No hay lugares añadidos aún.</p>`;
+                return;
+            }
+            contenedor.innerHTML = lugaresSeleccionados.map((l, i) => `
+                <div class="item">
+                    <span><strong>${l.nombre}</strong> ${l.descripcion ? '- ' + l.descripcion : ''}</span>
+                    <span class="item-eliminar" onclick="eliminarLugarSeleccionado(${i})">✕</span>
+                </div>
+            `).join('');
+        }
+
+        window.eliminarLugarSeleccionado = function(index) {
+            lugaresSeleccionados.splice(index, 1);
+            // También eliminar la actividad correspondiente en la ruta (por descripción)
+            const nombre = lugaresSeleccionados[index]?.nombre || '';
+            if (nombre) {
+                const idxRuta = rutaActividades.findIndex(a => a.descripcion === nombre && a.tipo === 'Lugar');
+                if (idxRuta !== -1) rutaActividades.splice(idxRuta, 1);
+            }
+            renderizarLugaresSeleccionados();
+            renderizarRuta();
+        };
+
+        // ---- FUNCIÓN: AGREGAR PARTICIPANTE ----
+        document.getElementById('btnAgregarParticipante').addEventListener('click', async function() {
+            const input = document.getElementById('buscarParticipante');
+            const texto = input.value.trim();
+            if (!texto) return alert('Escribe un nombre o RUT');
+
+            // Extraer RUT del texto (entre paréntesis)
+            const matchRut = texto.match(/\(([^)]+)\)/);
+            let rut = matchRut ? matchRut[1] : texto;
+            // Limpiar RUT
+            rut = rut.replace(/\./g, '').toUpperCase().trim();
+
+            // Buscar usuario en la base
+            const datos = await GitHub.leer('datos/usuarios.json');
+            if (!datos) return alert('Error al cargar usuarios');
+            const usuarioEncontrado = datos.usuarios.find(u => u.rut === rut);
+            if (!usuarioEncontrado) return alert('Usuario no encontrado');
+
+            const rol = document.getElementById('rolSeleccionado').value;
+
+            // Verificar duplicado
+            if (participantes.some(p => p.rut === rut)) {
+                alert('Este usuario ya está en la lista');
+                return;
+            }
+
+            participantes.push({
+                nombre: `${usuarioEncontrado.nombre} ${usuarioEncontrado.apellido}`,
+                rut: rut,
+                rol: rol
+            });
+
+            renderizarParticipantes();
+            input.value = '';
+        });
+
+        function renderizarParticipantes() {
+            const tbody = document.getElementById('cuerpoParticipantes');
+            if (participantes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#666;">No hay participantes añadidos</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = participantes.map((p, i) => `
+                <tr>
+                    <td>${p.nombre}</td>
+                    <td>${p.rut}</td>
+                    <td>${p.rol}</td>
+                    <td><button class="btn-eliminar" onclick="eliminarParticipante(${i})">✕</button></td>
+                </tr>
+            `).join('');
+        }
+
+        window.eliminarParticipante = function(index) {
+            participantes.splice(index, 1);
+            renderizarParticipantes();
+        };
+
+        // ---- FUNCIÓN: AGREGAR ACTIVIDAD A RUTA ----
+        document.getElementById('btnAgregarActividad').addEventListener('click', function() {
+            const tipo = document.getElementById('tipoActividad').value;
+            const desc = document.getElementById('descActividad').value.trim();
+            const inicio = document.getElementById('horaInicio').value;
+            const fin = document.getElementById('horaFin').value;
+
+            if (!desc) return alert('Escribe una descripción para la actividad');
+
+            rutaActividades.push({ tipo, descripcion: desc, inicio, fin });
+            renderizarRuta();
+            document.getElementById('descActividad').value = '';
+        });
+
+        function renderizarRuta() {
+            const contenedor = document.getElementById('contenedorRuta');
+            if (rutaActividades.length === 0) {
+                contenedor.innerHTML = `<p class="muted" style="text-align:center; width:100%;">No hay actividades en la ruta.</p>`;
+                return;
+            }
+            contenedor.innerHTML = rutaActividades.map((act, i) => `
+                <div class="ruta-item">
+                    <span class="tipo">${act.tipo}</span>
+                    <span class="desc">${act.descripcion}</span>
+                    <span class="horario-editable">
+                        <input type="time" value="${act.inicio}" onchange="actualizarHoraRuta(${i}, 'inicio', this.value)">
+                        <input type="time" value="${act.fin}" onchange="actualizarHoraRuta(${i}, 'fin', this.value)">
+                    </span>
+                    <span class="acciones">
+                        <button class="btn-ruta" onclick="subirActividad(${i})">⬆</button>
+                        <button class="btn-ruta" onclick="bajarActividad(${i})">⬇</button>
+                        <button class="btn-ruta" onclick="eliminarActividad(${i})">✕</button>
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        window.actualizarHoraRuta = function(index, campo, valor) {
+            rutaActividades[index][campo] = valor;
+        };
+
+        window.subirActividad = function(index) {
+            if (index === 0) return;
+            [rutaActividades[index], rutaActividades[index-1]] = [rutaActividades[index-1], rutaActividades[index]];
+            renderizarRuta();
+        };
+
+        window.bajarActividad = function(index) {
+            if (index === rutaActividades.length - 1) return;
+            [rutaActividades[index], rutaActividades[index+1]] = [rutaActividades[index+1], rutaActividades[index]];
+            renderizarRuta();
+        };
+
+        window.eliminarActividad = function(index) {
+            rutaActividades.splice(index, 1);
+            renderizarRuta();
+        };
+
+        // ---- GUARDAR SALIDA ----
+        document.getElementById('btnGuardarSalida').addEventListener('click', async function() {
+            // Recoger datos
+            const titulo = document.getElementById('inputTitulo').value.trim();
+            const fecha = document.getElementById('inputFecha').value;
+            const duracion = document.getElementById('inputDuracion').value;
+            const curso = document.getElementById('inputCurso').value.trim();
+            const precio = document.getElementById('inputPrecio').value.trim();
+            const menu = document.getElementById('inputMenu').value.trim();
+            const conductor = document.getElementById('inputConductor').value.trim();
+            const horarios = document.getElementById('inputHorarios').value.trim();
+            const precioTransporte = document.getElementById('inputPrecioTransporte').value.trim();
+            const descTransporte = document.getElementById('inputDescTransporte').value.trim();
+
+            // Validaciones
+            if (!titulo) return alert('El título es obligatorio');
+            if (!fecha) return alert('La fecha es obligatoria');
+            if (participantes.length === 0) return alert('Agrega al menos un participante');
+            if (rutaActividades.length === 0) return alert('Agrega al menos una actividad a la ruta');
+
+            // Construir objeto salida
+            const salida = {
+                titulo: titulo,
+                fecha: fecha,
+                duracion: duracion,
+                descripcion: `Ruta con ${rutaActividades.length} actividades.`,
+                ruta: rutaActividades,
+                participantes: participantes,
+                guias: participantes.filter(p => p.rol === 'Guía'),
+                precio: parseInt(precio) || 0,
+                curso: curso || 'Sin curso',
+                menu: menu || 'Sin menú',
+                transporte: {
+                    conductor: conductor || 'No especificado',
+                    horarios: horarios || 'No especificado',
+                    precio: precioTransporte || 'No especificado',
+                    descripcion: descTransporte || 'No especificado'
+                }
+            };
+
+            // Guardar
+            const ok = await Planificacion.guardarSalida(salida);
+            const mensajeDiv = document.getElementById('mensajeFeedback');
+            mensajeDiv.classList.remove('oculto');
+            if (ok) {
+                mensajeDiv.className = 'mensaje mensaje-exito';
+                mensajeDiv.textContent = '✅ Salida guardada exitosamente. Redirigiendo...';
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            } else {
+                mensajeDiv.className = 'mensaje mensaje-error';
+                mensajeDiv.textContent = '❌ Error al guardar la salida. Intenta de nuevo.';
+            }
+        });
+
+        // ---- FUNCIÓN PARA VOLVER ----
+        document.querySelector('.contenedor h1').addEventListener('dblclick', function() {
+            window.location.href = 'index.html';
+        });
+
+    })();
 </script>
 </body>
 </html>
