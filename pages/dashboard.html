@@ -9,43 +9,82 @@
 </head>
 <body>
 <div class="container">
-    <div class="header">
+    <div class="dashboard-header">
         <h1>👑 Panel de Administración</h1>
         <div class="header-actions">
             <button class="btn btn-index" id="btnIrIndex">🏠 Ir al Inicio</button>
-            <button class="btn btn-export" id="btnExportarExcel">📊 Exportar a Excel</button>
-            <span class="user-count" id="userCount">0 usuarios</span>
+            <span class="user-count-badge" id="userCount">0 usuarios</span>
+            <button class="btn btn-excel" id="btnExportarExcel">📊 Exportar a Excel</button>
             <button class="btn logout-btn" id="btnCerrarSesion">Cerrar Sesión</button>
         </div>
     </div>
     
-    <p>Gestión de usuarios del sistema.</p>
-    
-    <div id="dashboardMensaje" class="mensaje hidden"></div>
-    
-    <div class="search-bar">
-        <input type="text" id="buscarUsuario" placeholder="🔍 Buscar por RUT o nombre..." />
+    <div class="search-box">
+        <span class="lupa">🔍</span>
+        <input type="text" id="buscarUsuario" placeholder="Buscar por RUT, nombre o apellido..." />
         <button class="btn btn-small" id="btnBuscar">Buscar</button>
     </div>
     
+    <div id="dashboardMensaje" class="mensaje hidden"></div>
+    
     <h2>Lista de Usuarios</h2>
-    <div id="tablaUsuariosWrapper">
-        <ul class="user-list" id="listaUsuarios">
-            <li>Cargando usuarios...</li>
-        </ul>
+    <div class="user-table-container">
+        <table class="user-table" id="tablaUsuarios">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>RUT</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoTabla">
+                <tr>
+                    <td colspan="7" class="text-center">Cargando usuarios...</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
-<!-- ===== MODAL DE EDICIÓN ===== -->
-<div id="modalEditarUsuario" class="modal" style="display:none;">
-    <div class="modal-content">
-        <span class="modal-close" id="modalEditarCerrar">&times;</span>
+<!-- MODAL PARA EDITAR USUARIO -->
+<div id="modalEditar" class="modal">
+    <div class="modal-contenido">
         <h2>✏️ Editar Usuario</h2>
-        <div id="modalEditarBody"></div>
-        <div class="modal-botones">
-            <button class="btn" id="btnEditarCancelar">Cancelar</button>
-            <button class="btn btn-primario" id="btnEditarGuardar">💾 Guardar Cambios</button>
-        </div>
+        <form id="formEditar">
+            <input type="hidden" id="editRut" />
+            <div class="campo">
+                <label>Nombre</label>
+                <input type="text" id="editNombre" required />
+            </div>
+            <div class="campo">
+                <label>Apellido</label>
+                <input type="text" id="editApellido" required />
+            </div>
+            <div class="campo">
+                <label>Edad</label>
+                <input type="number" id="editEdad" required min="1" max="120" />
+            </div>
+            <div class="campo">
+                <label>Teléfono</label>
+                <input type="text" id="editTelefono" placeholder="912345678" required />
+            </div>
+            <div class="campo">
+                <label>Gmail</label>
+                <input type="email" id="editGmail" required />
+            </div>
+            <div class="campo">
+                <label>Historial Médico</label>
+                <textarea id="editHistorial" rows="2"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cerrar" id="btnCerrarModal">Cancelar</button>
+                <button type="submit" class="btn-guardar">💾 Guardar cambios</button>
+            </div>
+        </form>
     </div>
 </div>
 
