@@ -1,0 +1,180 @@
+/* ============================================================
+   studyzone.css - Estilos exclusivos para StudyZone
+   ============================================================ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #fafafa;
+    color: #1a1a1a;
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* ---- Header ---- */
+header {
+    border: 1px solid #1a1a1a;
+    background: #ffffff;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+header .user-badge {
+    border: 1px solid #1a1a1a;
+    padding: 4px 12px;
+    font-size: 13px;
+    background: #f0f0f0;
+}
+
+.volver {
+    border: 1px solid #1a1a1a;
+    padding: 4px 12px;
+    background: #fff;
+    cursor: pointer;
+    text-decoration: none;
+    color: #1a1a1a;
+    font-size: 13px;
+}
+
+.volver:hover {
+    background: #eaeaea;
+}
+
+/* ---- Contenedor principal ---- */
+.contenedor {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.subtitulo {
+    font-size: 1.1rem;
+    margin-bottom: 1.8rem;
+    color: #333;
+    border-left: 4px solid #2d6a2d;
+    padding-left: 12px;
+}
+
+/* ---- Grid de tarjetas ---- */
+.grid-lugares {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.8rem;
+}
+
+.tarjeta-lugar {
+    background: #ffffff;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.tarjeta-lugar:hover {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+
+.tarjeta-imagen {
+    width: 100%;
+    height: 190px;
+    overflow: hidden;
+    background: #eaeaea;
+}
+
+.tarjeta-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.tarjeta-contenido {
+    padding: 1rem 1.2rem 1.2rem;
+}
+
+.tarjeta-contenido h3 {
+    font-size: 1.15rem;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+}
+
+.tarjeta-contenido .descripcion {
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 0.8rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.tarjeta-contenido .datos {
+    font-size: 0.8rem;
+    color: #555;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 0.8rem;
+    border-top: 1px solid #eee;
+    padding-top: 6px;
+}
+
+.tarjeta-contenido .datos span {
+    display: block;
+}
+
+.btn-ver-mas {
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.15s;
+}
+
+.btn-ver-mas:hover {
+    background: #333;
+}
+
+.mensaje-vacio {
+    padding: 2rem;
+    text-align: center;
+    color: #777;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 600px) {
+    .grid-lugares {
+        grid-template-columns: 1fr;
+    }
+    header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    .tarjeta-imagen {
+        height: 160px;
+    }
+}
