@@ -21,8 +21,6 @@ Votación con piñas de pino (1-5) para todos los usuarios.
 Las fotos del Administrador deben aparecer en el Index para promocionar la página.
 
 👤 Gestión de usuarios y salidas
-⭐⭐ Edición de usuarios
-Permitir al Administrador editar datos de cualquier usuario (nombre, correo, teléfono, etc.) desde el panel de administración.
 
 ⭐⭐ Edición de salidas
 Permitir a Guías y Administradores modificar sus propias salidas (fechas, rutas, participantes, etc.) después de creadas.
