@@ -1,6 +1,8 @@
 📋 Tareas pendientes del proyecto
 (Basado en TextRequerimientos.txt – todo lo demás ya está implementado)
 
+
+
 🎨 Diseño visual y experiencia de usuario
 (Cambios exclusivamente en CSS, sin alterar la estructura HTML)
 
@@ -11,6 +13,8 @@ El emblema del liceo y el logo de turismo ya están integrados (Icon.jpg); solo 
 ⭐ Ajustes de estilo general
 Refinar tipografía, espaciados, fondos y otros detalles para lograr el look "natural como la naturaleza y formal sin exagerar".
 
+
+
 🖼️ Galería de viajes (nueva funcionalidad)
 ⭐⭐⭐ Sistema completo de galería
 
@@ -20,14 +24,13 @@ Votación con piñas de pino (1-5) para todos los usuarios.
 
 Las fotos del Administrador deben aparecer en el Index para promocionar la página.
 
-👤 Gestión de usuarios y salidas
 
-⭐⭐ Edición de salidas
-Permitir a Guías y Administradores modificar sus propias salidas (fechas, rutas, participantes, etc.) después de creadas.
 
 📍 Contenido y datos
 ⭐ Ampliación de lugares turísticos
 Añadir más zonas turísticas en lugares.js (trabajo específico de Belén).
+
+
 
 🔍 Escala de dificultad
 ⭐ = Baja (cambios sencillos, pocas líneas de código o ajustes directos).
