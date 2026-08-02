@@ -4,8 +4,6 @@
 
 - Arreglar la posición de los nombres de los usuarios para que no se vean desordenados o corridos. en el index.
 
-- Al iniciar sesión, mostrar los datos del usuario que entró. NO debe aparecer el RUT de Víctor (eso es datos de prueba).
-
 - El menú principal debe tener solo estas 5 secciones en este orden: Lugares, Personas, Transporte, Plan de Ruta y Datos Complementarios.
 
 - Quitar el ícono de "clipy" y remplazarlo por otro en el apartado de planificar salida
