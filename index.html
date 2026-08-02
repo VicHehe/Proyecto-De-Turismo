@@ -9,8 +9,18 @@
 <body>
 
 <header>
-    <h1>Turismo Eduardo Charme</h1>
-    <p>Descubre la capital de la Provincia de Colchagua</p>
+    <div class="header-left">
+        <div class="especialidad">
+            <span>ESPECIALIDAD</span>
+            <span>DE</span>
+            <span>TURISMO</span>
+            <span>LICEO EDUARDO CHARME</span>
+        </div>
+    </div>
+    <div class="header-center">
+        <h1>Turismo Eduardo Charme</h1>
+        <p>Descubre la capital de la Provincia de Colchagua</p>
+    </div>
     <div class="user-badge" id="userBadge">
         <span id="userNombre">Cargando...</span>
         <span class="rol" id="userRol">-</span>
@@ -22,11 +32,9 @@
 </nav>
 
 <section class="hero">
-    <h2>Bienvenido a San Fernando</h2>
+    <h2>Bienvenido a Turismo Eduardo Charme</h2>
     <p>
-        San Fernando es una ciudad ubicada en la Región de O'Higgins, reconocida
-        por su patrimonio, sus viñas, su historia y los atractivos naturales que
-        la rodean.
+        Aquí puedes inscribirte en guías turísticas y gestionar tus viajes.
     </p>
     <button onclick="sonido()">Comenzar recorrido</button>
 </section>
@@ -73,25 +81,21 @@
     // FUNCIÓN PARA OBTENER SALIDAS SEGÚN PERMISOS
     // ============================================================
     function getSalidasVisibles(todas, usuario) {
-        const hoy = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-        // Asegurar que todas tengan guias y participantes como arrays
+        const hoy = new Date().toISOString().split('T')[0];
         todas.forEach(s => {
             if (!s.guias) s.guias = [];
             if (!s.participantes) s.participantes = [];
         });
 
         if (usuario.rol === 'admin') {
-            // Admin ve todas (pasadas y futuras)
             return todas;
         } else if (usuario.rol === 'guia' || usuario.rol === 'asistente') {
-            // Guías/Asistentes ven solo salidas futuras donde estén como guía o participante
             return todas.filter(s => {
                 const esGuia = s.guias.some(g => g.rut === usuario.rut);
                 const esParticipante = s.participantes.some(p => p.rut === usuario.rut);
                 return (esGuia || esParticipante) && s.fecha >= hoy;
             });
         } else {
-            // Estudiantes/Visitantes: solo salidas futuras donde estén como participantes
             return todas.filter(s => {
                 const esParticipante = s.participantes.some(p => p.rut === usuario.rut);
                 return esParticipante && s.fecha >= hoy;
@@ -123,7 +127,6 @@
             html += `</ul></div>`;
         }
 
-        // Participantes: mostrar RUT solo a admin/guia/asistente
         if (salida.participantes.length > 0) {
             html += `<div class="detalle-item"><strong>Participantes:</strong><table class="participante-tabla"><tr><th>Nombre</th>`;
             if (esAdminOGuia) {
@@ -157,7 +160,6 @@
             if (t.descripcion) html += `<div class="detalle-item">Descripción: ${t.descripcion}</div>`;
         }
 
-        // Botón de inscripción para estudiantes (si no están inscritos)
         if (esEstudiante) {
             const yaInscrito = salida.participantes.some(p => p.rut === usuario.rut);
             if (!yaInscrito && salida.fecha >= new Date().toISOString().split('T')[0]) {
@@ -171,7 +173,6 @@
         modal.style.display = 'flex';
     }
 
-    // Función para ver ficha médica (solo para admin/guia/asistente)
     async function verFichaMedica(rut) {
         const datos = await GitHub.leer('datos/usuarios.json');
         if (!datos) return alert('No se pudo cargar la información');
@@ -183,7 +184,6 @@
         }
     }
 
-    // Exponer funciones globalmente
     window.verDetalles = verDetalles;
     window.inscribirEnSalida = inscribirEnSalida;
     window.verFichaMedica = verFichaMedica;
@@ -246,7 +246,6 @@
         document.getElementById('userNombre').textContent = `${usuario.nombre} ${usuario.apellido || ''}`;
         document.getElementById('userRol').textContent = usuario.rol;
 
-        // Botones del nav
         const nav = document.getElementById('navBotones');
         let botones = [];
         switch (usuario.rol) {
@@ -273,7 +272,6 @@
             nav.appendChild(btn);
         });
 
-        // Cargar y mostrar salidas (función global para recargar)
         window.cargarYMostrarSalidas = async function() {
             const contenedor = document.getElementById('contenedorSalidas');
             try {
