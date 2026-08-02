@@ -79,9 +79,17 @@ const Auth = {
         return { ok: true, rol: usuario.rol };
     },
 
-    // ===== REGISTRO =====
+    // ===== REGISTRO (con limpieza de datos) =====
     async registro(rut, nombre, apellido, edad, telefono, gmail, historial, password) {
+        // Limpiar RUT: eliminar puntos y espacios, convertir a mayúsculas
         const rutFormateado = this.formatearRut(rut);
+        // Limpiar teléfono: eliminar espacios, guiones, paréntesis y +56 (lo dejamos solo dígitos)
+        const telefonoLimpio = telefono.replace(/[\s\-\(\)\+]/g, '');
+        // Si el teléfono tiene 11 dígitos y empieza con 56, quitar el 56
+        const telefonoFinal = (telefonoLimpio.length === 11 && telefonoLimpio.startsWith('56')) 
+            ? telefonoLimpio.substring(2) 
+            : telefonoLimpio;
+
         const datos = await GitHub.leer('datos/usuarios.json');
         if (!datos) return { ok: false, error: 'Error al conectar con el servidor' };
         
@@ -97,12 +105,12 @@ const Auth = {
         const hash = await this.hashPassword(password);
         datos.usuarios.push({
             rut: rutFormateado,
-            nombre: nombre,
-            apellido: apellido,
+            nombre: nombre.trim(),
+            apellido: apellido.trim(),
             edad: parseInt(edad),
-            telefono: telefono,
-            gmail: gmail,
-            historial: historial,
+            telefono: telefonoFinal,
+            gmail: gmail.trim().toLowerCase(),
+            historial: historial.trim(),
             password: hash,
             rol: rol,
             estado: 'activo',
