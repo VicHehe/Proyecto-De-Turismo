@@ -54,7 +54,7 @@ const lugares = [
     cierre: "24 horas",
     ubicacion: "Centro de San Fernando, Provincia de Colchagua, Región de O'Higgins.",
     descripcion: "Plaza principal de la ciudad, punto de encuentro con monumentos, actividades comunales y acceso a comercios y la municipalidad.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Plaza_de_Armas_de_San_Fernando_02.jpg/500px-Plaza_de_Armas_de_San_Fernando_02.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Plaza_San_Fernando_%28Chile%29.jpg/250px-Plaza_San_Fernando_%28Chile%29.jpg"
   },
   {
     nombre: "Iglesia Parroquial Nuestra Señora del Carmen",
