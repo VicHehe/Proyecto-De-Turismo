@@ -6,7 +6,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Aprox. 65-77 km al este de San Fernando, en la ribera norte del río Tinguiririca; sector de montaña.",
     descripcion: "Centro termal natural en altura (1.736 msnm) con pozones y entorno andino; popular para turismo de naturaleza y trekking.",
-    miniatura: "https://www.alltrails.com/mugen/image/trail-app-router?url=https%3A%2F%2Fimages.alltrails.com%2FeyJidWNrZXQiOiJhc3NldHMuYWxsdHJhaWxzLmNvbSIsImtleSI6InVwbG9hZHMvcGhvdG8vaW1hZ2UvMzg4MTMxNDIvMDIzNWU3Njc0OWE5ZmY2ZTUzNmViMzY2NGFkYWUzMjAuanBnIiwiZWRpdHMiOnsidG9Gb3JtYXQiOiJ3ZWJwIiwicmVzaXplIjp7IndpZHRoIjoiMTA4MCIsImhlaWdodCI6IjcwMCIsImZpdCI6ImNvdmVyIn0sInJvdGF0ZSI6bnVsbCwianBlZyI6eyJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWUsIm9wdGltaXNlU2NhbnMiOnRydWUsInF1YW50aXNhdGlvblRhYmxlIjozfX19&w=3840&q=75"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Termas_del_Flaco_01.jpg/400px-Termas_del_Flaco_01.jpg"
   },
   {
     nombre: "Santuario Alto Huemul",
@@ -14,7 +14,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Cordillera de Colchagua, sector alto de la comuna (áreas de bosque entre 1.000 y 2.000 msnm).",
     descripcion: "Santuario de la Naturaleza que conserva bosquetes de roble y fauna nativa; apto para observación de aves y conservación.",
-    miniatura: "https://www.conaf.cl/wp-content/uploads/2023/02/santuario-alto-huemul-1.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Bosque_nativo_en_la_cordillera_de_la_costa.jpg/400px-Bosque_nativo_en_la_cordillera_de_la_costa.jpg"
   },
   {
     nombre: "Casa de las Piedras Pintadas del Tinguiririca",
@@ -22,7 +22,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Sector del río Tinguiririca, en la comuna (acceso por rutas interiores hacia el cordón cordillerano).",
     descripcion: "Alerón rocoso con pictografías prehispánicas de estilo geométrico, evidencia arqueológica de grupos recolectores.",
-    miniatura: "https://www.monumentos.gob.cl/sites/default/files/styles/landscape_medium/public/monumentos/piedras_pintadas_tinguiririca.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Petroglyphs_in_Chile.jpg/400px-Petroglyphs_in_Chile.jpg"
   },
   {
     nombre: "Huellas de Animales extintos (Termas del Flaco)",
@@ -30,7 +30,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "localidad de Termas del Flaco, 80 km al este de San Fernando.",
     descripcion: "Impresiones fósiles (huellas de terópodos) conservadas desde hace 150 millones de años; interés paleontológico y natural.",
-    miniatura: "https://www.dinossaurios.com/wp-content/uploads/2023/03/huellas-termas-flaco.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Dinosaur_footprints.jpg/400px-Dinosaur_footprints.jpg"
   },
   {
     nombre: "Ruta del Vino",
@@ -38,7 +38,7 @@ const lugares = [
     cierre: "17:30",
     ubicacion: "Viñas alrededor de San Fernando y Valle de Colchagua; alguna a 5-40 km de la ciudad.",
     descripcion: "Circuitos de enoturismo, degustaciones y visitas a bodegas; San Fernando es puerta de acceso a rutas del vino de Colchagua y Cachapoal.",
-    miniatura: "https://www.rutadelvino.cl/wp-content/uploads/2023/01/ruta-del-vino-colchagua.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Vi%C3%B1a_Santa_Cruz_02.jpg/400px-Vi%C3%B1a_Santa_Cruz_02.jpg"
   },
   {
     nombre: "Glaciar Universidad",
@@ -46,7 +46,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "En la ruta que une San Fernando con Termas del Flaco, siguiendo los ríos Azufre y San José.",
     descripcion: "Frente glaciar de interés para excursiones de montaña y observación glaciologica; requiere coordinación y buen tiempo.",
-    miniatura: "https://www.turismoregiondeohiggins.cl/wp-content/uploads/2023/01/glaciar-universidad.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Glaciar_en_los_Andes.jpg/400px-Glaciar_en_los_Andes.jpg"
   },
   {
     nombre: "Plaza de Armas de San Fernando",
@@ -54,7 +54,7 @@ const lugares = [
     cierre: "24 horas",
     ubicacion: "Centro de San Fernando, Provincia de Colchagua, Región de O'Higgins.",
     descripcion: "Plaza principal de la ciudad, punto de encuentro con monumentos, actividades comunales y acceso a comercios y la municipalidad.",
-    miniatura: "https://www.sanfernando.cl/wp-content/uploads/2023/01/plaza-armas-san-fernando.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Plaza_de_Armas_de_San_Fernando_02.jpg/400px-Plaza_de_Armas_de_San_Fernando_02.jpg"
   },
   {
     nombre: "Iglesia Parroquial Nuestra Señora del Carmen",
@@ -62,7 +62,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Próxima a la Plaza de Armas, centro de San Fernando.",
     descripcion: "Iglesia histórica que alberga celebraciones religiosas y procesiones locales importantes.",
-    miniatura: "https://www.iglesiasdechile.cl/wp-content/uploads/2023/01/iglesia-san-fernando.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Parroquia_Nuestra_Se%C3%B1ora_del_Carmen_%28San_Fernando%29.jpg/400px-Parroquia_Nuestra_Se%C3%B1ora_del_Carmen_%28San_Fernando%29.jpg"
   },
   {
     nombre: "Museo de Colchagua",
@@ -70,7 +70,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "En la provincia de Colchagua (museo principal en Santa Cruz, con información turística en San Fernando y rutas del vino accesibles desde San Fernando).",
     descripcion: "Museo que recoge patrimonio, historia y etnografía del valle; San Fernando sirve como puerta de entrada al Valle de Colchagua y rutas vitivinícolas.",
-    miniatura: "https://www.museodecolchagua.cl/wp-content/uploads/2023/01/museo-colchagua.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Museo_de_Colchagua_02.jpg/400px-Museo_de_Colchagua_02.jpg"
   },
   {
     nombre: "Museo Lircunlauta",
@@ -78,7 +78,7 @@ const lugares = [
     cierre: "13:00 y 14:30-18:30 (mar-vie); 14:00-19:00 (fin de semana)",
     ubicacion: "Juan Jiménez 1595, San Fernando",
     descripcion: "Museo patrimonial instalado en una casona histórica; es uno de los hitos culturales de la ciudad.",
-    miniatura: "https://www.sanfernando.cl/wp-content/uploads/2023/01/museo-lircunlauta.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Museo_Lircunlauta.jpg/400px-Museo_Lircunlauta.jpg"
   },
   {
     nombre: "City tour histórico",
@@ -86,7 +86,7 @@ const lugares = [
     cierre: "14:00 (lun-vie)",
     ubicacion: "Casco histórico de San Fernando; recorre Museo Lircunlauta, la Cárcel, la Pileta de la Plaza de Armas e Iglesia San Francisco.",
     descripcion: "Recorrido guiado por el centro patrimonial de la ciudad.",
-    miniatura: "https://www.sanfernando.cl/wp-content/uploads/2023/01/city-tour-san-fernando.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/San_Fernando_Plaza.jpg/400px-San_Fernando_Plaza.jpg"
   },
   {
     nombre: "Cementerio Municipal de San Fernando",
@@ -94,7 +94,7 @@ const lugares = [
     cierre: "17:30 (visitas fúnebres); atención general hasta 14:00",
     ubicacion: "Juan Jiménez 1266, San Fernando.",
     descripcion: "Espacio municipal con visitas fúnebres y atención al público.",
-    miniatura: "https://www.sanfernando.cl/wp-content/uploads/2023/01/cementerio-san-fernando.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Cementerio_de_San_Fernando.jpg/400px-Cementerio_de_San_Fernando.jpg"
   },
   {
     nombre: "Trekking Cerro Pangalillo",
@@ -102,7 +102,7 @@ const lugares = [
     cierre: "Consultar",
     ubicacion: "Final del camino Lircunlauta, sector La Olla.",
     descripcion: "Trekking de precordillera con flora y fauna nativa; el cerro va de 900 a 1165 msnm.",
-    miniatura: "https://www.turismoregiondeohiggins.cl/wp-content/uploads/2023/01/cerro-pangalillo.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Cerro_en_la_cordillera_de_la_costa.jpg/400px-Cerro_en_la_cordillera_de_la_costa.jpg"
   },
   {
     nombre: "Ruta Laguna del Encanto",
@@ -110,6 +110,6 @@ const lugares = [
     cierre: "Consultar",
     ubicacion: "Desde San Fernando por ruta a Puente Negro, siguiendo el camino a Termas del Flaco y luego el cruce hacia las sierras de Bella Vista.",
     descripcion: "Ruta de acceso a una laguna cordillerana en un entorno agreste.",
-    miniatura: "https://www.turismoregiondeohiggins.cl/wp-content/uploads/2023/01/laguna-del-encanto.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Laguna_en_los_Andes.jpg/400px-Laguna_en_los_Andes.jpg"
   }
 ];
