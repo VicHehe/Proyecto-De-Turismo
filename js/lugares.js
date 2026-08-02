@@ -14,7 +14,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Cordillera de Colchagua, sector alto de la comuna (áreas de bosque entre 1.000 y 2.000 msnm).",
     descripcion: "Santuario de la Naturaleza que conserva bosquetes de roble y fauna nativa; apto para observación de aves y conservación.",
-    miniatura: "https://commons.wikimedia.org/wiki/Special:FilePath/San_Fernando_Chile_3.jpg"
+    miniatura: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=500&h=300&fit=crop"
   },
   {
     nombre: "Casa de las Piedras Pintadas del Tinguiririca",
@@ -22,7 +22,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Sector del río Tinguiririca, en la comuna (acceso por rutas interiores hacia el cordón cordillerano).",
     descripcion: "Alerón rocoso con pictografías prehispánicas de estilo geométrico, evidencia arqueológica de grupos recolectores.",
-    miniatura: "https://commons.wikimedia.org/wiki/Special:FilePath/Petroglyphs_in_Chile.jpg"
+    miniatura: "https://images.unsplash.com/photo-1544644181-1484b3f6c0b0?w=500&h=300&fit=crop"
   },
   {
     nombre: "Huellas de Animales extintos (Termas del Flaco)",
@@ -38,7 +38,7 @@ const lugares = [
     cierre: "17:30",
     ubicacion: "Viñas alrededor de San Fernando y Valle de Colchagua; alguna a 5-40 km de la ciudad.",
     descripcion: "Circuitos de enoturismo, degustaciones y visitas a bodegas; San Fernando es puerta de acceso a rutas del vino de Colchagua y Cachapoal.",
-    miniatura: "https://commons.wikimedia.org/wiki/Special:FilePath/Viña_Santa_Cruz_02.jpg"
+    miniatura: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=500&h=300&fit=crop"
   },
   {
     nombre: "Glaciar Universidad",
@@ -46,7 +46,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "En la ruta que une San Fernando con Termas del Flaco, siguiendo los ríos Azufre y San José.",
     descripcion: "Frente glaciar de interés para excursiones de montaña y observación glaciologica; requiere coordinación y buen tiempo.",
-    miniatura: "https://commons.wikimedia.org/wiki/Special:FilePath/Laguna_en_los_Andes.jpg"
+    miniatura: "https://images.unsplash.com/photo-1464822759023-fea092662095?w=500&h=300&fit=crop"
   },
   {
     nombre: "Plaza de Armas de San Fernando",
@@ -54,7 +54,7 @@ const lugares = [
     cierre: "24 horas",
     ubicacion: "Centro de San Fernando, Provincia de Colchagua, Región de O'Higgins.",
     descripcion: "Plaza principal de la ciudad, punto de encuentro con monumentos, actividades comunales y acceso a comercios y la municipalidad.",
-    miniatura: "https://commons.wikimedia.org/wiki/Special:FilePath/Plaza_de_Armas_de_San_Fernando_02.jpg"
+    miniatura: "https://images.unsplash.com/photo-1513622470522-26c314a86b19?w=500&h=300&fit=crop"
   },
   {
     nombre: "Iglesia Parroquial Nuestra Señora del Carmen",
@@ -62,7 +62,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Próxima a la Plaza de Armas, centro de San Fernando.",
     descripcion: "Iglesia histórica que alberga celebraciones religiosas y procesiones locales importantes.",
-    miniatura: "https://commons.wikimedia.org/wiki/Special:FilePath/Parroquia_Nuestra_Señora_del_Carmen_(San_Fernando).jpg"
+    miniatura: "https://images.unsplash.com/photo-1548625361-f6dbbcaf2533?w=500&h=300&fit=crop"
   },
   {
     nombre: "Museo de Colchagua",
@@ -102,7 +102,7 @@ const lugares = [
     cierre: "Consultar",
     ubicacion: "Final del camino Lircunlauta, sector La Olla.",
     descripcion: "Trekking de precordillera con flora y fauna nativa; el cerro va de 900 a 1165 msnm.",
-    miniatura: "https://commons.wikimedia.org/wiki/Special:FilePath/Cerro_en_la_cordillera_de_la_costa.jpg"
+    miniatura: "https://images.unsplash.com/photo-1465188162913-8fb1d646294d?w=500&h=300&fit=crop"
   },
   {
     nombre: "Ruta Laguna del Encanto",
@@ -110,6 +110,6 @@ const lugares = [
     cierre: "Consultar",
     ubicacion: "Desde San Fernando por ruta a Puente Negro, siguiendo el camino a Termas del Flaco y luego el cruce hacia las sierras de Bella Vista.",
     descripcion: "Ruta de acceso a una laguna cordillerana en un entorno agreste.",
-    miniatura: "https://commons.wikimedia.org/wiki/Special:FilePath/Laguna_en_los_Andes.jpg"
+    miniatura: "https://images.unsplash.com/photo-1476611317561-60117649dd94?w=500&h=300&fit=crop"
   }
 ];
