@@ -6,7 +6,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Aprox. 65-77 km al este de San Fernando, en la ribera norte del río Tinguiririca; sector de montaña.",
     descripcion: "Centro termal natural en altura (1.736 msnm) con pozones y entorno andino; popular para turismo de naturaleza y trekking.",
-    miniatura: "https://www.turismoregiondeohiggins.cl/wp-content/uploads/2023/01/termas-del-flaco-3.jpg"
+    miniatura: "https://www.alltrails.com/mugen/image/trail-app-router?url=https%3A%2F%2Fimages.alltrails.com%2FeyJidWNrZXQiOiJhc3NldHMuYWxsdHJhaWxzLmNvbSIsImtleSI6InVwbG9hZHMvcGhvdG8vaW1hZ2UvMzg4MTMxNDIvMDIzNWU3Njc0OWE5ZmY2ZTUzNmViMzY2NGFkYWUzMjAuanBnIiwiZWRpdHMiOnsidG9Gb3JtYXQiOiJ3ZWJwIiwicmVzaXplIjp7IndpZHRoIjoiMTA4MCIsImhlaWdodCI6IjcwMCIsImZpdCI6ImNvdmVyIn0sInJvdGF0ZSI6bnVsbCwianBlZyI6eyJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWUsIm9wdGltaXNlU2NhbnMiOnRydWUsInF1YW50aXNhdGlvblRhYmxlIjozfX19&w=3840&q=75"
   },
   {
     nombre: "Santuario Alto Huemul",
