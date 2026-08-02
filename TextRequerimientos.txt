@@ -1,30 +1,39 @@
-- Visual: usar colores suaves (verdes, cafés, azules suaves). Poner el emblema del liceo y el logo de turismo. Los botones deben cambiar de color al pasar el mouse.
+📋 Tareas pendientes del proyecto
+(Basado en TextRequerimientos.txt – todo lo demás ya está implementado)
 
-- Adaptar la sección "Plan de Ruta" para que se vea bien y sea fácil de usar en teléfonos móviles.
+🎨 Diseño visual y experiencia de usuario
+(Cambios exclusivamente en CSS, sin alterar la estructura HTML)
 
-- Arreglar la posición de los nombres de los usuarios para que no se vean desordenados o corridos. en el index.
+⭐ Paleta de colores natural
+Aplicar colores suaves (verdes, cafés, azules) en toda la interfaz para dar un aspecto orgánico y formal.
+El emblema del liceo y el logo de turismo ya están integrados (Icon.jpg); solo falta ajustar colores y estilos.
 
-- El menú principal debe tener solo estas 5 secciones en este orden: Lugares, Personas, Transporte, Plan de Ruta y Datos Complementarios.
+⭐ Ajustes de estilo general
+Refinar tipografía, espaciados, fondos y otros detalles para lograr el look "natural como la naturaleza y formal sin exagerar".
 
-- Quitar el ícono de "clipy" y remplazarlo por otro en el apartado de planificar salida
+🖼️ Galería de viajes (nueva funcionalidad)
+⭐⭐⭐ Sistema completo de galería
 
-- Sistema de galería de viajes: 
-  - Solo los Guías y el Administrador pueden subir 1 o varias fotos + una descripción del viaje (los estudiantes NO pueden subir).
-  - Todos los usuarios (estudiantes, guías y admin) pueden votar esas fotos usando piñas de pino (en vez de estrellas), del 1 al 5.
-  - Las fotos que suba el Administrador deben aparecer en la página de inicio (Index) para promocionar la página.
+Subida de fotos + descripción solo para Guías y Administrador.
 
-- El Administrador puede editar los datos de cualquier usuario (nombre, correo, etc.) y el guia y admin puede puede modificar las salidas propias que ya estaban planificadas (fechas, rutas, etc.).
+Votación con piñas de pino (1-5) para todos los usuarios.
 
-- Cambiar el texto de bienvenida de la página principal. Quitar el texto largo que habla de San Fernando y poner algo más corto como: "Bienvenido a Turismo Eduardo Charm. Aquí puedes inscribirte en guías turísticas y gestionar tus viajes."
+Las fotos del Administrador deben aparecer en el Index para promocionar la página.
 
-- El texto debe sonar natural pero formal a la vez (que no sea muy poético ni muy relajado).
+👤 Gestión de usuarios y salidas
+⭐⭐ Edición de usuarios
+Permitir al Administrador editar datos de cualquier usuario (nombre, correo, teléfono, etc.) desde el panel de administración.
 
-- La pagina debe verse natural como la naturaleza y formal sin exagerar
+⭐⭐ Edición de salidas
+Permitir a Guías y Administradores modificar sus propias salidas (fechas, rutas, participantes, etc.) después de creadas.
 
-- En el Js con info de lugares debe añadirse mas zonas turisticas (Trabajo especifico de belen)
- 
-- Se le puede poner nombres a las salidas
+📍 Contenido y datos
+⭐ Ampliación de lugares turísticos
+Añadir más zonas turísticas en lugares.js (trabajo específico de Belén).
 
---- Extras (opcionales que solo se haran al finalizar todo lo demas.) ---
-- Poner el logo de fondo como marca de agua (transparente).
-- Agregar un fondo con fotos de paisajes que roten automáticamente (usando JavaScript).
+🔍 Escala de dificultad
+⭐ = Baja (cambios sencillos, pocas líneas de código o ajustes directos).
+
+⭐⭐ = Media (requiere lógica adicional, pero factible con el código actual).
+
+⭐⭐⭐ = Alta (nueva funcionalidad que implica varias capas: frontend, backend y persistencia de datos).
