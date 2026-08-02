@@ -27,9 +27,9 @@
         </div>
     </div>
 
-    <!-- ===== SECCIÓN 2: PARTICIPANTES ===== -->
+    <!-- ===== SECCIÓN 2: PERSONAS ===== -->
     <div class="seccion">
-        <h2>👥 Participantes</h2>
+        <h2>👥 Personas</h2>
         <p class="muted">Busca un usuario por nombre o RUT y asígnale un rol.</p>
         <div class="busqueda">
             <input type="text" id="buscarParticipante" list="listaParticipantes" placeholder="Nombre o RUT...">
@@ -51,7 +51,37 @@
         </table>
     </div>
 
-    <!-- ===== SECCIÓN 3: PLAN DE RUTA ===== -->
+    <!-- ===== SECCIÓN 3: TRANSPORTE ===== -->
+    <div class="seccion">
+        <h2>🚌 Transporte</h2>
+        <p class="muted">Completa los datos del transporte para esta salida.</p>
+        <div class="info-transporte">
+            <div class="grid-2">
+                <div>
+                    <div class="grupo" style="margin-bottom:0.4rem;">
+                        <label>Conductor</label>
+                        <input type="text" id="inputConductor" placeholder="Nombre del conductor">
+                    </div>
+                    <div class="grupo" style="margin-bottom:0.4rem;">
+                        <label>Horarios (ida/vuelta)</label>
+                        <input type="text" id="inputHorarios" placeholder="Ej: 08:00 – 18:00">
+                    </div>
+                </div>
+                <div>
+                    <div class="grupo" style="margin-bottom:0.4rem;">
+                        <label>Precio del servicio</label>
+                        <input type="text" id="inputPrecioTransporte" placeholder="Ej: $ 85.000 CLP">
+                    </div>
+                    <div class="grupo" style="margin-bottom:0.4rem;">
+                        <label>Descripción del vehículo</label>
+                        <input type="text" id="inputDescTransporte" placeholder="Ej: Bus 30 asientos, climatizado">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SECCIÓN 4: PLAN DE RUTA ===== -->
     <div class="seccion">
         <h2>🗺️ Plan de Ruta</h2>
         <p class="muted">Define el itinerario en orden: lugares, traslados y pausas. Puedes editar los horarios de cada actividad.</p>
@@ -71,9 +101,9 @@
         </div>
     </div>
 
-    <!-- ===== SECCIÓN 4: DATOS COMPLEMENTARIOS ===== -->
+    <!-- ===== SECCIÓN 5: DATOS COMPLEMENTARIOS ===== -->
     <div class="seccion">
-        <h2>📎 Datos complementarios</h2>
+        <h2>📋 Datos complementarios</h2>
         <div class="grid-3">
             <div class="grupo">
                 <label>Título de la salida *</label>
@@ -103,36 +133,6 @@
             <div class="grupo">
                 <label>Menú / Catering</label>
                 <input type="text" id="inputMenu" placeholder="Ej: Box lunch">
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== SECCIÓN 5: TRANSPORTE (MANUAL) ===== -->
-    <div class="seccion">
-        <h2>🚌 Transporte</h2>
-        <p class="muted">Completa los datos del transporte para esta salida.</p>
-        <div class="info-transporte">
-            <div class="grid-2">
-                <div>
-                    <div class="grupo" style="margin-bottom:0.4rem;">
-                        <label>Conductor</label>
-                        <input type="text" id="inputConductor" placeholder="Nombre del conductor">
-                    </div>
-                    <div class="grupo" style="margin-bottom:0.4rem;">
-                        <label>Horarios (ida/vuelta)</label>
-                        <input type="text" id="inputHorarios" placeholder="Ej: 08:00 – 18:00">
-                    </div>
-                </div>
-                <div>
-                    <div class="grupo" style="margin-bottom:0.4rem;">
-                        <label>Precio del servicio</label>
-                        <input type="text" id="inputPrecioTransporte" placeholder="Ej: $ 85.000 CLP">
-                    </div>
-                    <div class="grupo" style="margin-bottom:0.4rem;">
-                        <label>Descripción del vehículo</label>
-                        <input type="text" id="inputDescTransporte" placeholder="Ej: Bus 30 asientos, climatizado">
-                    </div>
-                </div>
             </div>
         </div>
     </div>
