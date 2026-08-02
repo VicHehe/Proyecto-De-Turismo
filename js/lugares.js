@@ -14,7 +14,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Cordillera de Colchagua, sector alto de la comuna (áreas de bosque entre 1.000 y 2.000 msnm).",
     descripcion: "Santuario de la Naturaleza que conserva bosquetes de roble y fauna nativa; apto para observación de aves y conservación.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Bosque_nativo_en_la_cordillera_de_la_costa.jpg/500px-Bosque_nativo_en_la_cordillera_de_la_costa.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/San_Fernando_Chile_3.jpg/500px-San_Fernando_Chile_3.jpg"
   },
   {
     nombre: "Casa de las Piedras Pintadas del Tinguiririca",
@@ -46,7 +46,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "En la ruta que une San Fernando con Termas del Flaco, siguiendo los ríos Azufre y San José.",
     descripcion: "Frente glaciar de interés para excursiones de montaña y observación glaciologica; requiere coordinación y buen tiempo.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Glaciar_en_los_Andes.jpg/500px-Glaciar_en_los_Andes.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Laguna_en_los_Andes.jpg/500px-Laguna_en_los_Andes.jpg"
   },
   {
     nombre: "Plaza de Armas de San Fernando",
