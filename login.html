@@ -149,38 +149,97 @@
         }
     }
 
-    // ===== REGISTRO =====
+    // ===== REGISTRO CON VALIDACIONES MEJORADAS =====
     async function registro() {
-        const nombre = document.getElementById('regNombre').value.trim();
-        const apellido = document.getElementById('regApellido').value.trim();
-        const edad = document.getElementById('regEdad').value.trim();
-        const rut = document.getElementById('regRut').value.trim();
-        const telefono = document.getElementById('regTelefono').value.trim();
-        const gmail = document.getElementById('regGmail').value.trim();
-        const historial = document.getElementById('regHistorial').value.trim();
-        const pass = document.getElementById('regPass').value;
-        const pass2 = document.getElementById('regPass2').value;
+        // Obtener valores y limpiar espacios
+        let nombre = document.getElementById('regNombre').value.trim();
+        let apellido = document.getElementById('regApellido').value.trim();
+        let edad = document.getElementById('regEdad').value.trim();
+        let rut = document.getElementById('regRut').value.trim();
+        let telefono = document.getElementById('regTelefono').value.trim();
+        let gmail = document.getElementById('regGmail').value.trim();
+        let historial = document.getElementById('regHistorial').value.trim();
+        let pass = document.getElementById('regPass').value;
+        let pass2 = document.getElementById('regPass2').value;
 
-        if (!nombre || !apellido || !edad || !rut || !telefono || !gmail || !historial || !pass || !pass2) {
-            return mostrarMsg('registroMsg', 'Todos los campos son obligatorios', 'error');
+        // --- VALIDACIONES ---
+
+        // 1. Nombre y apellido (solo letras y espacios, no vacíos)
+        if (!nombre) return mostrarMsg('registroMsg', 'El nombre es obligatorio.', 'error');
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(nombre)) {
+            return mostrarMsg('registroMsg', 'El nombre solo puede contener letras y espacios.', 'error');
+        }
+        if (!apellido) return mostrarMsg('registroMsg', 'El apellido es obligatorio.', 'error');
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(apellido)) {
+            return mostrarMsg('registroMsg', 'El apellido solo puede contener letras y espacios.', 'error');
+        }
+
+        // 2. Edad (número entero positivo)
+        if (!edad) return mostrarMsg('registroMsg', 'La edad es obligatoria.', 'error');
+        const edadNum = parseInt(edad);
+        if (isNaN(edadNum) || edadNum < 1 || edadNum > 120) {
+            return mostrarMsg('registroMsg', 'Ingresa una edad válida (1-120).', 'error');
+        }
+
+        // 3. RUT (formato chileno: 12345678-9 o 12345678-k)
+        // Limpiar puntos y espacios, dejar solo dígitos y guión
+        rut = rut.replace(/\./g, '').replace(/\s/g, '');
+        if (!rut) return mostrarMsg('registroMsg', 'El RUT es obligatorio.', 'error');
+        if (!/^\d{7,8}-[\dkK]$/.test(rut)) {
+            return mostrarMsg('registroMsg', 'RUT inválido. Debe tener el formato 12345678-9 (con guión).', 'error');
+        }
+        // Guardamos el RUT ya formateado en el campo (para que el usuario vea la corrección)
+        document.getElementById('regRut').value = rut;
+
+        // 4. Teléfono (solo dígitos, mínimo 9 dígitos)
+        let telefonoLimpio = telefono.replace(/[\s\-\(\)\+]/g, '');
+        if (!telefonoLimpio) return mostrarMsg('registroMsg', 'El teléfono es obligatorio.', 'error');
+        if (!/^\d{9,15}$/.test(telefonoLimpio)) {
+            return mostrarMsg('registroMsg', 'Teléfono inválido. Debe tener al menos 9 dígitos (ej: 912345678).', 'error');
+        }
+        // Si tiene 11 dígitos y empieza con 56, quitar el 56 inicial
+        if (telefonoLimpio.length === 11 && telefonoLimpio.startsWith('56')) {
+            telefonoLimpio = telefonoLimpio.substring(2);
+        }
+        document.getElementById('regTelefono').value = telefonoLimpio;
+
+        // 5. Correo electrónico (formato básico)
+        if (!gmail) return mostrarMsg('registroMsg', 'El correo electrónico es obligatorio.', 'error');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(gmail)) {
+            return mostrarMsg('registroMsg', 'Correo electrónico inválido (ej: usuario@dominio.com).', 'error');
+        }
+
+        // 6. Historial (puede estar vacío, pero si tiene texto, solo letras y espacios)
+        if (historial && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s,.;:()\-]+$/.test(historial)) {
+            return mostrarMsg('registroMsg', 'El historial médico contiene caracteres no permitidos.', 'error');
+        }
+
+        // 7. Contraseña
+        if (!pass) return mostrarMsg('registroMsg', 'La contraseña es obligatoria.', 'error');
+        if (pass.length < 6) {
+            return mostrarMsg('registroMsg', 'La contraseña debe tener al menos 6 caracteres.', 'error');
         }
         if (pass !== pass2) {
-            return mostrarMsg('registroMsg', 'Las contraseñas no coinciden', 'error');
-        }
-        if (pass.length < 6) {
-            return mostrarMsg('registroMsg', 'La contraseña debe tener al menos 6 caracteres', 'error');
-        }
-        if (isNaN(edad) || parseInt(edad) < 1) {
-            return mostrarMsg('registroMsg', 'Edad inválida', 'error');
+            return mostrarMsg('registroMsg', 'Las contraseñas no coinciden.', 'error');
         }
 
+        // --- Si todo está bien, llamar a Auth.registro ---
         if (typeof Auth === 'undefined') {
             return mostrarMsg('registroMsg', 'Error: Auth no está definido', 'error');
         }
 
         setLoading('btnRegistro', true);
         try {
-            const res = await Auth.registro(rut, nombre, apellido, edad, telefono, gmail, historial, pass);
+            const res = await Auth.registro(
+                rut,                      // RUT ya formateado
+                nombre,
+                apellido,
+                edadNum,                  // Edad como número
+                telefonoLimpio,           // Teléfono formateado
+                gmail,
+                historial,
+                pass
+            );
             setLoading('btnRegistro', false);
             if (!res.ok) {
                 return mostrarMsg('registroMsg', res.error, 'error');
@@ -191,6 +250,7 @@
                 : `✅ Cuenta creada como ${res.rol.toUpperCase()}`;
             
             mostrarMsg('registroMsg', mensajeRol, 'success');
+            // Limpiar campos
             document.querySelectorAll('#panelRegistro input').forEach(input => input.value = '');
             
             setTimeout(() => {
@@ -203,6 +263,7 @@
         }
     }
 
+    // Eventos de teclado para enviar con Enter
     document.getElementById('loginPass').addEventListener('keydown', e => {
         if (e.key === 'Enter') login();
     });
