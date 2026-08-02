@@ -166,3 +166,19 @@ h3 {
 .mt-1 { margin-top: 0.8rem; }
 .mb-1 { margin-bottom: 0.8rem; }
 .text-center { text-align: center; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .grid-3 {
+        grid-template-columns: 1fr !important;
+    }
+    .grid-2 {
+        grid-template-columns: 1fr !important;
+    }
+    body {
+        padding: 1rem;
+    }
+    h1 {
+        font-size: 1.5rem;
+    }
+}
