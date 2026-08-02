@@ -6,7 +6,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Aprox. 65-77 km al este de San Fernando, en la ribera norte del río Tinguiririca; sector de montaña.",
     descripcion: "Centro termal natural en altura (1.736 msnm) con pozones y entorno andino; popular para turismo de naturaleza y trekking.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/7/7f/Termas_del_Flaco%2C_Chile.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Anocheciendo.JPG/500px-Anocheciendo.JPG"
   },
   {
     nombre: "Santuario Alto Huemul",
@@ -14,7 +14,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Cordillera de Colchagua, sector alto de la comuna (áreas de bosque entre 1.000 y 2.000 msnm).",
     descripcion: "Santuario de la Naturaleza que conserva bosquetes de roble y fauna nativa; apto para observación de aves y conservación.",
-    miniatura: null
+    miniatura: "https://img.wikiloc.com/static/tmp/photos/16114124/16114124_1600.jpg"
   },
   {
     nombre: "Casa de las Piedras Pintadas del Tinguiririca",
@@ -22,7 +22,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Sector del río Tinguiririca, en la comuna (acceso por rutas interiores hacia el cordón cordillerano).",
     descripcion: "Alerón rocoso con pictografías prehispánicas de estilo geométrico, evidencia arqueológica de grupos recolectores.",
-    miniatura: null
+    miniatura: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiHgaHJQrLcIC2TtQuo7XUQG6iUzKXKjFTO38bDYg7TH1R7u6u2q7K7uY00Ic_dD7RcK-DVQ4lsoh0RisT95M2nGJ6mAg6URH1GpUZg7Kq_-hpVbrJquEBV4FssJ-RYy1i4s_5h3P3Z3Fc/s1600/casa-pintada-tinguiririca.jpg"
   },
   {
     nombre: "Huellas de Animales extintos (Termas del Flaco)",
@@ -30,7 +30,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "localidad de Termas del Flaco, 80 km al este de San Fernando.",
     descripcion: "Impresiones fósiles (huellas de terópodos) conservadas desde hace 150 millones de años; interés paleontológico y natural.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Dinosaur_footprints.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Dinosaur_footprints.jpg/500px-Dinosaur_footprints.jpg"
   },
   {
     nombre: "Ruta del Vino",
@@ -38,7 +38,7 @@ const lugares = [
     cierre: "17:30",
     ubicacion: "Viñas alrededor de San Fernando y Valle de Colchagua; alguna a 5-40 km de la ciudad.",
     descripcion: "Circuitos de enoturismo, degustaciones y visitas a bodegas; San Fernando es puerta de acceso a rutas del vino de Colchagua y Cachapoal.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Vinedos_Colchagua.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Vi%C3%B1a_Santa_Cruz_02.jpg/500px-Vi%C3%B1a_Santa_Cruz_02.jpg"
   },
   {
     nombre: "Glaciar Universidad",
@@ -46,7 +46,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "En la ruta que une San Fernando con Termas del Flaco, siguiendo los ríos Azufre y San José.",
     descripcion: "Frente glaciar de interés para excursiones de montaña y observación glaciologica; requiere coordinación y buen tiempo.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Glaciar_Universidad.jpg"
+    miniatura: "https://www.wikiexplora.com/images/thumb/4/4d/Glaciar_Universidad.jpg/500px-Glaciar_Universidad.jpg"
   },
   {
     nombre: "Plaza de Armas de San Fernando",
@@ -54,7 +54,7 @@ const lugares = [
     cierre: "24 horas",
     ubicacion: "Centro de San Fernando, Provincia de Colchagua, Región de O'Higgins.",
     descripcion: "Plaza principal de la ciudad, punto de encuentro con monumentos, actividades comunales y acceso a comercios y la municipalidad.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/0/0b/Plaza_de_Armas_San_Fernando_Chile.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Plaza_de_Armas_de_San_Fernando_02.jpg/500px-Plaza_de_Armas_de_San_Fernando_02.jpg"
   },
   {
     nombre: "Iglesia Parroquial Nuestra Señora del Carmen",
@@ -62,7 +62,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "Próxima a la Plaza de Armas, centro de San Fernando.",
     descripcion: "Iglesia histórica que alberga celebraciones religiosas y procesiones locales importantes.",
-    miniatura: null
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Parroquia_Nuestra_Se%C3%B1ora_del_Carmen_%28San_Fernando%29.jpg/500px-Parroquia_Nuestra_Se%C3%B1ora_del_Carmen_%28San_Fernando%29.jpg"
   },
   {
     nombre: "Museo de Colchagua",
@@ -70,7 +70,7 @@ const lugares = [
     cierre: "Variable",
     ubicacion: "En la provincia de Colchagua (museo principal en Santa Cruz, con información turística en San Fernando y rutas del vino accesibles desde San Fernando).",
     descripcion: "Museo que recoge patrimonio, historia y etnografía del valle; San Fernando sirve como puerta de entrada al Valle de Colchagua y rutas vitivinícolas.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/8/8f/Museo_de_Colchagua.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Museo_de_Colchagua.JPG/500px-Museo_de_Colchagua.JPG"
   },
   {
     nombre: "Museo Lircunlauta",
@@ -78,7 +78,7 @@ const lugares = [
     cierre: "13:00 y 14:30-18:30 (mar-vie); 14:00-19:00 (fin de semana)",
     ubicacion: "Juan Jiménez 1595, San Fernando",
     descripcion: "Museo patrimonial instalado en una casona histórica; es uno de los hitos culturales de la ciudad.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Museo_Lircunlauta.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Museo_Casa_Lircunlauta.JPG/500px-Museo_Casa_Lircunlauta.JPG"
   },
   {
     nombre: "City tour histórico",
@@ -86,7 +86,7 @@ const lugares = [
     cierre: "14:00 (lun-vie)",
     ubicacion: "Casco histórico de San Fernando; recorre Museo Lircunlauta, la Cárcel, la Pileta de la Plaza de Armas e Iglesia San Francisco.",
     descripcion: "Recorrido guiado por el centro patrimonial de la ciudad.",
-    miniatura: "https://upload.wikimedia.org/wikipedia/commons/0/0b/Plaza_de_Armas_San_Fernando_Chile.jpg"
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/San_Fernando_Plaza.jpg/500px-San_Fernando_Plaza.jpg"
   },
   {
     nombre: "Cementerio Municipal de San Fernando",
@@ -94,7 +94,7 @@ const lugares = [
     cierre: "17:30 (visitas fúnebres); atención general hasta 14:00",
     ubicacion: "Juan Jiménez 1266, San Fernando.",
     descripcion: "Espacio municipal con visitas fúnebres y atención al público.",
-    miniatura: null
+    miniatura: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Cementerio_de_San_Fernando.jpg/500px-Cementerio_de_San_Fernando.jpg"
   },
   {
     nombre: "Trekking Cerro Pangalillo",
@@ -102,7 +102,7 @@ const lugares = [
     cierre: "Consultar",
     ubicacion: "Final del camino Lircunlauta, sector La Olla.",
     descripcion: "Trekking de precordillera con flora y fauna nativa; el cerro va de 900 a 1165 msnm.",
-    miniatura: null
+    miniatura: "https://img.wikiloc.com/static/tmp/photos/8710589/8710589_1600.jpg"
   },
   {
     nombre: "Ruta Laguna del Encanto",
@@ -110,6 +110,6 @@ const lugares = [
     cierre: "Consultar",
     ubicacion: "Desde San Fernando por ruta a Puente Negro, siguiendo el camino a Termas del Flaco y luego el cruce hacia las sierras de Bella Vista.",
     descripcion: "Ruta de acceso a una laguna cordillerana en un entorno agreste.",
-    miniatura: null
+    miniatura: "https://img.wikiloc.com/static/tmp/photos/12956137/12956137_1600.jpg"
   }
 ];
