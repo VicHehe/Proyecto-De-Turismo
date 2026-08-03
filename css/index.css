@@ -2,17 +2,17 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
 }
 
 body {
-    background: #f9f8dd;
-    color: #272120;
+    background: #f9f8dd;              /* crema claro */
+    color: #272120;                   /* marrón oscuro */
 }
 
 header {
-    background: #3b473c;
-    color: #f9f8dd;
+    background: #3b473c;              /* verde muy oscuro */
+    color: #f9f8dd;                   /* crema */
     padding: 20px 30px;
     display: flex;
     justify-content: space-between;
@@ -20,7 +20,6 @@ header {
     flex-wrap: wrap;
     gap: 10px;
     position: relative;
-    border-bottom: 3px solid #a8d455;
 }
 
 .header-left {
@@ -42,7 +41,7 @@ header {
     line-height: 1.1;
     font-size: 0.7rem;
     font-weight: bold;
-    border-left: 1px solid #f9f8dd;
+    border-left: 1px solid #d2e291;   /* verde claro */
     padding-left: 10px;
     text-align: left;
     letter-spacing: 0.5px;
@@ -58,102 +57,97 @@ header {
     font-size: 1.5rem;
     margin: 0;
     color: #f9f8dd;
+    border-bottom: none;
 }
 
 .header-center p {
     font-size: 0.8rem;
     opacity: 0.8;
     margin: 0;
-    color: #b7c4d0;
+    color: #d2e291;
 }
 
 .user-badge {
     background: #f9f8dd;
     color: #272120;
     padding: 6px 14px;
-    border: 2px solid #a8d455;
+    border: 1px solid #876661;
     font-size: 0.85rem;
     font-weight: bold;
     display: flex;
     align-items: center;
     gap: 10px;
     flex: 0 0 auto;
+    border-radius: 4px;
     cursor: pointer;
-    transition: 0.2s;
-}
-.user-badge:hover {
-    background: #d2e291;
-    border-color: #5c8d58;
 }
 
 .user-badge .rol {
-    background: #5c8d58;
+    background: #54555c;
     color: #f9f8dd;
     padding: 2px 10px;
     font-size: 0.7rem;
     text-transform: uppercase;
+    border-radius: 12px;
 }
 
 nav {
-    background: #54555c;
+    background: #54555c;              /* gris oscuro */
     display: flex;
     justify-content: center;
     gap: 15px;
     padding: 15px;
     flex-wrap: wrap;
-    border-bottom: 3px solid #8daad6;
 }
 
 nav button {
     padding: 10px 20px;
-    border: 2px solid #272120;
+    border: 1px solid #876661;
     background: #f9f8dd;
-    color: #272120;
+    color: #3b473c;
     cursor: pointer;
     font-weight: bold;
-    transition: 0.2s;
+    border-radius: 4px;
+    transition: background 0.2s;
 }
 
 nav button:hover {
-    background: #a8d455;
-    border-color: #5c8d58;
-    color: #272120;
+    background: #d2e291;
 }
 
 .hero {
     text-align: center;
     padding: 60px 20px;
-    background: #ffffff;
-    border: 2px solid #272120;
-    margin: 20px;
+    color: #272120;
 }
 
 .hero h2 {
+    color: #3b473c;
+    border-bottom: none;
     margin-bottom: 20px;
-    color: #5c8d58;
 }
 
 .hero p {
     max-width: 700px;
     margin: auto;
     line-height: 1.6;
-    color: #54555c;
 }
 
 /* ---- SECCIÓN DE PROMOCIÓN DE GALERÍA ---- */
 .galeria-promo {
     margin: 40px 20px;
     padding: 20px;
-    border: 2px solid #272120;
-    background: #ffffff;
+    border: 1px solid #ba9572;
+    background: #f9f8dd;
+    border-radius: 4px;
 }
 
 .galeria-promo h2 {
     text-align: center;
-    border-bottom: 2px solid #272120;
+    border-bottom: 1px solid #ba9572;
     padding-bottom: 10px;
     margin-bottom: 20px;
-    color: #5c8d58;
+    color: #3b473c;
 }
 
 .promo-grid {
@@ -165,25 +159,22 @@ nav button:hover {
 
 .promo-item {
     width: 200px;
-    border: 2px solid #272120;
+    border: 1px solid #ba9572;
     background: #f9f8dd;
     padding: 10px;
     text-align: center;
     display: flex;
     flex-direction: column;
     gap: 4px;
-    transition: 0.2s;
-}
-.promo-item:hover {
-    border-color: #a8d455;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 4px;
 }
 
 .promo-item img {
     width: 100%;
     height: 150px;
     object-fit: cover;
-    border: 1px solid #272120;
+    border: 1px solid #876661;
+    border-radius: 4px;
 }
 
 .promo-item .desc {
@@ -194,7 +185,7 @@ nav button:hover {
 
 .promo-item .autor {
     font-size: 0.7rem;
-    color: #876661;
+    color: #54555c;
     margin-top: 2px;
 }
 
@@ -205,18 +196,17 @@ nav button:hover {
 }
 
 .promo-ver-todas a {
-    color: #272120;
-    border: 2px solid #272120;
+    color: #3b473c;
+    border: 1px solid #876661;
     padding: 6px 20px;
     text-decoration: none;
     background: #f9f8dd;
     transition: 0.15s;
-    font-weight: bold;
+    border-radius: 4px;
 }
 
 .promo-ver-todas a:hover {
-    background: #a8d455;
-    color: #272120;
+    background: #d2e291;
     border-color: #5c8d58;
 }
 
@@ -232,43 +222,42 @@ nav button:hover {
 
 .tarjeta {
     width: 280px;
-    border: 2px solid #272120;
+    border: 1px solid #ba9572;
     padding: 20px;
     text-align: center;
-    background: #ffffff;
+    background: #f9f8dd;
     min-height: 180px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: 0.2s;
-}
-.tarjeta:hover {
-    border-color: #8daad6;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(39, 33, 32, 0.06);
 }
 
 .tarjeta h3 {
+    color: #3b473c;
     margin-bottom: 15px;
-    color: #5c8d58;
 }
 
 .tarjeta p {
     margin-bottom: 20px;
     flex-grow: 1;
-    color: #54555c;
+    color: #272120;
 }
 
 .tarjeta button {
     padding: 10px 20px;
-    background: #3b473c;
+    background: #5c8d58;
     color: #f9f8dd;
     border: none;
     cursor: pointer;
+    border-radius: 4px;
     font-weight: bold;
-    transition: 0.2s;
+    transition: background 0.2s;
 }
+
 .tarjeta button:hover {
-    background: #5c8d58;
+    background: #3b473c;
 }
 
 footer {
@@ -282,31 +271,32 @@ footer {
     gap: 20px;
     align-items: center;
     flex-wrap: wrap;
-    border-top: 3px solid #a8d455;
+    border-radius: 4px;
 }
 
 footer .btn-cerrar {
     background: #f9f8dd;
-    color: #272120;
-    border: 2px solid #a8d455;
+    color: #3b473c;
+    border: 1px solid #876661;
     padding: 5px 15px;
     cursor: pointer;
     font-weight: bold;
-    transition: 0.2s;
+    border-radius: 4px;
+    transition: background 0.2s;
 }
 
 footer .btn-cerrar:hover {
-    background: #a8d455;
-    border-color: #5c8d58;
+    background: #d2e291;
 }
 
 .mensaje-vacio {
     width: 100%;
     text-align: center;
     padding: 40px;
-    border: 2px solid #272120;
+    border: 1px solid #ba9572;
     background: #f9f8dd;
     color: #54555c;
+    border-radius: 4px;
 }
 
 /* MODAL */
@@ -318,20 +308,22 @@ footer .btn-cerrar:hover {
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(39, 33, 32, 0.7);
+    background: rgba(39, 33, 32, 0.5);
     justify-content: center;
     align-items: center;
 }
 
 .modal-content {
     background: #f9f8dd;
-    border: 3px solid #272120;
+    border: 2px solid #876661;
     max-width: 700px;
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
     padding: 2rem;
     position: relative;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(39, 33, 32, 0.15);
 }
 
 .modal-close {
@@ -340,16 +332,17 @@ footer .btn-cerrar:hover {
     right: 15px;
     font-size: 1.8rem;
     cursor: pointer;
-    color: #272120;
-}
-.modal-close:hover {
     color: #876661;
 }
 
+.modal-close:hover {
+    color: #272120;
+}
+
 .modal-content h2 {
-    border-bottom: 2px solid #272120;
+    border-bottom: 1px solid #ba9572;
     padding-bottom: 0.3rem;
-    color: #5c8d58;
+    color: #3b473c;
 }
 
 .modal-content .detalle-item {
@@ -369,14 +362,19 @@ footer .btn-cerrar:hover {
 
 .modal-content .participante-tabla th,
 .modal-content .participante-tabla td {
-    border: 1px solid #272120;
+    border: 1px solid #ba9572;
     padding: 0.2rem 0.5rem;
     text-align: left;
 }
 
 .modal-content .participante-tabla th {
-    background: #8b8893;
-    color: #f9f8dd;
+    background: #d2e291;
+    color: #3b473c;
+    font-weight: 600;
+}
+
+.modal-content .participante-tabla td {
+    background: #f9f8dd;
 }
 
 /* Responsive */
@@ -413,7 +411,6 @@ footer .btn-cerrar:hover {
     }
     .hero {
         padding: 30px 15px;
-        margin: 10px;
     }
     .hero h2 {
         font-size: 1.2rem;
