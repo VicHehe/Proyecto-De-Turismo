@@ -1,6 +1,7 @@
 /* ============================================================
    galeria.css - Estilos para la galería de viajes
    Estilo en blanco y negro, consistente con el resto del sistema.
+   Incluye votación con piñas y botón eliminar.
    ============================================================ */
 
 * {
@@ -106,6 +107,73 @@ header h1 {
     object-fit: cover;
     border: 1px solid #000;
     background: #f0f0f0;
+}
+
+/* ---- Footer de publicación (votación y eliminar) ---- */
+.pub-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+    border-top: 1px solid #eee;
+    padding-top: 6px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.votacion {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pina-icono {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0.7) contrast(1.2); /* Ajuste para hacerla más oscura */
+    /* Si quieres más clara: filter: brightness(1.2) contrast(0.8); */
+    image-rendering: auto;
+}
+
+.pina-conteo {
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+}
+
+.btn-votar {
+    background: #fff;
+    border: 1px solid #000;
+    padding: 2px 10px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.btn-votar:hover {
+    background: #eee;
+}
+
+.ya-voto {
+    font-size: 12px;
+    color: #008800;
+    font-weight: bold;
+}
+
+.btn-eliminar {
+    background: #fff;
+    border: 1px solid #cc0000;
+    color: #cc0000;
+    padding: 2px 10px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.btn-eliminar:hover {
+    background: #cc0000;
+    color: #fff;
 }
 
 /* ---- Mensaje vacío ---- */
@@ -296,5 +364,15 @@ header h1 {
     .preview-thumb {
         width: 70px;
         height: 70px;
+    }
+    .pub-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .votacion {
+        justify-content: center;
+    }
+    .btn-eliminar {
+        align-self: center;
     }
 }
