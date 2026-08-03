@@ -155,6 +155,8 @@ header .user-badge {
     border-bottom: 1px solid #000;
     padding-bottom: 6px;
     margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .detalle-header h2 {
@@ -172,6 +174,21 @@ header .user-badge {
 
 .btn-editar:hover {
     background: #eee;
+}
+
+/* ---- Botón eliminar (nuevo) ---- */
+.btn-eliminar {
+    background: #fff;
+    border: 1px solid #cc0000;
+    color: #cc0000;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.btn-eliminar:hover {
+    background: #cc0000;
+    color: #fff;
 }
 
 .detalle-body h3 {
@@ -440,7 +457,7 @@ header .user-badge {
 
     .panel-lista {
         max-width: 100%;
-        max-height: 250px; /* Altura más reducida para no ocupar mucho */
+        max-height: 250px;
         margin-bottom: 10px;
     }
 
@@ -450,15 +467,14 @@ header .user-badge {
         padding: 12px;
     }
 
-    /* Ajustes en el modal para que se vea mejor */
     .modal-contenido {
         padding: 1rem;
         width: 98%;
         max-width: 98%;
     }
 
-    /* Botones más grandes para táctil */
     .btn-editar,
+    .btn-eliminar,
     .btn-small,
     .btn-agregar-actividad,
     .modal-acciones button {
@@ -477,15 +493,13 @@ header .user-badge {
         justify-content: center;
     }
 
-    /* Mejorar inputs en móvil */
     .campo input,
     .campo select,
     .campo textarea {
-        font-size: 16px; /* evita zoom automático en iOS */
+        font-size: 16px;
         padding: 10px 8px;
     }
 
-    /* Ruta en edición: apilar elementos */
     .ruta-edit-item {
         flex-direction: column;
         align-items: stretch;
@@ -504,7 +518,6 @@ header .user-badge {
         padding: 8px;
     }
 
-    /* Participantes: mejor legibilidad */
     .participante-edit-item {
         font-size: 15px;
         padding: 8px 0;
@@ -515,7 +528,6 @@ header .user-badge {
         padding: 0 8px;
     }
 
-    /* Tabla de participantes: scroll horizontal */
     .participantes-tabla {
         display: block;
         overflow-x: auto;
@@ -529,13 +541,11 @@ header .user-badge {
         min-width: 80px;
     }
 
-    /* Botón eliminar actividad más grande */
     .btn-eliminar-actividad {
         font-size: 1.4rem;
         padding: 4px 8px;
     }
 
-    /* Ajustes en el header */
     header {
         flex-direction: column;
         align-items: stretch;
@@ -554,7 +564,6 @@ header .user-badge {
         align-self: center;
     }
 
-    /* Detalle: encabezado */
     .detalle-header {
         flex-wrap: wrap;
         gap: 8px;
@@ -619,6 +628,7 @@ header .user-badge {
     }
 
     .btn-editar,
+    .btn-eliminar,
     .btn-small,
     .btn-agregar-actividad,
     .modal-acciones button {
@@ -633,18 +643,4 @@ header .user-badge {
         font-size: 15px;
         padding: 12px 8px;
     }
-}
-
-/* ---- Botón eliminar ---- */
-.btn-eliminar {
-    background: #fff;
-    border: 1px solid #cc0000;
-    color: #cc0000;
-    padding: 4px 12px;
-    cursor: pointer;
-    font-size: 13px;
-}
-.btn-eliminar:hover {
-    background: #cc0000;
-    color: #fff;
 }
