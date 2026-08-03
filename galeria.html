@@ -9,7 +9,7 @@
 <body>
 
 <header>
-    <h1>📸 Galería de Viajes</h1>
+    <h1>📸 Galería de Viajes <span id="cargandoHeader" style="font-size:0.8rem; font-weight:normal; color:#888;">(Cargando...)</span></h1>
     <div style="display: flex; align-items: center; gap: 12px;">
         <span class="user-badge" id="userBadge">Cargando...</span>
         <a href="index.html" class="volver">← Volver al Lobby</a>
@@ -17,10 +17,14 @@
 </header>
 
 <!-- Contenedor de publicaciones -->
-<div id="contenedorPublicaciones" class="galeria-grid"></div>
+<div id="contenedorPublicaciones" class="galeria-grid">
+    <div class="mensaje-carga" style="grid-column: 1 / -1; text-align:center; padding:40px; border:1px solid #000; background:#fafafa;">
+        ⏳ Cargando publicaciones...
+    </div>
+</div>
 
 <!-- Controles de paginación -->
-<div id="paginacion">
+<div id="paginacion" style="display:none;">
     <button id="btnAnterior" class="btn-pagina">⬅ Anterior</button>
     <span id="infoPagina">Página 1 de 1</span>
     <button id="btnSiguiente" class="btn-pagina">Siguiente ➡</button>
@@ -55,7 +59,7 @@
                 <label>Imágenes (máximo 4, formato JPG/PNG)</label>
                 <input type="file" id="inputImagenes" accept="image/jpeg,image/png" multiple>
                 <div id="previsualizacion" class="preview-container"></div>
-                <p class="muted">Selecciona hasta 4 imágenes. Serán redimensionadas a 350px de ancho y comprimidas (calidad 0.5).</p>
+                <p class="muted">Selecciona hasta 4 imágenes. Serán redimensionadas a 350px de ancho y comprimidas (calidad 0.3).</p>
             </div>
             <div class="modal-acciones">
                 <button type="button" class="btn-cancelar" id="btnCancelarSubir">Cancelar</button>
@@ -79,6 +83,7 @@
             return;
         }
         document.getElementById('userBadge').textContent = `${usuario.nombre} ${usuario.apellido || ''} (${usuario.rol})`;
+        document.getElementById('cargandoHeader').textContent = '';
 
         const puedeSubir = ['admin', 'guia', 'asistente'].includes(usuario.rol);
         const btnSubir = document.getElementById('btnNuevaPublicacion');
@@ -188,6 +193,15 @@
         // ============================================================
         async function cargarPublicaciones() {
             const contenedor = document.getElementById('contenedorPublicaciones');
+            // Mostrar mensaje de carga
+            contenedor.innerHTML = `
+                <div class="mensaje-carga" style="grid-column: 1 / -1; text-align:center; padding:40px; border:1px solid #000; background:#fafafa;">
+                    ⏳ Cargando publicaciones...
+                </div>
+            `;
+            document.getElementById('paginacion').style.display = 'none';
+            document.getElementById('cargandoHeader').textContent = '(Cargando...)';
+
             try {
                 const indice = await GitHub.leer('publicaciones/indice.json');
                 if (!indice || !indice.publicaciones || indice.publicaciones.length === 0) {
@@ -198,6 +212,7 @@
                         </div>
                     `;
                     document.getElementById('paginacion').style.display = 'none';
+                    document.getElementById('cargandoHeader').textContent = '';
                     return;
                 }
                 document.getElementById('paginacion').style.display = 'flex';
@@ -206,10 +221,12 @@
                 if (paginaActual >= totalPaginas) paginaActual = totalPaginas - 1;
                 if (paginaActual < 0) paginaActual = 0;
                 await renderizarPagina(paginaActual, totalPaginas);
+                document.getElementById('cargandoHeader').textContent = '';
             } catch (error) {
                 console.error('Error al cargar publicaciones:', error);
                 contenedor.innerHTML = `<div class="mensaje-vacio" style="grid-column: 1 / -1;"><p>⚠️ Error al cargar la galería.</p></div>`;
                 document.getElementById('paginacion').style.display = 'none';
+                document.getElementById('cargandoHeader').textContent = '';
             }
         }
 
@@ -222,6 +239,7 @@
             const fin = Math.min(inicio + POR_PAGINA, publicacionesCompletas.length);
             const publicacionesPagina = publicacionesCompletas.slice(inicio, fin);
             
+            // Construir HTML base con placeholders de carga para imágenes
             let html = '';
             for (const pub of publicacionesPagina) {
                 const esAdmin = usuario.rol === 'admin';
@@ -230,22 +248,10 @@
 
                 let imagenesHtml = '';
                 if (pub.imagenes && pub.imagenes.length > 0) {
-                    const imagenesDataUrls = [];
-                    for (const ruta of pub.imagenes) {
-                        const base64 = await obtenerImagenBase64(ruta);
-                        if (base64) {
-                            imagenesDataUrls.push(`data:image/jpeg;base64,${base64}`);
-                        } else {
-                            imagenesDataUrls.push(null);
-                        }
-                    }
                     imagenesHtml = `<div class="pub-imagenes">`;
-                    for (const dataUrl of imagenesDataUrls) {
-                        if (dataUrl) {
-                            imagenesHtml += `<img src="${dataUrl}" alt="Imagen" loading="lazy">`;
-                        } else {
-                            imagenesHtml += `<div class="img-placeholder">🖼️ Imagen no disponible</div>`;
-                        }
+                    // Placeholder de carga para cada imagen
+                    for (let i = 0; i < pub.imagenes.length; i++) {
+                        imagenesHtml += `<div class="img-loading" style="width:100%; height:120px; background:#eee; border:1px solid #ccc; display:flex; align-items:center; justify-content:center; color:#888;">⏳</div>`;
                     }
                     imagenesHtml += `</div>`;
                 }
@@ -282,10 +288,42 @@
 
             contenedor.innerHTML = html || `<div class="mensaje-vacio" style="grid-column: 1 / -1;"><p>No hay publicaciones en esta página.</p></div>`;
 
+            // Actualizar controles de paginación
             document.getElementById('infoPagina').textContent = `Página ${pagina+1} de ${totalPaginas}`;
             document.getElementById('btnAnterior').disabled = (pagina === 0);
             document.getElementById('btnSiguiente').disabled = (pagina === totalPaginas - 1);
 
+            // Ahora cargar las imágenes reales y reemplazar los placeholders
+            const publicacionesElements = contenedor.querySelectorAll('.publicacion');
+            for (let idx = 0; idx < publicacionesPagina.length; idx++) {
+                const pub = publicacionesPagina[idx];
+                const pubElement = publicacionesElements[idx];
+                if (!pubElement) continue;
+                const imagenesContainer = pubElement.querySelector('.pub-imagenes');
+                if (imagenesContainer && pub.imagenes && pub.imagenes.length > 0) {
+                    const loadingDivs = imagenesContainer.querySelectorAll('.img-loading');
+                    for (let i = 0; i < pub.imagenes.length; i++) {
+                        const ruta = pub.imagenes[i];
+                        const base64 = await obtenerImagenBase64(ruta);
+                        const imgElement = document.createElement('img');
+                        imgElement.loading = 'lazy';
+                        imgElement.alt = 'Imagen';
+                        if (base64) {
+                            imgElement.src = `data:image/jpeg;base64,${base64}`;
+                        } else {
+                            imgElement.alt = 'Imagen no disponible';
+                            imgElement.className = 'img-placeholder';
+                            imgElement.textContent = '🖼️';
+                        }
+                        // Reemplazar el div de carga con la imagen
+                        if (loadingDivs[i]) {
+                            loadingDivs[i].replaceWith(imgElement);
+                        }
+                    }
+                }
+            }
+
+            // Eventos de eliminar (se mantienen)
             document.querySelectorAll('.btn-eliminar').forEach(btn => {
                 btn.addEventListener('click', async function(e) {
                     const id = this.dataset.id;
@@ -385,7 +423,7 @@
         }
 
         // ============================================================
-        // PREVISUALIZACIÓN Y COMPRESIÓN (350px, calidad 0.5)
+        // PREVISUALIZACIÓN Y COMPRESIÓN (350px, calidad 0.3)
         // ============================================================
         document.getElementById('inputImagenes').addEventListener('change', function(e) {
             const files = e.target.files;
@@ -407,7 +445,7 @@
                         const ctx = canvas.getContext('2d');
                         let width = img.width;
                         let height = img.height;
-                        const maxWidth = 350; // NUEVO TAMAÑO
+                        const maxWidth = 350;
                         if (width > maxWidth) {
                             height = (maxWidth / width) * height;
                             width = maxWidth;
@@ -415,7 +453,7 @@
                         canvas.width = width;
                         canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.3); // Calidad 0.5
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.3);
                         imagenesSeleccionadas.push(dataUrl);
 
                         const div = document.createElement('div');
