@@ -171,11 +171,8 @@
     });
 
     // ============================================================
-    // FUNCIONES PARA OBTENER IMÁGENES DESDE EL WORKER (adaptado de galeria)
+    // FUNCIÓN PARA OBTENER IMAGEN EN BASE64 (usa WORKER_URL de github.js)
     // ============================================================
-    // Usamos la misma URL que en github.js
-    const WORKER_URL = 'https://green-flower-8734.victortilleria116.workers.dev';
-
     async function obtenerImagenBase64(ruta) {
         try {
             const res = await fetch(`${WORKER_URL}?path=${encodeURIComponent(ruta)}`);
@@ -197,7 +194,6 @@
     async function cargarGaleriaPromo() {
         const container = document.getElementById('promoGrid');
         try {
-            // Leer el índice de publicaciones
             const indice = await GitHub.leer('publicaciones/indice.json');
             if (!indice || !indice.publicaciones || indice.publicaciones.length === 0) {
                 container.innerHTML = `
@@ -208,12 +204,10 @@
                 `;
                 return;
             }
-            // Tomar las 3 más recientes
             const recientes = indice.publicaciones.slice(-3).reverse();
             let html = '';
             for (const pub of recientes) {
                 if (pub.imagenes && pub.imagenes.length > 0) {
-                    // Obtener la primera imagen en base64
                     const base64 = await obtenerImagenBase64(pub.imagenes[0]);
                     const imgSrc = base64 ? `data:image/jpeg;base64,${base64}` : '';
                     html += `
