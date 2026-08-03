@@ -6,14 +6,13 @@
 }
 
 body {
-    background: #f9f8dd;              /* crema claro – fondo natural */
-    color: #272120;                   /* marrón oscuro – texto principal */
+    background: #f9f8dd;
+    color: #272120;
 }
 
-/* ===== HEADER (barra superior) ===== */
 header {
-    background: #272120;              /* casi negro (marrón oscuro) – con leve tono cálido */
-    color: #f9f8dd;                   /* crema */
+    background: #272120;
+    color: #f9f8dd;
     padding: 20px 30px;
     display: flex;
     justify-content: space-between;
@@ -21,7 +20,7 @@ header {
     flex-wrap: wrap;
     gap: 10px;
     position: relative;
-    border-bottom: 2px solid #3b473c; /* línea verde oscuro que separa del nav */
+    border-bottom: 3px solid #3b473c;
 }
 
 .header-left {
@@ -43,7 +42,7 @@ header {
     line-height: 1.1;
     font-size: 0.7rem;
     font-weight: bold;
-    border-left: 1px solid #d2e291;   /* verde claro */
+    border-left: 1px solid #d2e291;
     padding-left: 10px;
     text-align: left;
     letter-spacing: 0.5px;
@@ -93,15 +92,13 @@ header {
     border-radius: 12px;
 }
 
-/* ===== NAV (barra de navegación) ===== */
 nav {
-    background: #3b473c;              /* verde oscuro – mismo que la línea de separación */
+    background: #3b473c;
     display: flex;
     justify-content: center;
     gap: 15px;
     padding: 15px;
     flex-wrap: wrap;
-    border-top: 2px solid #3b473c;   /* línea de unión con el header (opcional) */
 }
 
 nav button {
@@ -119,7 +116,6 @@ nav button:hover {
     background: #d2e291;
 }
 
-/* ===== HERO ===== */
 .hero {
     text-align: center;
     padding: 60px 20px;
@@ -138,7 +134,6 @@ nav button:hover {
     line-height: 1.6;
 }
 
-/* ===== SECCIÓN DE PROMOCIÓN DE GALERÍA ===== */
 .galeria-promo {
     margin: 40px 20px;
     padding: 20px;
@@ -215,7 +210,6 @@ nav button:hover {
     border-color: #5c8d58;
 }
 
-/* ===== TARJETAS DE SALIDAS ===== */
 .lugares {
     display: flex;
     justify-content: center;
@@ -264,7 +258,6 @@ nav button:hover {
     background: #3b473c;
 }
 
-/* ===== FOOTER ===== */
 footer {
     background: #3b473c;
     color: #f9f8dd;
@@ -294,7 +287,6 @@ footer .btn-cerrar:hover {
     background: #d2e291;
 }
 
-/* ===== MENSAJE VACÍO ===== */
 .mensaje-vacio {
     width: 100%;
     text-align: center;
@@ -305,7 +297,6 @@ footer .btn-cerrar:hover {
     border-radius: 4px;
 }
 
-/* ===== MODAL ===== */
 .modal {
     display: none;
     position: fixed;
@@ -383,7 +374,6 @@ footer .btn-cerrar:hover {
     background: #f9f8dd;
 }
 
-/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     header {
         flex-direction: column;
