@@ -37,6 +37,16 @@
                 <textarea id="inputDescripcion" rows="3" maxlength="500" placeholder="Escribe una descripción para esta publicación..."></textarea>
             </div>
             <div class="campo">
+                <label>Calificación con piñas (1 a 5)</label>
+                <select id="inputPinas">
+                    <option value="1">1 piña</option>
+                    <option value="2">2 piñas</option>
+                    <option value="3" selected>3 piñas</option>
+                    <option value="4">4 piñas</option>
+                    <option value="5">5 piñas</option>
+                </select>
+            </div>
+            <div class="campo">
                 <label>Imágenes (máximo 5, formato JPG/PNG)</label>
                 <input type="file" id="inputImagenes" accept="image/jpeg,image/png" multiple>
                 <div id="previsualizacion" class="preview-container"></div>
@@ -54,7 +64,7 @@
 <script src="js/auth.js"></script>
 <script>
     // ============================================================
-    // galeria.js - Código completo con votación y eliminación
+    // galeria.js - Con piñas fijas por publicación (sin votación)
     // ============================================================
 
     (function() {
@@ -75,7 +85,7 @@
         }
 
         // ---- VARIABLES GLOBALES ----
-        let imagenesSeleccionadas = []; // Array de strings Base64
+        let imagenesSeleccionadas = [];
 
         // ---- CARGAR PUBLICACIONES ----
         async function cargarPublicaciones() {
@@ -95,12 +105,6 @@
                 const publicaciones = datos.publicaciones.slice().reverse();
                 let html = '';
                 publicaciones.forEach(pub => {
-                    // Inicializar votos si no existe
-                    if (!pub.votos) pub.votos = { total: 0, usuarios: [] };
-
-                    // Verificar si el usuario actual ya votó
-                    const yaVoto = pub.votos.usuarios.includes(usuario.rut);
-
                     // Determinar si puede eliminar
                     const esAdmin = usuario.rol === 'admin';
                     const esAutor = pub.autor === `${usuario.nombre} ${usuario.apellido || ''}`.trim() || pub.autor === usuario.rut;
@@ -116,6 +120,15 @@
                         imagenesHtml += `</div>`;
                     }
 
+                    // Generar estrellas (piñas) según la calificación
+                    let pinasHtml = '';
+                    const pinas = pub.pinas || 0;
+                    for (let i = 0; i < pinas; i++) {
+                        pinasHtml += `<img src="PiñaDePino.png" alt="Piña" class="pina-icono">`;
+                    }
+                    // Si no hay piñas, mostrar "Sin calificación"
+                    if (pinas === 0) pinasHtml = '<span class="sin-pinas">Sin calificación</span>';
+
                     const fecha = new Date(pub.fecha).toLocaleDateString('es-CL', {
                         year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
                     });
@@ -129,10 +142,9 @@
                             ${pub.descripcion ? `<div class="pub-desc">${pub.descripcion}</div>` : ''}
                             ${imagenesHtml}
                             <div class="pub-footer">
-                                <div class="votacion">
-                                    <img src="PiñaDePino.png" alt="Piña" class="pina-icono">
-                                    <span class="pina-conteo" id="conteo-${pub.id}">${pub.votos.total}</span>
-                                    ${!yaVoto ? `<button class="btn-votar" data-id="${pub.id}">👍 Votar</button>` : `<span class="ya-voto">✅ Ya votaste</span>`}
+                                <div class="calificacion">
+                                    <span class="pinas-label">Calificación:</span>
+                                    ${pinasHtml}
                                 </div>
                                 ${puedeEliminar ? `<button class="btn-eliminar" data-id="${pub.id}">🗑️ Eliminar</button>` : ''}
                             </div>
@@ -140,14 +152,6 @@
                     `;
                 });
                 contenedor.innerHTML = html;
-
-                // ---- EVENTOS DE VOTACIÓN ----
-                document.querySelectorAll('.btn-votar').forEach(btn => {
-                    btn.addEventListener('click', async function(e) {
-                        const id = this.dataset.id;
-                        await votarPublicacion(id);
-                    });
-                });
 
                 // ---- EVENTOS DE ELIMINACIÓN ----
                 document.querySelectorAll('.btn-eliminar').forEach(btn => {
@@ -165,44 +169,6 @@
             }
         }
 
-        // ---- VOTAR PUBLICACIÓN ----
-        async function votarPublicacion(id) {
-            try {
-                const datos = await GitHub.leer('datos/galeria.json');
-                if (!datos || !datos.publicaciones) return alert('Error al cargar datos');
-
-                const pub = datos.publicaciones.find(p => p.id === id);
-                if (!pub) return alert('Publicación no encontrada');
-
-                if (!pub.votos) pub.votos = { total: 0, usuarios: [] };
-                if (pub.votos.usuarios.includes(usuario.rut)) {
-                    alert('Ya votaste esta publicación.');
-                    return;
-                }
-
-                pub.votos.total += 1;
-                pub.votos.usuarios.push(usuario.rut);
-
-                const sha = await GitHub.sha('datos/galeria.json');
-                const ok = await GitHub.escribir('datos/galeria.json', datos, sha);
-                if (ok) {
-                    // Actualizar el contador en la interfaz
-                    const conteoEl = document.getElementById(`conteo-${id}`);
-                    if (conteoEl) conteoEl.textContent = pub.votos.total;
-                    // Deshabilitar el botón de votar
-                    const btnVotar = document.querySelector(`.btn-votar[data-id="${id}"]`);
-                    if (btnVotar) {
-                        btnVotar.replaceWith(document.createTextNode('✅ Ya votaste'));
-                    }
-                } else {
-                    alert('❌ Error al registrar el voto.');
-                }
-            } catch (error) {
-                console.error('Error al votar:', error);
-                alert('Error al votar.');
-            }
-        }
-
         // ---- ELIMINAR PUBLICACIÓN ----
         async function eliminarPublicacion(id) {
             try {
@@ -212,7 +178,6 @@
                 const index = datos.publicaciones.findIndex(p => p.id === id);
                 if (index === -1) return alert('Publicación no encontrada');
 
-                // Verificar permisos nuevamente (seguridad)
                 const pub = datos.publicaciones[index];
                 const esAdmin = usuario.rol === 'admin';
                 const esAutor = pub.autor === `${usuario.nombre} ${usuario.apellido || ''}`.trim() || pub.autor === usuario.rut;
@@ -225,7 +190,7 @@
                 const ok = await GitHub.escribir('datos/galeria.json', datos, sha);
                 if (ok) {
                     alert('✅ Publicación eliminada.');
-                    cargarPublicaciones(); // Recargar lista
+                    cargarPublicaciones();
                 } else {
                     alert('❌ Error al eliminar.');
                 }
@@ -242,6 +207,7 @@
             document.getElementById('inputImagenes').value = '';
             document.getElementById('previsualizacion').innerHTML = '';
             imagenesSeleccionadas = [];
+            document.getElementById('inputPinas').value = '3';
         }
 
         // ---- CERRAR MODAL ----
@@ -315,6 +281,7 @@
         document.getElementById('formSubir').addEventListener('submit', async function(e) {
             e.preventDefault();
             const descripcion = document.getElementById('inputDescripcion').value.trim();
+            const pinas = parseInt(document.getElementById('inputPinas').value);
             if (imagenesSeleccionadas.length === 0) {
                 alert('Debes seleccionar al menos una imagen.');
                 return;
@@ -330,7 +297,7 @@
                 fecha: new Date().toISOString(),
                 descripcion: descripcion || 'Sin descripción',
                 imagenes: imagenesSeleccionadas,
-                votos: { total: 0, usuarios: [] }
+                pinas: pinas
             };
 
             let datos = await GitHub.leer('datos/galeria.json');
@@ -360,8 +327,6 @@
 
         // ---- INICIALIZAR ----
         cargarPublicaciones();
-
-        // Exponer funciones para recargar desde consola
         window.recargarGaleria = cargarPublicaciones;
     })();
 </script>
