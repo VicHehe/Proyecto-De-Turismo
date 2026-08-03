@@ -1,49 +1,55 @@
 .seccion {
     margin-bottom: 2rem;
     border: 1px solid #ba9572;
-    padding: 1.5rem;
+    padding: 1.6rem;
     background: #f9f8dd;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(39, 33, 32, 0.06);
 }
 
 .seccion h2 {
     margin-top: 0;
     border-bottom: 1px solid #8b8893;
-    padding-bottom: 0.3rem;
+    padding-bottom: 0.4rem;
     color: #3b473c;
 }
 
 .header-planificar {
-    border: 1px solid #272120;
-    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 18px;
     margin-bottom: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
-    background: #f9f8dd;
+    background: linear-gradient(135deg, #3b473c, #272120);
+    box-shadow: 0 3px 10px rgba(39, 33, 32, 0.15);
 }
 
 .header-planificar h1 {
     font-size: 20px;
     font-weight: bold;
     margin: 0;
-    color: #3b473c;
+    color: #f9f8dd;
 }
 
 .btn-volver {
-    border: 1px solid #272120;
-    padding: 4px 12px;
-    background: #f9f8dd;
+    border: 1px solid #f9f8dd;
+    padding: 5px 14px;
+    background: transparent;
     text-decoration: none;
-    color: #272120;
+    color: #f9f8dd;
     font-size: 13px;
     display: inline-block;
-    border-radius: 4px;
+    border-radius: 20px;
+    transition: 0.2s ease;
 }
 
 .btn-volver:hover {
-    background: #d2e291;
+    background: #f9f8dd;
+    color: #272120;
 }
 
 .busqueda {
@@ -55,34 +61,40 @@
 
 .busqueda input,
 .busqueda select {
-    padding: 0.4rem 0.6rem;
-    border: 1px solid #272120;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid #8b8893;
     background: #f9f8dd;
     flex: 1;
     min-width: 150px;
     color: #272120;
-    border-radius: 4px;
+    border-radius: 6px;
+}
+
+.busqueda input:focus,
+.busqueda select:focus {
+    border-color: #5c8d58;
+    outline: none;
 }
 
 .busqueda button {
     flex: 0;
-    padding: 0.4rem 1rem;
+    padding: 0.5rem 1.1rem;
 }
 
 .lista-items {
     border: 1px solid #ba9572;
-    padding: 0.5rem;
+    padding: 0.6rem;
     min-height: 60px;
     margin-top: 0.5rem;
     background: #f9f8dd;
-    border-radius: 4px;
+    border-radius: 8px;
 }
 
 .item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.4rem 0;
+    padding: 0.45rem 0;
     border-bottom: 1px solid #d2e291;
 }
 
@@ -102,12 +114,14 @@
     border-collapse: collapse;
     margin-top: 0.5rem;
     font-size: 0.9rem;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
 .tabla-participantes th,
 .tabla-participantes td {
-    border: 1px solid #272120;
-    padding: 0.3rem 0.5rem;
+    border: 1px solid #ba9572;
+    padding: 0.35rem 0.55rem;
     text-align: left;
 }
 
@@ -129,7 +143,7 @@
     flex-wrap: wrap;
     gap: 0.5rem 1rem;
     align-items: center;
-    padding: 0.5rem 0;
+    padding: 0.55rem 0;
     border-bottom: 1px solid #d2e291;
 }
 
@@ -156,11 +170,11 @@
 }
 
 .ruta-item .horario-editable input[type="time"] {
-    padding: 0.2rem;
-    border: 1px solid #272120;
+    padding: 0.25rem;
+    border: 1px solid #8b8893;
     width: 100px;
     background: #f9f8dd;
-    border-radius: 4px;
+    border-radius: 6px;
     color: #272120;
 }
 
@@ -172,15 +186,17 @@
 
 .btn-ruta {
     background: #f9f8dd;
-    border: 1px solid #272120;
-    padding: 0.2rem 0.6rem;
+    border: 1px solid #8daad6;
+    padding: 0.25rem 0.7rem;
     cursor: pointer;
-    color: #272120;
-    border-radius: 4px;
+    color: #3b473c;
+    border-radius: 6px;
+    transition: 0.2s ease;
 }
 
 .btn-ruta:hover {
-    background: #d2e291;
+    background: #8daad6;
+    color: #f9f8dd;
 }
 
 .oculto {
@@ -189,10 +205,10 @@
 
 .mensaje {
     border: 1px solid #272120;
-    padding: 0.5rem;
+    padding: 0.55rem;
     margin: 0.5rem 0;
     background: #f9f8dd;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 .mensaje-exito {
@@ -222,26 +238,33 @@
 .grupo input,
 .grupo select {
     width: 100%;
-    padding: 0.45rem 0.6rem;
-    border: 1px solid #272120;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid #8b8893;
     background: #f9f8dd;
     font-size: 0.95rem;
-    border-radius: 4px;
+    border-radius: 6px;
     color: #272120;
+}
+
+.grupo input:focus,
+.grupo select:focus {
+    border-color: #5c8d58;
+    outline: none;
 }
 
 .btn {
     background: #f9f8dd;
-    border: 1px solid #272120;
-    padding: 0.5rem 1.2rem;
+    border: 1px solid #876661;
+    padding: 0.55rem 1.3rem;
     font-size: 0.9rem;
     font-weight: 500;
     margin-right: 0.5rem;
     margin-bottom: 0.5rem;
     display: inline-block;
-    color: #272120;
+    color: #3b473c;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 6px;
+    transition: 0.2s ease;
 }
 
 .btn:hover {
@@ -249,21 +272,22 @@
 }
 
 .btn-primario {
-    background: #5c8d58;
+    background: linear-gradient(135deg, #5c8d58, #3b473c);
     color: #f9f8dd;
     border: 1px solid #3b473c;
 }
 
 .btn-primario:hover {
-    background: #3b473c;
+    background: linear-gradient(135deg, #3b473c, #272120);
 }
 
 .info-transporte {
-    background: #f9f8dd;
-    border: 1px solid #ba9572;
-    padding: 0.8rem 1rem;
+    background: #f2f4f7;
+    border: 1px solid #b7c4d0;
+    border-left: 4px solid #8daad6;
+    padding: 0.9rem 1.1rem;
     margin-top: 0.5rem;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 .grid-2 {
@@ -290,8 +314,8 @@
 
 h1 {
     font-size: 2rem;
-    font-weight: 600;
-    border-bottom: 2px solid #876661;
+    font-weight: 700;
+    border-bottom: 3px solid #5c8d58;
     padding-bottom: 0.5rem;
     margin-bottom: 2rem;
     color: #3b473c;
