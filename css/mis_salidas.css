@@ -635,14 +635,16 @@ header .user-badge {
     }
 }
 
-.btn-eliminar-guia {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.1rem;
-    padding: 0 4px;
+/* ---- Botón eliminar ---- */
+.btn-eliminar {
+    background: #fff;
+    border: 1px solid #cc0000;
     color: #cc0000;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-size: 13px;
 }
-.btn-eliminar-guia:hover {
-    background: #ffebeb;
+.btn-eliminar:hover {
+    background: #cc0000;
+    color: #fff;
 }
