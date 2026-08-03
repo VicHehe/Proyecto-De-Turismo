@@ -321,7 +321,10 @@
             let html = `
                 <div class="detalle-header">
                     <h2>${salida.titulo || 'Sin título'}</h2>
-                    ${puedeEditar ? `<button class="btn-editar" id="btnAbrirEditar">✏️ Editar</button>` : ''}
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        ${puedeEditar ? `<button class="btn-editar" id="btnAbrirEditar">✏️ Editar</button>` : ''}
+                        <button class="btn-editar" id="btnExportarExcel">📊 Exportar a Excel</button>
+                    </div>
                 </div>
                 <div class="detalle-body">
                     <p><strong>Fecha:</strong> ${salida.fecha || 'No definida'}</p>
@@ -398,6 +401,103 @@
                 btnEditar.addEventListener('click', function() {
                     abrirModalEdicion(salida);
                 });
+            }
+
+            // Botón exportar
+            const btnExportar = document.getElementById('btnExportarExcel');
+            if (btnExportar) {
+                btnExportar.addEventListener('click', function() {
+                    exportarSalidaCSV(salida);
+                });
+            }
+        }
+
+        // ===== EXPORTAR A CSV (EXCEL) =====
+        async function exportarSalidaCSV(salida) {
+            try {
+                // Cargar usuarios para datos completos de participantes
+                const datosUsuarios = await GitHub.leer('datos/usuarios.json');
+                const usuarios = datosUsuarios ? datosUsuarios.usuarios : [];
+                const participantesConInfo = salida.participantes.map(p => {
+                    const user = usuarios.find(u => u.rut === p.rut);
+                    return {
+                        ...p,
+                        edad: user ? user.edad : '—',
+                        telefono: user ? user.telefono : '—',
+                        historial: user ? user.historial : 'Sin información'
+                    };
+                });
+
+                // Construir CSV
+                let csvRows = [];
+                // Datos principales
+                csvRows.push(['Título', 'Fecha', 'Duración', 'Descripción', 'Curso', 'Precio por persona', 'Menú']);
+                csvRows.push([
+                    salida.titulo || '',
+                    salida.fecha || '',
+                    salida.duracion || '',
+                    salida.descripcion || '',
+                    salida.curso || '',
+                    salida.precio || '',
+                    salida.menu || ''
+                ]);
+                // Ruta
+                csvRows.push([]);
+                csvRows.push(['RUTA (Actividades)']);
+                csvRows.push(['Tipo', 'Descripción', 'Inicio', 'Fin']);
+                if (salida.ruta && salida.ruta.length > 0) {
+                    salida.ruta.forEach(act => {
+                        csvRows.push([act.tipo, act.descripcion, act.inicio, act.fin]);
+                    });
+                } else {
+                    csvRows.push(['Sin actividades']);
+                }
+                // Transporte
+                csvRows.push([]);
+                csvRows.push(['TRANSPORTE']);
+                csvRows.push(['Conductor', 'Horarios', 'Precio servicio', 'Descripción vehículo']);
+                if (salida.transporte) {
+                    csvRows.push([
+                        salida.transporte.conductor || '',
+                        salida.transporte.horarios || '',
+                        salida.transporte.precio || '',
+                        salida.transporte.descripcion || ''
+                    ]);
+                } else {
+                    csvRows.push(['Sin información']);
+                }
+                // Participantes
+                csvRows.push([]);
+                csvRows.push(['PARTICIPANTES']);
+                csvRows.push(['Nombre', 'RUT', 'Rol', 'Edad', 'Teléfono', 'Historial Médico']);
+                if (participantesConInfo.length > 0) {
+                    participantesConInfo.forEach(p => {
+                        csvRows.push([
+                            p.nombre || '',
+                            p.rut || '',
+                            p.rol || '',
+                            p.edad || '',
+                            p.telefono || '',
+                            p.historial || ''
+                        ]);
+                    });
+                } else {
+                    csvRows.push(['Sin participantes']);
+                }
+
+                // Convertir a CSV string
+                const csvString = csvRows.map(row => row.join(',')).join('\n');
+                // Crear Blob y descargar
+                const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                const nombreArchivo = `salida_${(salida.titulo || 'sin_titulo').replace(/\s+/g, '_')}_${salida.fecha || 'fecha'}.csv`;
+                link.download = nombreArchivo;
+                link.click();
+                URL.revokeObjectURL(link.href);
+            } catch (error) {
+                console.error('Error al exportar:', error);
+                alert('❌ Error al exportar la salida.');
             }
         }
 
