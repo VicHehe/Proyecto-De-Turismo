@@ -3,32 +3,24 @@
 
 
 
+
 🎨 Diseño visual y experiencia de usuario
 (Cambios exclusivamente en CSS, sin alterar la estructura HTML)
 
 ⭐ Paleta de colores natural
 Aplicar colores suaves (verdes, cafés, azules) en toda la interfaz para dar un aspecto orgánico y formal.
-El emblema del liceo y el logo de turismo ya están integrados (Icon.jpg); solo falta ajustar colores y estilos.
+solo falta ajustar colores y estilos.
 
 ⭐ Ajustes de estilo general
 Refinar tipografía, espaciados, fondos y otros detalles para lograr el look "natural como la naturaleza y formal sin exagerar".
 
 
 
-🖼️ Galería de viajes (nueva funcionalidad)
-⭐⭐⭐ Sistema completo de galería
-
-Subida de fotos + descripción solo para Guías y Administrador.
-
-Votación con piñas de pino (1-5) para todos los usuarios.
-
-Las fotos del Administrador deben aparecer en el Index para promocionar la página.
-
-
 
 📍 Contenido y datos
 ⭐ Ampliación de lugares turísticos
 Añadir más zonas turísticas en lugares.js (trabajo específico de Belén).
+
 
 
 
