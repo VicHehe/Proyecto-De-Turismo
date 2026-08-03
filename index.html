@@ -42,6 +42,17 @@
     </p>
 </section>
 
+<!-- SECCIÓN DE PROMOCIÓN DE GALERÍA (las imágenes del admin) -->
+<section class="galeria-promo" id="seccionGaleriaPromo">
+    <h2>📸 Destinos destacados</h2>
+    <div id="promoGrid" class="promo-grid">
+        <!-- Se llena con JS -->
+    </div>
+    <div class="promo-ver-todas">
+        <a href="galeria.html">Ver todas las fotos →</a>
+    </div>
+</section>
+
 <section class="lugares" id="contenedorSalidas">
     <!-- Se llena dinámicamente con las salidas guardadas -->
 </section>
@@ -64,7 +75,7 @@
 <script src="js/planificacion.js"></script>
 <script>
     // ============================================================
-    // SONIDO (efecto "Comenzar recorrido") - ELIMINADO
+    // CÓDIGO COMPLETO DE index.html
     // ============================================================
 
     // ============================================================
@@ -77,12 +88,10 @@
             if (!s.participantes) s.participantes = [];
         });
 
-        // --- NUEVO: FILTRAR SALIDAS PASADAS PARA TODOS ---
-        // Solo se muestran salidas con fecha >= hoy
         const futuras = todas.filter(s => s.fecha >= hoy);
 
         if (usuario.rol === 'admin') {
-            return futuras; // Admin solo ve futuras en el lobby
+            return futuras;
         } else if (usuario.rol === 'guia' || usuario.rol === 'asistente') {
             return futuras.filter(s => {
                 const esGuia = s.guias.some(g => g.rut === usuario.rut);
@@ -229,6 +238,43 @@
     });
 
     // ============================================================
+    // CARGAR PUBLICACIONES DE GALERÍA PARA PROMOCIÓN
+    // ============================================================
+    async function cargarGaleriaPromo() {
+        const container = document.getElementById('promoGrid');
+        try {
+            const datos = await GitHub.leer('datos/galeria.json');
+            if (!datos || !datos.publicaciones || datos.publicaciones.length === 0) {
+                container.innerHTML = `
+                    <div class="mensaje-vacio" style="width:100%;">
+                        <p>📭 No hay imágenes en la galería aún.</p>
+                        <p style="font-size:0.9rem;">Sé el primero en <a href="galeria.html" style="color:#000; font-weight:bold;">subir una foto</a>.</p>
+                    </div>
+                `;
+                return;
+            }
+            // Tomar las 3 más recientes (últimas 3 del array)
+            const recientes = datos.publicaciones.slice(-3).reverse();
+            let html = '';
+            recientes.forEach(pub => {
+                if (pub.imagenes && pub.imagenes.length > 0) {
+                    html += `
+                        <div class="promo-item">
+                            <img src="${pub.imagenes[0]}" alt="${pub.descripcion || 'Imagen de viaje'}">
+                            <div class="desc">${pub.descripcion ? pub.descripcion.substring(0, 60) + (pub.descripcion.length > 60 ? '...' : '') : 'Sin descripción'}</div>
+                            <div class="autor">${pub.autor || 'Anónimo'}</div>
+                        </div>
+                    `;
+                }
+            });
+            container.innerHTML = html || '<div class="mensaje-vacio" style="width:100%;"><p>No hay publicaciones con imágenes.</p></div>';
+        } catch (error) {
+            console.error('Error al cargar galería promocional:', error);
+            container.innerHTML = '<div class="mensaje-vacio" style="width:100%;"><p>⚠️ Error al cargar las imágenes.</p></div>';
+        }
+    }
+
+    // ============================================================
     // MAIN
     // ============================================================
     (function() {
@@ -260,6 +306,9 @@
                 botones.push({ texto: '📅 Calendario', href: 'calendario_interactivo_personal.html' });
                 break;
         }
+        // Botón de galería siempre visible
+        botones.push({ texto: '📸 Galería', href: 'galeria.html' });
+
         botones.forEach(b => {
             const btn = document.createElement('button');
             btn.textContent = b.texto;
@@ -308,6 +357,7 @@
         };
 
         cargarYMostrarSalidas();
+        cargarGaleriaPromo();
 
         document.getElementById('btnCerrarSesion').addEventListener('click', function() {
             Auth.cerrarSesion();
