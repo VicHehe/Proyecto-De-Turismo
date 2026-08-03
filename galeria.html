@@ -407,7 +407,7 @@
                         const ctx = canvas.getContext('2d');
                         let width = img.width;
                         let height = img.height;
-                        const maxWidth = 300; // NUEVO TAMAÑO
+                        const maxWidth = 350; // NUEVO TAMAÑO
                         if (width > maxWidth) {
                             height = (maxWidth / width) * height;
                             width = maxWidth;
@@ -415,7 +415,7 @@
                         canvas.width = width;
                         canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.25); // Calidad 0.5
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.3); // Calidad 0.5
                         imagenesSeleccionadas.push(dataUrl);
 
                         const div = document.createElement('div');
