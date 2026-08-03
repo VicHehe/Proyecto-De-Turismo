@@ -634,3 +634,15 @@ header .user-badge {
         padding: 12px 8px;
     }
 }
+
+.btn-eliminar-guia {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0 4px;
+    color: #cc0000;
+}
+.btn-eliminar-guia:hover {
+    background: #ffebeb;
+}
