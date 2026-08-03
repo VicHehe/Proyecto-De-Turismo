@@ -12,16 +12,18 @@ body {
 }
 
 header {
-    border: 2px solid #272120;
-    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 18px;
     margin-bottom: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
-    background: #54555c;
+    background: linear-gradient(135deg, #3b473c, #272120);
     color: #f9f8dd;
+    box-shadow: 0 3px 10px rgba(39, 33, 32, 0.15);
 }
 
 header h1 {
@@ -35,17 +37,19 @@ header .user-badge {
     padding: 4px 12px;
     font-size: 13px;
     color: #f9f8dd;
+    border-radius: 14px;
 }
 
 .volver {
     border: 1px solid #f9f8dd;
-    padding: 4px 12px;
+    padding: 5px 14px;
     background: transparent;
     cursor: pointer;
     text-decoration: none;
     color: #f9f8dd;
     font-size: 13px;
-    border-radius: 4px;
+    border-radius: 20px;
+    transition: 0.2s ease;
 }
 
 .volver:hover {
@@ -60,33 +64,37 @@ header .user-badge {
 }
 
 .calendario {
-    border: 2px solid #272120;
+    border: 1px solid #ba9572;
+    border-radius: 8px;
     flex: 2;
     min-width: 320px;
     background: #f9f8dd;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(39, 33, 32, 0.06);
 }
 
 .cal-header {
-    border-bottom: 2px solid #272120;
-    padding: 10px;
+    border-bottom: 1px solid #272120;
+    padding: 12px;
     text-align: center;
     font-weight: bold;
     font-size: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #8b8893;
+    background: #5c8d58;
     color: #f9f8dd;
 }
 
 .cal-header button {
     background: #f9f8dd;
-    border: 1px solid #272120;
-    padding: 2px 12px;
+    border: 1px solid #3b473c;
+    padding: 3px 14px;
     cursor: pointer;
     font-weight: bold;
-    color: #272120;
-    border-radius: 4px;
+    color: #3b473c;
+    border-radius: 6px;
+    transition: 0.2s ease;
 }
 
 .cal-header button:hover {
@@ -96,7 +104,7 @@ header .user-badge {
 .dias-semana {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    border-bottom: 2px solid #272120;
+    border-bottom: 1px solid #272120;
     background: #9197b6;
     color: #f9f8dd;
 }
@@ -105,8 +113,8 @@ header .user-badge {
     text-align: center;
     font-size: 11px;
     font-weight: bold;
-    padding: 6px 0;
-    border-right: 1px solid #272120;
+    padding: 7px 0;
+    border-right: 1px solid rgba(249, 248, 221, 0.25);
 }
 
 .dias-semana div:last-child {
@@ -120,8 +128,8 @@ header .user-badge {
 }
 
 .dia {
-    border-right: 1px solid #272120;
-    border-bottom: 1px solid #272120;
+    border-right: 1px solid #e5e0c0;
+    border-bottom: 1px solid #e5e0c0;
     padding: 4px;
     font-size: 11px;
     position: relative;
@@ -129,6 +137,7 @@ header .user-badge {
     overflow: hidden;
     background: #f9f8dd;
     color: #272120;
+    transition: background 0.15s ease;
 }
 
 .dia:nth-child(7n) {
@@ -147,52 +156,56 @@ header .user-badge {
 .dia .evento {
     margin-top: 2px;
     font-size: 8.5px;
-    border: 1px solid #272120;
-    padding: 1px 3px;
+    border: none;
+    padding: 1px 4px;
     display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    background: #d2e291;
+    background: #a8d455;
     color: #272120;
-    border-radius: 2px;
+    border-radius: 3px;
+    font-weight: 600;
 }
 
 .dia .evento.multiple {
-    background: #8b8893;
+    background: #6b72d4;
     color: #f9f8dd;
 }
 
 .dia:hover {
-    background: #e0bf7a;
+    background: #eef3dc;
 }
 
 .detalle {
     flex: 1;
     min-width: 260px;
-    border: 2px solid #272120;
-    padding: 12px;
+    border: 1px solid #ba9572;
+    border-radius: 8px;
+    padding: 14px;
     max-height: 500px;
     overflow-y: auto;
     background: #f9f8dd;
+    box-shadow: 0 3px 10px rgba(39, 33, 32, 0.06);
 }
 
 .detalle h2 {
     font-size: 15px;
-    border-bottom: 2px solid #272120;
+    border-bottom: 2px solid #5c8d58;
     padding-bottom: 6px;
     margin-bottom: 10px;
     color: #3b473c;
 }
 
 .tarjeta {
-    border: 2px solid #272120;
-    padding: 8px 10px;
+    border: 1px solid #ba9572;
+    padding: 10px 12px;
     margin-bottom: 10px;
     font-size: 12.5px;
     background: #f9f8dd;
     color: #272120;
-    border-radius: 4px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(39, 33, 32, 0.05);
 }
 
 .tarjeta .titulo {
@@ -209,31 +222,32 @@ header .user-badge {
 
 .tarjeta .etiqueta {
     display: inline-block;
-    border: 1px solid #272120;
+    border: 1px solid #9cab6c;
     font-size: 9.5px;
-    padding: 0 4px;
+    padding: 1px 6px;
     margin-bottom: 4px;
-    background: #d2e291;
-    color: #272120;
-    border-radius: 4px;
+    background: #eef3dc;
+    color: #3b473c;
+    border-radius: 10px;
+    font-weight: 600;
 }
 
 .nota {
     font-size: 11px;
     margin-top: 10px;
     padding-top: 8px;
-    border-top: 1px solid #272120;
+    border-top: 1px solid #e5e0c0;
     color: #54555c;
 }
 
 footer {
     margin-top: 16px;
-    border: 2px solid #272120;
-    padding: 8px 12px;
+    border: none;
+    padding: 10px 14px;
     font-size: 11px;
-    background: #54555c;
+    background: #3b473c;
     color: #f9f8dd;
-    border-radius: 4px;
+    border-radius: 8px;
 }
 
 .no-eventos {
