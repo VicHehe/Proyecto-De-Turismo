@@ -1,7 +1,7 @@
 # 🌿 Sistema de Gestión de Salidas Turísticas  
 **Liceo Eduardo Charme – Especialidad de Turismo**
 
-![Logo de la especialidad](Icon.jpg)
+![Logo de la especialidad](Icon.png)
 
 Bienvenido al sistema de gestión de salidas pedagógicas y turísticas del Liceo Eduardo Charme. Esta plataforma ha sido diseñada para facilitar la planificación, inscripción y seguimiento de las actividades turísticas realizadas por los estudiantes de la especialidad.
 
