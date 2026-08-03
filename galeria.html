@@ -54,7 +54,7 @@
 <script src="js/auth.js"></script>
 <script>
     // ============================================================
-    // galeria.js - Código completo para la galería
+    // galeria.js - Código completo con votación y eliminación
     // ============================================================
 
     (function() {
@@ -95,7 +95,18 @@
                 const publicaciones = datos.publicaciones.slice().reverse();
                 let html = '';
                 publicaciones.forEach(pub => {
-                    // Mostrar hasta 5 imágenes en una cuadrícula
+                    // Inicializar votos si no existe
+                    if (!pub.votos) pub.votos = { total: 0, usuarios: [] };
+
+                    // Verificar si el usuario actual ya votó
+                    const yaVoto = pub.votos.usuarios.includes(usuario.rut);
+
+                    // Determinar si puede eliminar
+                    const esAdmin = usuario.rol === 'admin';
+                    const esAutor = pub.autor === `${usuario.nombre} ${usuario.apellido || ''}`.trim() || pub.autor === usuario.rut;
+                    const puedeEliminar = esAdmin || (['guia', 'asistente'].includes(usuario.rol) && esAutor);
+
+                    // Imágenes
                     let imagenesHtml = '';
                     if (pub.imagenes && pub.imagenes.length > 0) {
                         imagenesHtml = `<div class="pub-imagenes">`;
@@ -104,24 +115,123 @@
                         });
                         imagenesHtml += `</div>`;
                     }
+
                     const fecha = new Date(pub.fecha).toLocaleDateString('es-CL', {
                         year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
                     });
+
                     html += `
-                        <div class="publicacion">
+                        <div class="publicacion" data-id="${pub.id}">
                             <div class="pub-header">
                                 <strong>${pub.autor || 'Anónimo'}</strong>
                                 <span class="pub-fecha">${fecha}</span>
                             </div>
                             ${pub.descripcion ? `<div class="pub-desc">${pub.descripcion}</div>` : ''}
                             ${imagenesHtml}
+                            <div class="pub-footer">
+                                <div class="votacion">
+                                    <img src="PiñaDePino.png" alt="Piña" class="pina-icono">
+                                    <span class="pina-conteo" id="conteo-${pub.id}">${pub.votos.total}</span>
+                                    ${!yaVoto ? `<button class="btn-votar" data-id="${pub.id}">👍 Votar</button>` : `<span class="ya-voto">✅ Ya votaste</span>`}
+                                </div>
+                                ${puedeEliminar ? `<button class="btn-eliminar" data-id="${pub.id}">🗑️ Eliminar</button>` : ''}
+                            </div>
                         </div>
                     `;
                 });
                 contenedor.innerHTML = html;
+
+                // ---- EVENTOS DE VOTACIÓN ----
+                document.querySelectorAll('.btn-votar').forEach(btn => {
+                    btn.addEventListener('click', async function(e) {
+                        const id = this.dataset.id;
+                        await votarPublicacion(id);
+                    });
+                });
+
+                // ---- EVENTOS DE ELIMINACIÓN ----
+                document.querySelectorAll('.btn-eliminar').forEach(btn => {
+                    btn.addEventListener('click', async function(e) {
+                        const id = this.dataset.id;
+                        if (confirm('¿Eliminar esta publicación permanentemente?')) {
+                            await eliminarPublicacion(id);
+                        }
+                    });
+                });
+
             } catch (error) {
                 console.error('Error al cargar publicaciones:', error);
                 contenedor.innerHTML = `<div class="mensaje-vacio" style="grid-column: 1 / -1;"><p>⚠️ Error al cargar la galería.</p></div>`;
+            }
+        }
+
+        // ---- VOTAR PUBLICACIÓN ----
+        async function votarPublicacion(id) {
+            try {
+                const datos = await GitHub.leer('datos/galeria.json');
+                if (!datos || !datos.publicaciones) return alert('Error al cargar datos');
+
+                const pub = datos.publicaciones.find(p => p.id === id);
+                if (!pub) return alert('Publicación no encontrada');
+
+                if (!pub.votos) pub.votos = { total: 0, usuarios: [] };
+                if (pub.votos.usuarios.includes(usuario.rut)) {
+                    alert('Ya votaste esta publicación.');
+                    return;
+                }
+
+                pub.votos.total += 1;
+                pub.votos.usuarios.push(usuario.rut);
+
+                const sha = await GitHub.sha('datos/galeria.json');
+                const ok = await GitHub.escribir('datos/galeria.json', datos, sha);
+                if (ok) {
+                    // Actualizar el contador en la interfaz
+                    const conteoEl = document.getElementById(`conteo-${id}`);
+                    if (conteoEl) conteoEl.textContent = pub.votos.total;
+                    // Deshabilitar el botón de votar
+                    const btnVotar = document.querySelector(`.btn-votar[data-id="${id}"]`);
+                    if (btnVotar) {
+                        btnVotar.replaceWith(document.createTextNode('✅ Ya votaste'));
+                    }
+                } else {
+                    alert('❌ Error al registrar el voto.');
+                }
+            } catch (error) {
+                console.error('Error al votar:', error);
+                alert('Error al votar.');
+            }
+        }
+
+        // ---- ELIMINAR PUBLICACIÓN ----
+        async function eliminarPublicacion(id) {
+            try {
+                const datos = await GitHub.leer('datos/galeria.json');
+                if (!datos || !datos.publicaciones) return alert('Error al cargar datos');
+
+                const index = datos.publicaciones.findIndex(p => p.id === id);
+                if (index === -1) return alert('Publicación no encontrada');
+
+                // Verificar permisos nuevamente (seguridad)
+                const pub = datos.publicaciones[index];
+                const esAdmin = usuario.rol === 'admin';
+                const esAutor = pub.autor === `${usuario.nombre} ${usuario.apellido || ''}`.trim() || pub.autor === usuario.rut;
+                const puedeEliminar = esAdmin || (['guia', 'asistente'].includes(usuario.rol) && esAutor);
+                if (!puedeEliminar) return alert('No tienes permiso para eliminar esta publicación.');
+
+                datos.publicaciones.splice(index, 1);
+
+                const sha = await GitHub.sha('datos/galeria.json');
+                const ok = await GitHub.escribir('datos/galeria.json', datos, sha);
+                if (ok) {
+                    alert('✅ Publicación eliminada.');
+                    cargarPublicaciones(); // Recargar lista
+                } else {
+                    alert('❌ Error al eliminar.');
+                }
+            } catch (error) {
+                console.error('Error al eliminar:', error);
+                alert('Error al eliminar.');
             }
         }
 
@@ -157,7 +267,6 @@
                 reader.onload = function(ev) {
                     const img = new Image();
                     img.onload = function() {
-                        // Redimensionar a 800px de ancho (manteniendo proporción)
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
                         let width = img.width;
@@ -173,7 +282,6 @@
                         const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
                         imagenesSeleccionadas.push(dataUrl);
 
-                        // Mostrar miniatura
                         const div = document.createElement('div');
                         div.className = 'preview-thumb';
                         const thumb = document.createElement('img');
@@ -187,10 +295,8 @@
                             e.stopPropagation();
                             const idx = parseInt(this.dataset.index);
                             imagenesSeleccionadas.splice(idx, 1);
-                            // Reconstruir previsualización
                             const parent = this.closest('.preview-thumb');
                             parent.remove();
-                            // Reasignar índices
                             document.querySelectorAll('.eliminar-thumb').forEach((btn, i) => {
                                 btn.dataset.index = i;
                             });
@@ -198,9 +304,6 @@
                         div.appendChild(btnEliminar);
                         preview.appendChild(div);
                         procesadas++;
-                        if (procesadas === files.length) {
-                            // Todas procesadas
-                        }
                     };
                     img.src = ev.target.result;
                 };
@@ -226,10 +329,10 @@
                 autor: `${usuario.nombre} ${usuario.apellido || ''}`.trim() || usuario.rut,
                 fecha: new Date().toISOString(),
                 descripcion: descripcion || 'Sin descripción',
-                imagenes: imagenesSeleccionadas
+                imagenes: imagenesSeleccionadas,
+                votos: { total: 0, usuarios: [] }
             };
 
-            // Leer datos actuales
             let datos = await GitHub.leer('datos/galeria.json');
             if (!datos) datos = { publicaciones: [] };
             if (!datos.publicaciones) datos.publicaciones = [];
@@ -241,7 +344,6 @@
                 alert('✅ Publicación subida exitosamente.');
                 cerrarModal();
                 cargarPublicaciones();
-                // Actualizar la promoción en index (si está abierto, pero no importa)
             } else {
                 alert('❌ Error al guardar la publicación.');
             }
@@ -259,7 +361,7 @@
         // ---- INICIALIZAR ----
         cargarPublicaciones();
 
-        // Exponer funciones para recargar desde consola si es necesario
+        // Exponer funciones para recargar desde consola
         window.recargarGaleria = cargarPublicaciones;
     })();
 </script>
