@@ -263,4 +263,38 @@ h1 {
     .info-transporte {
         padding: 0.5rem;
     }
+
+    /* ... estilos existentes ... */
+
+/* ---- Header de la página ---- */
+.header-planificar {
+    border: 1px solid #000;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.header-planificar h1 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.header-planificar .volver {
+    border: 1px solid #000;
+    padding: 4px 12px;
+    background: #fff;
+    text-decoration: none;
+    color: #000;
+    font-size: 13px;
+    transition: 0.15s;
+}
+
+.header-planificar .volver:hover {
+    background: #eee;
+}
 }
