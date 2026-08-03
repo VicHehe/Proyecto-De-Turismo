@@ -47,10 +47,10 @@
                 </select>
             </div>
             <div class="campo">
-                <label>Imágenes (máximo 5, formato JPG/PNG)</label>
+                <label>Imágenes (máximo 4, formato JPG/PNG)</label>
                 <input type="file" id="inputImagenes" accept="image/jpeg,image/png" multiple>
                 <div id="previsualizacion" class="preview-container"></div>
-                <p class="muted">Selecciona hasta 5 imágenes. Serán redimensionadas a 800px de ancho.</p>
+                <p class="muted">Selecciona hasta 4 imágenes. Serán redimensionadas a 800px de ancho.</p>
             </div>
             <div class="modal-acciones">
                 <button type="button" class="btn-cancelar" id="btnCancelarSubir">Cancelar</button>
@@ -218,8 +218,8 @@
         // ---- PREVISUALIZACIÓN Y REDIMENSIONADO ----
         document.getElementById('inputImagenes').addEventListener('change', function(e) {
             const files = e.target.files;
-            if (files.length > 5) {
-                alert('Máximo 5 imágenes.');
+            if (files.length > 4) {
+                alert('Máximo 4 imágenes.');
                 this.value = '';
                 return;
             }
