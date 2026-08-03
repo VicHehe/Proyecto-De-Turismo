@@ -13,13 +13,13 @@
     flex-wrap: wrap;
     gap: 1rem;
     margin-bottom: 1.5rem;
-    border-bottom: 2px solid #3b473c;
-    padding-bottom: 0.8rem;
+    border-bottom: 3px solid #5c8d58;
+    padding-bottom: 0.9rem;
 }
 
 .dashboard-header h1 {
     margin: 0;
-    font-size: 1.6rem;
+    font-size: 1.7rem;
     font-weight: 700;
     color: #3b473c;
 }
@@ -34,22 +34,23 @@
 .btn {
     background: #f9f8dd;
     border: 1.5px solid #876661;
-    padding: 0.4rem 1rem;
+    padding: 0.45rem 1.1rem;
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
-    transition: 0.15s;
+    transition: 0.2s ease;
     text-decoration: none;
     color: #272120;
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    border-radius: 4px;
+    gap: 0.35rem;
+    border-radius: 6px;
 }
 
 .btn:hover {
     background: #d2e291;
     color: #3b473c;
+    box-shadow: 0 2px 6px rgba(39, 33, 32, 0.1);
 }
 
 .btn-index {
@@ -83,13 +84,14 @@
 }
 
 .btn-small {
-    padding: 0.3rem 0.7rem;
+    padding: 0.32rem 0.75rem;
     font-size: 0.75rem;
     border: 1px solid #272120;
     background: #f9f8dd;
     cursor: pointer;
     color: #272120;
-    border-radius: 4px;
+    border-radius: 6px;
+    transition: 0.2s ease;
 }
 
 .btn-small:hover {
@@ -97,13 +99,13 @@
 }
 
 .user-count-badge {
-    border: 1px solid #54555c;
-    padding: 0.2rem 0.8rem;
+    border: 1px solid #9cab6c;
+    padding: 0.25rem 0.9rem;
     background: #e0bf7a;
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #272120;
-    border-radius: 4px;
+    border-radius: 14px;
 }
 
 .search-box {
@@ -112,16 +114,21 @@
     gap: 0.5rem;
     background: #f9f8dd;
     border: 1px solid #8b8893;
-    padding: 0.2rem 0.5rem;
+    padding: 0.25rem 0.6rem;
     margin-bottom: 1.5rem;
     max-width: 450px;
-    border-radius: 4px;
+    border-radius: 8px;
+    transition: border-color 0.2s ease;
+}
+
+.search-box:focus-within {
+    border-color: #5c8d58;
 }
 
 .search-box input {
     border: none;
     outline: none;
-    padding: 0.4rem 0;
+    padding: 0.45rem 0;
     font-size: 0.9rem;
     width: 100%;
     background: transparent;
@@ -137,7 +144,7 @@
     border: none;
     background: #3b473c;
     color: #f9f8dd;
-    padding: 0.3rem 0.8rem;
+    padding: 0.35rem 0.9rem;
 }
 
 .search-box .btn-small:hover {
@@ -147,6 +154,7 @@
 .user-table-container {
     overflow-x: auto;
     margin-top: 0.5rem;
+    border-radius: 8px;
 }
 
 .user-table {
@@ -158,7 +166,7 @@
 .user-table th {
     background: #d2e291;
     border: 1px solid #272120;
-    padding: 0.6rem 0.5rem;
+    padding: 0.65rem 0.55rem;
     text-align: left;
     font-weight: 700;
     white-space: nowrap;
@@ -167,13 +175,13 @@
 
 .user-table td {
     border: 1px solid #ba9572;
-    padding: 0.4rem 0.5rem;
+    padding: 0.45rem 0.55rem;
     vertical-align: middle;
     background: #f9f8dd;
 }
 
 .user-table tbody tr:hover td {
-    background: #e0bf7a;
+    background: #f3efc9;
 }
 
 .acciones {
@@ -186,12 +194,13 @@
 .acciones select,
 .acciones button {
     font-size: 0.7rem;
-    padding: 0.15rem 0.4rem;
+    padding: 0.18rem 0.45rem;
     border: 1px solid #272120;
     background: #f9f8dd;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 6px;
     color: #272120;
+    transition: 0.2s ease;
 }
 
 .acciones select:hover,
@@ -222,35 +231,35 @@
 .admin-badge {
     font-weight: 700;
     background: #e0bf7a;
-    padding: 0.1rem 0.5rem;
+    padding: 0.12rem 0.55rem;
     border: 1px solid #272120;
     font-size: 0.7rem;
     display: inline-block;
     color: #3b473c;
-    border-radius: 4px;
+    border-radius: 12px;
 }
 
 .estado-activo {
     color: #5c8d58;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .estado-kick {
     color: #ba9572;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .estado-baneado {
     color: #876661;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .mensaje {
-    padding: 0.5rem 1rem;
+    padding: 0.55rem 1.1rem;
     margin: 0.5rem 0 1rem 0;
     border: 1px solid #272120;
     background: #f9f8dd;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 .mensaje-exito {
@@ -285,17 +294,18 @@
     border: 2px solid #272120;
     max-width: 500px;
     width: 90%;
-    padding: 1.5rem 2rem;
+    padding: 1.6rem 2rem;
     max-height: 80vh;
     overflow-y: auto;
-    border-radius: 4px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(39, 33, 32, 0.2);
 }
 
 .modal-contenido h2 {
     margin-top: 0;
     border-bottom: 1px solid #54555c;
     padding-bottom: 0.5rem;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     color: #3b473c;
 }
 
@@ -307,20 +317,20 @@
     display: block;
     font-weight: 600;
     font-size: 0.85rem;
-    margin-bottom: 0.15rem;
+    margin-bottom: 0.2rem;
     color: #3b473c;
 }
 
 .modal-contenido .campo input,
 .modal-contenido .campo textarea {
     width: 100%;
-    padding: 0.4rem;
+    padding: 0.45rem;
     border: 1px solid #8b8893;
     font-size: 0.9rem;
     background: #f9f8dd;
     box-sizing: border-box;
     color: #272120;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 .modal-contenido .campo textarea {
@@ -336,13 +346,14 @@
 }
 
 .modal-actions button {
-    padding: 0.4rem 1.2rem;
+    padding: 0.45rem 1.3rem;
     border: 1px solid #272120;
     background: #f9f8dd;
     cursor: pointer;
     font-weight: 600;
     color: #272120;
-    border-radius: 4px;
+    border-radius: 6px;
+    transition: 0.2s ease;
 }
 
 .modal-actions .btn-guardar {
