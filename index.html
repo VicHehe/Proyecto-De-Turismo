@@ -23,7 +23,7 @@
         <h1>Turismo Eduardo Charme</h1>
         <p>Explora, Aprende y Gestiona tus Viajes</p>
     </div>
-    <div class="user-badge" id="userBadge">
+    <div class="user-badge" id="userBadge" style="cursor:pointer;">
         <span id="userNombre">Cargando...</span>
         <span class="rol" id="userRol">-</span>
     </div>
@@ -287,6 +287,11 @@
 
         document.getElementById('userNombre').textContent = `${usuario.nombre} ${usuario.apellido || ''}`;
         document.getElementById('userRol').textContent = usuario.rol;
+
+        // Al hacer clic en el badge, redirigir a modificar cuenta
+        document.getElementById('userBadge').addEventListener('click', function() {
+            window.location.href = 'modificar_cuenta.html';
+        });
 
         const nav = document.getElementById('navBotones');
         let botones = [];
