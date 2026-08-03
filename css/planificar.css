@@ -1,14 +1,53 @@
+/* ============================================================
+   planificar.css - Estilos para planificar salida (Aragon16)
+   ============================================================ */
+
+/* ---- Estructura general ---- */
 .seccion {
     margin-bottom: 2rem;
-    border: 1px solid #000;
+    border: 1px solid #ba9572; /* Marrón claro */
     padding: 1.5rem;
-    background: #fff;
+    background: #f9f8dd;
 }
 .seccion h2 {
     margin-top: 0;
-    border-bottom: 1px solid #000;
+    border-bottom: 1px solid #8b8893;
     padding-bottom: 0.3rem;
+    color: #3b473c;
 }
+
+/* ---- Header de planificación ---- */
+.header-planificar {
+    border: 1px solid #272120;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #f9f8dd;
+}
+.header-planificar h1 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    color: #3b473c;
+}
+.btn-volver {
+    border: 1px solid #272120;
+    padding: 4px 12px;
+    background: #f9f8dd;
+    text-decoration: none;
+    color: #272120;
+    font-size: 13px;
+    display: inline-block;
+}
+.btn-volver:hover {
+    background: #d2e291;
+}
+
+/* ---- Buscador ---- */
 .busqueda {
     display: flex;
     gap: 0.5rem;
@@ -17,27 +56,31 @@
 }
 .busqueda input, .busqueda select {
     padding: 0.4rem 0.6rem;
-    border: 1px solid #000;
-    background: #fff;
+    border: 1px solid #272120;
+    background: #f9f8dd;
     flex: 1;
     min-width: 150px;
+    color: #272120;
 }
 .busqueda button {
     flex: 0;
     padding: 0.4rem 1rem;
 }
+
+/* ---- Lista de items ---- */
 .lista-items {
-    border: 1px solid #000;
+    border: 1px solid #ba9572;
     padding: 0.5rem;
     min-height: 60px;
     margin-top: 0.5rem;
+    background: #f9f8dd;
 }
 .item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.4rem 0;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #d2e291;
 }
 .item:last-child {
     border-bottom: none;
@@ -45,9 +88,11 @@
 .item-eliminar {
     cursor: pointer;
     font-weight: bold;
-    color: #d00;
+    color: #876661;
     margin-left: 0.5rem;
 }
+
+/* ---- Tabla de participantes ---- */
 .tabla-participantes {
     width: 100%;
     border-collapse: collapse;
@@ -55,34 +100,30 @@
     font-size: 0.9rem;
 }
 .tabla-participantes th, .tabla-participantes td {
-    border: 1px solid #000;
+    border: 1px solid #272120;
     padding: 0.3rem 0.5rem;
     text-align: left;
 }
 .tabla-participantes th {
-    background: #f5f5f5;
+    background: #d2e291;
+    color: #3b473c;
 }
 .btn-eliminar {
     background: none;
     border: none;
     cursor: pointer;
     font-weight: bold;
-    color: #d00;
+    color: #876661;
 }
-.btn-subir, .btn-bajar {
-    background: none;
-    border: 1px solid #000;
-    cursor: pointer;
-    padding: 0 0.4rem;
-    margin: 0 0.2rem;
-}
+
+/* ---- Ruta ---- */
 .ruta-item {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem 1rem;
     align-items: center;
     padding: 0.5rem 0;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #d2e291;
 }
 .ruta-item:last-child {
     border-bottom: none;
@@ -90,6 +131,7 @@
 .ruta-item .tipo {
     font-weight: bold;
     min-width: 70px;
+    color: #3b473c;
 }
 .ruta-item .desc {
     flex: 2;
@@ -103,43 +145,40 @@
 }
 .ruta-item .horario-editable input[type="time"] {
     padding: 0.2rem;
-    border: 1px solid #000;
+    border: 1px solid #272120;
     width: 100px;
-    background: #fff;
-}
-.ruta-item .horario-referencia {
-    font-size: 0.75rem;
-    color: #666;
-    margin-left: 0.3rem;
+    background: #f9f8dd;
 }
 .ruta-item .acciones {
     margin-left: auto;
     display: flex;
     gap: 0.3rem;
 }
+
+/* ---- Botones de ruta ---- */
 .btn-ruta {
-    background: #fff;
-    border: 1px solid #000;
+    background: #f9f8dd;
+    border: 1px solid #272120;
     padding: 0.2rem 0.6rem;
     cursor: pointer;
+    color: #272120;
 }
 .btn-ruta:hover {
-    background: #eee;
+    background: #d2e291;
 }
+
+/* ---- Mensajes ---- */
 .oculto { display: none; }
 .mensaje {
-    border: 1px solid #000;
+    border: 1px solid #272120;
     padding: 0.5rem;
     margin: 0.5rem 0;
+    background: #f9f8dd;
 }
-.mensaje-exito { background: #ebffeb; }
-.mensaje-error { background: #ffebeb; }
-.duracion-select { width: auto; min-width: 120px; }
-.grid-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-}
+.mensaje-exito { background: #d2e291; border-color: #5c8d58; color: #3b473c; }
+.mensaje-error { background: #e0bf7a; border-color: #876661; color: #272120; }
+
+/* ---- Grupos e inputs ---- */
 .grupo {
     margin-bottom: 1.2rem;
 }
@@ -148,52 +187,58 @@
     font-weight: 500;
     font-size: 0.9rem;
     margin-bottom: 0.2rem;
+    color: #3b473c;
 }
 .grupo input, .grupo select {
     width: 100%;
     padding: 0.45rem 0.6rem;
-    border: 1px solid #222;
-    background: white;
+    border: 1px solid #272120;
+    background: #f9f8dd;
     font-size: 0.95rem;
-    border-radius: 0;
+    color: #272120;
 }
+
+/* ---- Botones generales ---- */
 .btn {
-    background: white;
-    border: 1px solid #000;
+    background: #f9f8dd;
+    border: 1px solid #272120;
     padding: 0.5rem 1.2rem;
     font-size: 0.9rem;
     font-weight: 500;
-    transition: none;
     margin-right: 0.5rem;
     margin-bottom: 0.5rem;
     display: inline-block;
-    color: #000;
+    color: #272120;
+    cursor: pointer;
 }
 .btn:hover {
-    background: #f0f0f0;
+    background: #d2e291;
 }
 .btn-primario {
-    background: #000;
-    color: white;
-    border: 1px solid #000;
+    background: #5c8d58;
+    color: #f9f8dd;
+    border: 1px solid #3b473c;
 }
 .btn-primario:hover {
-    background: #222;
+    background: #3b473c;
 }
+
+/* ---- Información transporte ---- */
 .info-transporte {
-    background: #fafafa;
-    border: 1px solid #000;
+    background: #f9f8dd;
+    border: 1px solid #ba9572;
     padding: 0.8rem 1rem;
     margin-top: 0.5rem;
 }
-.grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-}
+
+/* ---- Grillas ---- */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+
+/* ---- Textos ---- */
 .muted {
     font-size: 0.85rem;
-    color: #222;
+    color: #54555c;
 }
 .contenedor {
     max-width: 1200px;
@@ -202,110 +247,22 @@
 h1 {
     font-size: 2rem;
     font-weight: 600;
-    border-bottom: 2px solid #000;
+    border-bottom: 2px solid #876661;
     padding-bottom: 0.5rem;
     margin-bottom: 2rem;
+    color: #3b473c;
 }
 
-/* ===== RESPONSIVE ===== */
+/* ---- Responsive ---- */
 @media (max-width: 768px) {
-    .grid-3 {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
-    }
-    .grid-2 {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    .ruta-item {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.3rem;
-    }
-    .ruta-item .horario-editable {
-        flex-wrap: wrap;
-    }
-    .ruta-item .horario-editable input[type="time"] {
-        width: 80px;
-        font-size: 0.8rem;
-    }
-    .ruta-item .acciones {
-        margin-left: 0;
-        justify-content: flex-end;
-    }
-    .busqueda {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .busqueda input, .busqueda select {
-        min-width: auto;
-    }
-    .busqueda button {
-        width: 100%;
-    }
-    .tabla-participantes {
-        font-size: 0.8rem;
-    }
-    .tabla-participantes th, .tabla-participantes td {
-        padding: 0.2rem 0.3rem;
-    }
-    .seccion {
-        padding: 1rem;
-    }
-    .btn {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
-    }
-    .btn-primario {
-        padding: 0.6rem 1.5rem;
-        font-size: 1rem;
-    }
-    .info-transporte {
-        padding: 0.5rem;
-    }
-
-/* ===== HEADER DE PLANIFICACIÓN (igual que las otras páginas) ===== */
-.header-planificar {
-    border: 1px solid #000;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-/* ============================================================
-   HEADER DE PLANIFICACIÓN (visible en todos los tamaños)
-   ============================================================ */
-.header-planificar {
-    border: 1px solid #000;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.header-planificar h1 {
-    font-size: 20px;
-    font-weight: bold;
-    margin: 0;
-}
-
-.btn-volver {
-    border: 1px solid #000;
-    padding: 4px 12px;
-    background: #fff;
-    text-decoration: none;
-    color: #000;           /* Forzamos color negro */
-    font-size: 13px;
-    display: inline-block; /* Asegura que se comporte como botón */
-}
-
-.btn-volver:hover {
-    background: #eee;
+    .grid-3, .grid-2 { grid-template-columns: 1fr; gap: 1rem; }
+    .ruta-item { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+    .ruta-item .horario-editable input[type="time"] { width: 80px; }
+    .ruta-item .acciones { margin-left: 0; justify-content: flex-end; }
+    .busqueda { flex-direction: column; align-items: stretch; }
+    .busqueda input, .busqueda select { min-width: auto; }
+    .busqueda button { width: 100%; }
+    .seccion { padding: 1rem; }
+    .btn { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+    .btn-primario { padding: 0.6rem 1.5rem; font-size: 1rem; }
 }
