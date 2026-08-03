@@ -4,13 +4,13 @@
     padding: 0;
 }
 body {
-    background: #fff;
-    color: #000;
+    background: #f9f8dd;
+    color: #272120;
     font-family: Arial, Helvetica, sans-serif;
     padding: 20px;
 }
 header {
-    border: 1px solid #000;
+    border: 2px solid #272120;
     padding: 12px 16px;
     margin-bottom: 16px;
     display: flex;
@@ -18,15 +18,32 @@ header {
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
+    background: #54555c;
+    color: #f9f8dd;
 }
 header h1 {
     font-size: 20px;
     font-weight: bold;
+    color: #f9f8dd;
 }
 header .user-badge {
-    border: 1px solid #000;
+    border: 1px solid #f9f8dd;
     padding: 4px 12px;
     font-size: 13px;
+    color: #f9f8dd;
+}
+.volver {
+    border: 1px solid #f9f8dd;
+    padding: 4px 12px;
+    background: transparent;
+    cursor: pointer;
+    text-decoration: none;
+    color: #f9f8dd;
+    font-size: 13px;
+}
+.volver:hover {
+    background: #f9f8dd;
+    color: #272120;
 }
 .calendario-wrap {
     display: flex;
@@ -34,12 +51,13 @@ header .user-badge {
     flex-wrap: wrap;
 }
 .calendario {
-    border: 1px solid #000;
+    border: 2px solid #272120;
     flex: 2;
     min-width: 320px;
+    background: #f9f8dd;
 }
 .cal-header {
-    border-bottom: 1px solid #000;
+    border-bottom: 2px solid #272120;
     padding: 10px;
     text-align: center;
     font-weight: bold;
@@ -47,28 +65,33 @@ header .user-badge {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: #8b8893;
+    color: #f9f8dd;
 }
 .cal-header button {
-    background: #fff;
-    border: 1px solid #000;
+    background: #f9f8dd;
+    border: 1px solid #272120;
     padding: 2px 12px;
     cursor: pointer;
     font-weight: bold;
+    color: #272120;
 }
 .cal-header button:hover {
-    background: #eee;
+    background: #d2e291;
 }
 .dias-semana {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    border-bottom: 1px solid #000;
+    border-bottom: 2px solid #272120;
+    background: #9197b6;
+    color: #f9f8dd;
 }
 .dias-semana div {
     text-align: center;
     font-size: 11px;
     font-weight: bold;
     padding: 6px 0;
-    border-right: 1px solid #000;
+    border-right: 1px solid #272120;
 }
 .dias-semana div:last-child {
     border-right: none;
@@ -79,63 +102,74 @@ header .user-badge {
     grid-auto-rows: 70px;
 }
 .dia {
-    border-right: 1px solid #000;
-    border-bottom: 1px solid #000;
+    border-right: 1px solid #272120;
+    border-bottom: 1px solid #272120;
     padding: 4px;
     font-size: 11px;
     position: relative;
     cursor: pointer;
     overflow: hidden;
+    background: #f9f8dd;
+    color: #272120;
 }
 .dia:nth-child(7n) {
     border-right: none;
 }
 .dia.vacio {
-    background: repeating-linear-gradient(45deg, #fff, #fff 4px, #f5f5f5 4px, #f5f5f5 5px);
+    background: repeating-linear-gradient(45deg, #f9f8dd, #f9f8dd 4px, #e0bf7a 4px, #e0bf7a 5px);
 }
 .dia .num-dia {
     font-weight: bold;
+    color: #3b473c;
 }
 .dia .evento {
     margin-top: 2px;
     font-size: 8.5px;
-    border: 1px solid #000;
+    border: 1px solid #272120;
     padding: 1px 3px;
     display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    background: #d2e291;
+    color: #272120;
 }
 .dia .evento.multiple {
-    background: #f0f0f0;
+    background: #8b8893;
+    color: #f9f8dd;
 }
 .dia:hover {
-    background: #fafafa;
+    background: #e0bf7a;
 }
 .detalle {
     flex: 1;
     min-width: 260px;
-    border: 1px solid #000;
+    border: 2px solid #272120;
     padding: 12px;
     max-height: 500px;
     overflow-y: auto;
+    background: #f9f8dd;
 }
 .detalle h2 {
     font-size: 15px;
-    border-bottom: 1px solid #000;
+    border-bottom: 2px solid #272120;
     padding-bottom: 6px;
     margin-bottom: 10px;
+    color: #3b473c;
 }
 .tarjeta {
-    border: 1px solid #000;
+    border: 2px solid #272120;
     padding: 8px 10px;
     margin-bottom: 10px;
     font-size: 12.5px;
+    background: #ffffff;
+    color: #272120;
 }
 .tarjeta .titulo {
     font-weight: bold;
     font-size: 13px;
     margin-bottom: 4px;
+    color: #5c8d58;
 }
 .tarjeta ul {
     margin: 6px 0 0 16px;
@@ -143,36 +177,29 @@ header .user-badge {
 }
 .tarjeta .etiqueta {
     display: inline-block;
-    border: 1px solid #000;
+    border: 1px solid #272120;
     font-size: 9.5px;
     padding: 0 4px;
     margin-bottom: 4px;
+    background: #d2e291;
+    color: #272120;
 }
 .nota {
     font-size: 11px;
     margin-top: 10px;
     padding-top: 8px;
-    border-top: 1px solid #000;
+    border-top: 1px solid #272120;
+    color: #54555c;
 }
 footer {
     margin-top: 16px;
-    border: 1px solid #000;
+    border: 2px solid #272120;
     padding: 8px 12px;
     font-size: 11px;
+    background: #54555c;
+    color: #f9f8dd;
 }
 .no-eventos {
-    color: #666;
+    color: #876661;
     font-style: italic;
-}
-.volver {
-    border: 1px solid #000;
-    padding: 4px 12px;
-    background: #fff;
-    cursor: pointer;
-    text-decoration: none;
-    color: #000;
-    font-size: 13px;
-}
-.volver:hover {
-    background: #eee;
 }
