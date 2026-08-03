@@ -109,6 +109,19 @@ header h1 {
     background: #f0f0f0;
 }
 
+/* ---- Placeholder para imágenes no disponibles ---- */
+.img-placeholder {
+    width: 100%;
+    height: 120px;
+    background: #f0f0f0;
+    border: 1px dashed #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #666;
+}
+
 /* ---- Footer de publicación (calificación y eliminar) ---- */
 .pub-footer {
     display: flex;
@@ -136,7 +149,7 @@ header h1 {
 .pina-icono {
     width: 20px;
     height: 20px;
-    filter: brightness(0.7) contrast(1.2); /* Ajuste para hacerla más oscura */
+    filter: brightness(0.7) contrast(1.2);
     image-rendering: auto;
 }
 
@@ -186,6 +199,40 @@ header h1 {
 .btn-subir:hover {
     background: #333;
     color: #fff;
+}
+
+/* ---- Paginación ---- */
+#paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.btn-pagina {
+    padding: 8px 16px;
+    background: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.btn-pagina:hover:not(:disabled) {
+    background: #1a252f;
+}
+
+.btn-pagina:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#infoPagina {
+    font-weight: bold;
+    color: #2c3e50;
 }
 
 /* ---- MODAL ---- */
@@ -344,6 +391,9 @@ header h1 {
     .pub-imagenes img {
         height: 80px;
     }
+    .img-placeholder {
+        height: 80px;
+    }
     .modal-contenido {
         padding: 1rem;
     }
@@ -360,5 +410,9 @@ header h1 {
     }
     .btn-eliminar {
         align-self: center;
+    }
+    #paginacion {
+        flex-wrap: wrap;
+        gap: 10px;
     }
 }
