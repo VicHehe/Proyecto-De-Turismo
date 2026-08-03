@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Cuenta</title>
+    <link rel="stylesheet" href="css/modificar_cuenta.css">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>✏️ Modificar mi cuenta</h1>
+        <a href="index.html" class="volver">← Volver al Lobby</a>
+    </header>
+
+    <form id="formModificar">
+        <div class="campo">
+            <label>RUT (no editable)</label>
+            <input type="text" id="editRut" readonly>
+        </div>
+        <div class="campo">
+            <label>Nombre *</label>
+            <input type="text" id="editNombre" required>
+        </div>
+        <div class="campo">
+            <label>Apellido *</label>
+            <input type="text" id="editApellido" required>
+        </div>
+        <div class="campo">
+            <label>Edad *</label>
+            <input type="number" id="editEdad" required min="1" max="120">
+        </div>
+        <div class="campo">
+            <label>Teléfono *</label>
+            <input type="text" id="editTelefono" placeholder="912345678" required>
+        </div>
+        <div class="campo">
+            <label>Correo electrónico *</label>
+            <input type="email" id="editGmail" required>
+        </div>
+        <div class="campo">
+            <label>Historial médico</label>
+            <textarea id="editHistorial" rows="2"></textarea>
+        </div>
+        <div class="campo">
+            <label>Nueva contraseña (dejar en blanco para no cambiar)</label>
+            <input type="password" id="editPassword" placeholder="Mínimo 6 caracteres">
+        </div>
+        <div class="campo">
+            <label>Confirmar nueva contraseña</label>
+            <input type="password" id="editPassword2" placeholder="Repite la contraseña">
+        </div>
+
+        <div id="mensajeFeedback" class="mensaje oculto"></div>
+
+        <div class="acciones">
+            <button type="button" class="btn-cancelar" onclick="window.location.href='index.html'">Cancelar</button>
+            <button type="submit" class="btn-guardar">💾 Guardar cambios</button>
+        </div>
+    </form>
+</div>
+
+<script src="js/github.js"></script>
+<script src="js/auth.js"></script>
+<script>
+    (function() {
+        // Verificar sesión
+        const usuario = Auth.getSesion();
+        if (!usuario) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Rellenar campos con los datos del usuario
+        async function cargarDatos() {
+            const datos = await GitHub.leer('datos/usuarios.json');
+            if (!datos) {
+                alert('Error al cargar tus datos');
+                return;
+            }
+            const user = datos.usuarios.find(u => u.rut === usuario.rut);
+            if (!user) {
+                alert('Usuario no encontrado');
+                return;
+            }
+
+            document.getElementById('editRut').value = user.rut;
+            document.getElementById('editNombre').value = user.nombre || '';
+            document.getElementById('editApellido').value = user.apellido || '';
+            document.getElementById('editEdad').value = user.edad || '';
+            document.getElementById('editTelefono').value = user.telefono ? user.telefono.replace(/\s/g, '') : '';
+            document.getElementById('editGmail').value = user.gmail || '';
+            document.getElementById('editHistorial').value = user.historial || '';
+        }
+        cargarDatos();
+
+        // Guardar cambios
+        document.getElementById('formModificar').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const rut = document.getElementById('editRut').value;
+            const nombre = document.getElementById('editNombre').value.trim();
+            const apellido = document.getElementById('editApellido').value.trim();
+            const edad = parseInt(document.getElementById('editEdad').value);
+            let telefono = document.getElementById('editTelefono').value.trim();
+            const gmail = document.getElementById('editGmail').value.trim();
+            const historial = document.getElementById('editHistorial').value.trim();
+            const pass = document.getElementById('editPassword').value;
+            const pass2 = document.getElementById('editPassword2').value;
+
+            // Validaciones
+            if (!nombre || !apellido || !edad || !telefono || !gmail) {
+                mostrarMensaje('Todos los campos (excepto contraseña) son obligatorios', 'error');
+                return;
+            }
+            if (isNaN(edad) || edad < 1 || edad > 120) {
+                mostrarMensaje('Edad inválida', 'error');
+                return;
+            }
+            // Limpiar teléfono
+            telefono = telefono.replace(/[\s\-\(\)\+]/g, '');
+            if (!/^\d{9,15}$/.test(telefono)) {
+                mostrarMensaje('Teléfono inválido (mínimo 9 dígitos)', 'error');
+                return;
+            }
+            // Formatear teléfono
+            let telefonoFormateado;
+            if (telefono.length === 9) {
+                telefonoFormateado = `+56 9 ${telefono.substring(0,4)} ${telefono.substring(4,8)}${telefono.substring(8)}`;
+            } else if (telefono.length === 11 && telefono.startsWith('56')) {
+                const sinCodigo = telefono.substring(2);
+                telefonoFormateado = `+56 9 ${sinCodigo.substring(0,4)} ${sinCodigo.substring(4,8)}${sinCodigo.substring(8)}`;
+            } else if (telefono.length === 10 && telefono.startsWith('9')) {
+                telefonoFormateado = `+56 ${telefono.substring(0,4)} ${telefono.substring(4,8)}${telefono.substring(8)}`;
+            } else {
+                const chunks = telefono.match(/.{1,4}/g);
+                telefonoFormateado = chunks.join(' ');
+            }
+
+            // Validar contraseña si se ingresó
+            if (pass || pass2) {
+                if (pass.length < 6) {
+                    mostrarMensaje('La nueva contraseña debe tener al menos 6 caracteres', 'error');
+                    return;
+                }
+                if (pass !== pass2) {
+                    mostrarMensaje('Las contraseñas no coinciden', 'error');
+                    return;
+                }
+            }
+
+            // Leer datos actuales
+            const datos = await GitHub.leer('datos/usuarios.json');
+            if (!datos) {
+                mostrarMensaje('Error al leer los datos', 'error');
+                return;
+            }
+            const index = datos.usuarios.findIndex(u => u.rut === rut);
+            if (index === -1) {
+                mostrarMensaje('Usuario no encontrado', 'error');
+                return;
+            }
+
+            // Actualizar campos
+            datos.usuarios[index].nombre = nombre;
+            datos.usuarios[index].apellido = apellido;
+            datos.usuarios[index].edad = edad;
+            datos.usuarios[index].telefono = telefonoFormateado;
+            datos.usuarios[index].gmail = gmail;
+            datos.usuarios[index].historial = historial;
+
+            // Si se ingresó nueva contraseña, hashearla y guardarla
+            if (pass) {
+                const hash = await Auth.hashPassword(pass);
+                datos.usuarios[index].password = hash;
+            }
+
+            // Guardar en GitHub
+            const sha = await GitHub.sha('datos/usuarios.json');
+            const ok = await GitHub.escribir('datos/usuarios.json', datos, sha);
+
+            if (ok) {
+                // Actualizar sesión (nombre y apellido pueden haber cambiado)
+                Auth.setSesion({
+                    rut: usuario.rut,
+                    nombre: nombre,
+                    apellido: apellido,
+                    rol: usuario.rol,
+                    estado: usuario.estado
+                });
+                mostrarMensaje('✅ Datos actualizados correctamente', 'exito');
+                setTimeout(() => window.location.href = 'index.html', 1500);
+            } else {
+                mostrarMensaje('❌ Error al guardar los cambios', 'error');
+            }
+        });
+
+        function mostrarMensaje(texto, tipo) {
+            const div = document.getElementById('mensajeFeedback');
+            div.textContent = texto;
+            div.className = `mensaje ${tipo}`;
+            div.classList.remove('oculto');
+            setTimeout(() => div.classList.add('oculto'), 5000);
+        }
+    })();
+</script>
+</body>
+</html>
