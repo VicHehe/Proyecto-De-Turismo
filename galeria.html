@@ -5,6 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Galería de Viajes</title>
     <link rel="stylesheet" href="css/galeria.css" />
+    <style>
+        /* Estilos adicionales para la paginación */
+        #paginacion {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .btn-pagina {
+            padding: 8px 16px;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .btn-pagina:hover:not(:disabled) {
+            background: #1a252f;
+        }
+        .btn-pagina:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #infoPagina {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .pub-imagenes img {
+            max-width: 200px;
+            height: auto;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
 
@@ -16,8 +52,17 @@
     </div>
 </header>
 
+<!-- Contenedor de publicaciones -->
 <div id="contenedorPublicaciones" class="galeria-grid"></div>
 
+<!-- Controles de paginación -->
+<div id="paginacion">
+    <button id="btnAnterior" class="btn-pagina">⬅ Anterior</button>
+    <span id="infoPagina">Página 1 de 1</span>
+    <button id="btnSiguiente" class="btn-pagina">Siguiente ➡</button>
+</div>
+
+<!-- Botón para nueva publicación -->
 <div id="botonSubir" style="text-align:center; margin: 20px 0;">
     <button class="btn-subir" id="btnNuevaPublicacion">➕ Nueva publicación</button>
 </div>
@@ -150,7 +195,14 @@
         }
 
         // ============================================================
-        // CARGAR PUBLICACIONES (desde el índice)
+        // VARIABLES DE PAGINACIÓN
+        // ============================================================
+        let publicacionesCompletas = [];
+        let paginaActual = 0;
+        const POR_PAGINA = 4;
+
+        // ============================================================
+        // CARGAR PUBLICACIONES (con paginación)
         // ============================================================
         async function cargarPublicaciones() {
             const contenedor = document.getElementById('contenedorPublicaciones');
@@ -163,88 +215,107 @@
                             ${puedeSubir ? '<p style="font-size:0.9rem;">¡Sé el primero en compartir una foto!</p>' : ''}
                         </div>
                     `;
+                    document.getElementById('paginacion').style.display = 'none';
                     return;
                 }
-                const publicaciones = indice.publicaciones.slice().reverse(); // más reciente primero
-                let html = '';
-                publicaciones.forEach(pub => {
-                    const esAdmin = usuario.rol === 'admin';
-                    const esAutor = pub.autor === `${usuario.nombre} ${usuario.apellido || ''}`.trim() || pub.autor === usuario.rut;
-                    const puedeEliminar = esAdmin || (['guia', 'asistente'].includes(usuario.rol) && esAutor);
-
-                    let imagenesHtml = '';
-                    if (pub.imagenes && pub.imagenes.length > 0) {
-                        imagenesHtml = `<div class="pub-imagenes">`;
-                        pub.imagenes.forEach(ruta => {
-                            const url = `https://raw.githubusercontent.com/${GitHub.owner}/${GitHub.repo}/main/${ruta}`;
-                            imagenesHtml += `<img src="${url}" alt="Imagen" loading="lazy">`;
-                        });
-                        imagenesHtml += `</div>`;
-                    }
-
-                    let pinasHtml = '';
-                    const pinas = pub.pinas || 0;
-                    for (let i = 0; i < pinas; i++) {
-                        pinasHtml += `<img src="PiñaDePino.png" alt="Piña" class="pina-icono">`;
-                    }
-                    if (pinas === 0) pinasHtml = '<span class="sin-pinas">Sin calificación</span>';
-
-                    const fecha = new Date(pub.fecha).toLocaleDateString('es-CL', {
-                        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                    });
-
-                    html += `
-                        <div class="publicacion" data-id="${pub.id}">
-                            <div class="pub-header">
-                                <strong>${pub.autor || 'Anónimo'}</strong>
-                                <span class="pub-fecha">${fecha}</span>
-                            </div>
-                            ${pub.descripcion ? `<div class="pub-desc">${pub.descripcion}</div>` : ''}
-                            ${imagenesHtml}
-                            <div class="pub-footer">
-                                <div class="calificacion">
-                                    <span class="pinas-label">Calificación:</span>
-                                    ${pinasHtml}
-                                </div>
-                                ${puedeEliminar ? `<button class="btn-eliminar" data-id="${pub.id}">🗑️ Eliminar</button>` : ''}
-                            </div>
-                        </div>
-                    `;
-                });
-                contenedor.innerHTML = html;
-
-                // Eventos de eliminar
-                document.querySelectorAll('.btn-eliminar').forEach(btn => {
-                    btn.addEventListener('click', async function(e) {
-                        const id = this.dataset.id;
-                        if (confirm('¿Eliminar esta publicación permanentemente?')) {
-                            await eliminarPublicacion(id);
-                        }
-                    });
-                });
-
+                document.getElementById('paginacion').style.display = 'flex';
+                publicacionesCompletas = indice.publicaciones.slice().reverse(); // más reciente primero
+                const totalPaginas = Math.ceil(publicacionesCompletas.length / POR_PAGINA);
+                if (paginaActual >= totalPaginas) paginaActual = totalPaginas - 1;
+                if (paginaActual < 0) paginaActual = 0;
+                renderizarPagina(paginaActual, totalPaginas);
             } catch (error) {
                 console.error('Error al cargar publicaciones:', error);
                 contenedor.innerHTML = `<div class="mensaje-vacio" style="grid-column: 1 / -1;"><p>⚠️ Error al cargar la galería.</p></div>`;
+                document.getElementById('paginacion').style.display = 'none';
             }
         }
 
+        function renderizarPagina(pagina, totalPaginas) {
+            const contenedor = document.getElementById('contenedorPublicaciones');
+            const inicio = pagina * POR_PAGINA;
+            const fin = Math.min(inicio + POR_PAGINA, publicacionesCompletas.length);
+            const publicacionesPagina = publicacionesCompletas.slice(inicio, fin);
+            
+            let html = '';
+            publicacionesPagina.forEach(pub => {
+                const esAdmin = usuario.rol === 'admin';
+                const esAutor = pub.autor === `${usuario.nombre} ${usuario.apellido || ''}`.trim() || pub.autor === usuario.rut;
+                const puedeEliminar = esAdmin || (['guia', 'asistente'].includes(usuario.rol) && esAutor);
+
+                let imagenesHtml = '';
+                if (pub.imagenes && pub.imagenes.length > 0) {
+                    imagenesHtml = `<div class="pub-imagenes">`;
+                    pub.imagenes.forEach(ruta => {
+                        const url = `https://raw.githubusercontent.com/${GitHub.owner}/${GitHub.repo}/main/${ruta}`;
+                        imagenesHtml += `<img src="${url}" alt="Imagen" loading="lazy">`;
+                    });
+                    imagenesHtml += `</div>`;
+                }
+
+                let pinasHtml = '';
+                const pinas = pub.pinas || 0;
+                for (let i = 0; i < pinas; i++) {
+                    pinasHtml += `<img src="PiñaDePino.png" alt="Piña" class="pina-icono">`;
+                }
+                if (pinas === 0) pinasHtml = '<span class="sin-pinas">Sin calificación</span>';
+
+                const fecha = new Date(pub.fecha).toLocaleDateString('es-CL', {
+                    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+
+                html += `
+                    <div class="publicacion" data-id="${pub.id}">
+                        <div class="pub-header">
+                            <strong>${pub.autor || 'Anónimo'}</strong>
+                            <span class="pub-fecha">${fecha}</span>
+                        </div>
+                        ${pub.descripcion ? `<div class="pub-desc">${pub.descripcion}</div>` : ''}
+                        ${imagenesHtml}
+                        <div class="pub-footer">
+                            <div class="calificacion">
+                                <span class="pinas-label">Calificación:</span>
+                                ${pinasHtml}
+                            </div>
+                            ${puedeEliminar ? `<button class="btn-eliminar" data-id="${pub.id}">🗑️ Eliminar</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            contenedor.innerHTML = html || `<div class="mensaje-vacio" style="grid-column: 1 / -1;"><p>No hay publicaciones en esta página.</p></div>`;
+
+            // Actualizar controles de paginación
+            document.getElementById('infoPagina').textContent = `Página ${pagina+1} de ${totalPaginas}`;
+            document.getElementById('btnAnterior').disabled = (pagina === 0);
+            document.getElementById('btnSiguiente').disabled = (pagina === totalPaginas - 1);
+
+            // Eventos de eliminar
+            document.querySelectorAll('.btn-eliminar').forEach(btn => {
+                btn.addEventListener('click', async function(e) {
+                    const id = this.dataset.id;
+                    if (confirm('¿Eliminar esta publicación permanentemente?')) {
+                        await eliminarPublicacion(id);
+                    }
+                });
+            });
+
+            paginaActual = pagina;
+        }
+
         // ============================================================
-        // ELIMINAR PUBLICACIÓN (borra imágenes, archivo JSON individual e índice)
+        // ELIMINAR PUBLICACIÓN
         // ============================================================
         async function eliminarPublicacion(id) {
             try {
-                // 1. Obtener datos de la publicación desde su archivo individual (para saber las rutas de imágenes)
                 const pubData = await GitHub.leer(`publicaciones/${id}.json`);
                 if (!pubData) {
-                    // Si no existe, intentar eliminar solo del índice
                     await eliminarDelIndice(id);
                     alert('Publicación eliminada del índice (archivo individual no encontrado).');
                     cargarPublicaciones();
                     return;
                 }
 
-                // 2. Eliminar imágenes
+                // Eliminar imágenes
                 if (pubData.imagenes && pubData.imagenes.length > 0) {
                     for (const ruta of pubData.imagenes) {
                         try {
@@ -256,11 +327,11 @@
                     }
                 }
 
-                // 3. Eliminar archivo JSON individual
+                // Eliminar archivo JSON individual
                 const shaPub = await obtenerShaArchivo(`publicaciones/${id}.json`);
                 if (shaPub) await borrarArchivoGitHub(`publicaciones/${id}.json`, shaPub);
 
-                // 4. Eliminar del índice
+                // Eliminar del índice
                 await eliminarDelIndice(id);
 
                 alert('✅ Publicación eliminada completamente.');
@@ -282,6 +353,23 @@
                 await GitHub.escribir('publicaciones/indice.json', indice, shaIndice);
             }
         }
+
+        // ============================================================
+        // EVENTOS DE NAVEGACIÓN
+        // ============================================================
+        document.getElementById('btnAnterior').addEventListener('click', () => {
+            if (paginaActual > 0) {
+                paginaActual--;
+                cargarPublicaciones();
+            }
+        });
+        document.getElementById('btnSiguiente').addEventListener('click', () => {
+            const totalPaginas = Math.ceil(publicacionesCompletas.length / POR_PAGINA);
+            if (paginaActual < totalPaginas - 1) {
+                paginaActual++;
+                cargarPublicaciones();
+            }
+        });
 
         // ============================================================
         // ABRIR/CERRAR MODAL
@@ -334,7 +422,7 @@
                         canvas.width = width;
                         canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.3); // Calidad muy baja
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.3);
                         imagenesSeleccionadas.push(dataUrl);
 
                         const div = document.createElement('div');
@@ -391,7 +479,6 @@
             const rutasImagenes = [];
 
             try {
-                // 1. Subir imágenes comprimidas
                 for (let i = 0; i < imagenesSeleccionadas.length; i++) {
                     const dataUrl = imagenesSeleccionadas[i];
                     const base64Data = dataUrl.split(',')[1];
@@ -401,7 +488,6 @@
                     mensajeDiv.textContent = `Subiendo imagen ${i+1}/${imagenesSeleccionadas.length}...`;
                 }
 
-                // 2. Crear objeto de publicación
                 const publicacion = {
                     id: id,
                     autor: `${usuario.nombre} ${usuario.apellido || ''}`.trim() || usuario.rut,
@@ -411,13 +497,10 @@
                     pinas: pinas
                 };
 
-                // 3. Guardar archivo individual
                 await GitHub.escribir(`publicaciones/${id}.json`, publicacion);
 
-                // 4. Actualizar índice
                 const indice = await GitHub.leer('publicaciones/indice.json');
                 if (!indice) {
-                    // Si no existe, crear uno nuevo
                     await GitHub.escribir('publicaciones/indice.json', { publicaciones: [publicacion] });
                 } else {
                     if (!indice.publicaciones) indice.publicaciones = [];
@@ -433,14 +516,12 @@
             } catch (error) {
                 console.error('Error al subir:', error);
                 alert(`❌ Error: ${error.message}`);
-                // Rollback: borrar imágenes subidas
                 for (const ruta of rutasImagenes) {
                     try {
                         const shaImg = await obtenerShaArchivo(ruta);
                         if (shaImg) await borrarArchivoGitHub(ruta, shaImg);
                     } catch (e) {}
                 }
-                // También eliminar el archivo individual si se creó
                 try {
                     const shaPub = await obtenerShaArchivo(`publicaciones/${id}.json`);
                     if (shaPub) await borrarArchivoGitHub(`publicaciones/${id}.json`, shaPub);
