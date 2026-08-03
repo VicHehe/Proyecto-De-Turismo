@@ -63,7 +63,7 @@
     <button class="btn-cerrar" id="btnCerrarSesion">Cerrar sesión</button>
 </footer>
 
-<!-- MODAL DE DETALLES -->
+<!-- MODAL DE DETALLES (ya no se usa, pero se mantiene por si acaso) -->
 <div id="modalDetalles" class="modal">
     <div class="modal-content">
         <span class="modal-close" id="modalCerrar">&times;</span>
@@ -108,93 +108,26 @@
     }
 
     // ============================================================
-    // MOSTRAR DETALLES (MODAL) + BOTÓN INSCRIPCIÓN
+    // REDIRECCIÓN A MIS SALIDAS CON ID
+    // ============================================================
+    function irAMisSalidas(id) {
+        window.location.href = `mis_salidas.html?id=${id}`;
+    }
+    window.irAMisSalidas = irAMisSalidas;
+
+    // ============================================================
+    // MOSTRAR DETALLES (MODAL) - Ya no se usa, pero se mantiene
     // ============================================================
     function verDetalles(salida) {
-        const usuario = Auth.getSesion();
-        if (!usuario) return;
-        const esAdminOGuia = usuario.rol === 'admin' || usuario.rol === 'guia' || usuario.rol === 'asistente';
-        const esEstudiante = usuario.rol === 'visitante' || usuario.rol === 'estudiante';
-        const modal = document.getElementById('modalDetalles');
-        const body = document.getElementById('modalBody');
-
-        let html = `<h2>${salida.titulo || 'Salida sin título'}</h2>`;
-        html += `<div class="detalle-item"><strong>Fecha:</strong> ${salida.fecha || 'No definida'}</div>`;
-        html += `<div class="detalle-item"><strong>Duración:</strong> ${salida.duracion || 'No especificada'}</div>`;
-        html += `<div class="detalle-item"><strong>Descripción:</strong> ${salida.descripcion || 'Sin descripción'}</div>`;
-
-        if (salida.ruta && salida.ruta.length > 0) {
-            html += `<div class="detalle-item"><strong>Ruta:</strong><ul class="ruta-lista">`;
-            salida.ruta.forEach(act => {
-                html += `<li>${act.tipo}: ${act.descripcion} (${act.inicio} - ${act.fin})</li>`;
-            });
-            html += `</ul></div>`;
-        }
-
-        if (salida.participantes.length > 0) {
-            html += `<div class="detalle-item"><strong>Participantes:</strong><table class="participante-tabla"><tr><th>Nombre</th>`;
-            if (esAdminOGuia) {
-                html += `<th>RUT</th><th>Ficha Médica</th>`;
-            }
-            html += `<th>Rol</th></tr>`;
-            salida.participantes.forEach(p => {
-                html += `<tr><td>${p.nombre}</td>`;
-                if (esAdminOGuia) {
-                    html += `<td>${p.rut}</td>`;
-                    html += `<td><button onclick="verFichaMedica('${p.rut}')" style="background:none;border:1px solid #000;cursor:pointer;">Ver</button></td>`;
-                }
-                html += `<td>${p.rol}</td></tr>`;
-            });
-            html += `</table></div>`;
-        }
-
-        if (salida.guias.length > 0) {
-            html += `<div class="detalle-item"><strong>Guía(s):</strong> ${salida.guias.map(g => g.nombre).join(', ')}</div>`;
-        }
-        if (salida.precio) html += `<div class="detalle-item"><strong>Precio:</strong> $${salida.precio}</div>`;
-        if (salida.curso) html += `<div class="detalle-item"><strong>Curso:</strong> ${salida.curso}</div>`;
-        if (salida.menu) html += `<div class="detalle-item"><strong>Menú:</strong> ${salida.menu}</div>`;
-
-        if (salida.transporte) {
-            const t = salida.transporte;
-            html += `<div class="detalle-item"><strong>Transporte</strong></div>`;
-            if (t.conductor) html += `<div class="detalle-item">Conductor: ${t.conductor}</div>`;
-            if (t.horarios) html += `<div class="detalle-item">Horarios: ${t.horarios}</div>`;
-            if (t.precio) html += `<div class="detalle-item">Precio servicio: ${t.precio}</div>`;
-            if (t.descripcion) html += `<div class="detalle-item">Descripción: ${t.descripcion}</div>`;
-        }
-
-        if (esEstudiante) {
-            const yaInscrito = salida.participantes.some(p => p.rut === usuario.rut);
-            const hoy = new Date().toISOString().split('T')[0];
-            if (!yaInscrito && salida.fecha >= hoy) {
-                html += `<button class="btn" id="btnInscribir" onclick="inscribirEnSalida('${salida.id}')" style="margin-top:10px; background:#000; color:#fff; border:1px solid #000; padding:8px 20px; cursor:pointer;">✅ Inscribirme</button>`;
-            } else if (yaInscrito) {
-                html += `<p style="margin-top:10px; color:green; font-weight:bold;">✅ Ya estás inscrito en esta salida.</p>`;
-            }
-        }
-
-        body.innerHTML = html;
-        modal.style.display = 'flex';
-    }
-
-    async function verFichaMedica(rut) {
-        const datos = await GitHub.leer('datos/usuarios.json');
-        if (!datos) return alert('No se pudo cargar la información');
-        const usuario = datos.usuarios.find(u => u.rut === rut);
-        if (usuario) {
-            alert(`Ficha médica de ${usuario.nombre} ${usuario.apellido}:\n${usuario.historial || 'Sin información'}`);
-        } else {
-            alert('Usuario no encontrado');
+        // Esta función ya no se usa, pero se conserva para no romper nada
+        // Si se llama, redirige a mis_salidas con el ID
+        if (salida && salida.id) {
+            irAMisSalidas(salida.id);
         }
     }
-
-    window.verDetalles = verDetalles;
-    window.inscribirEnSalida = inscribirEnSalida;
-    window.verFichaMedica = verFichaMedica;
 
     // ============================================================
-    // INSCRIPCIÓN EN SALIDA
+    // INSCRIPCIÓN EN SALIDA (se mantiene igual)
     // ============================================================
     async function inscribirEnSalida(id) {
         const usuario = Auth.getSesion();
@@ -226,8 +159,10 @@
         }
     }
 
+    window.inscribirEnSalida = inscribirEnSalida;
+
     // ============================================================
-    // CERRAR MODAL
+    // CERRAR MODAL (ya no se usa, pero se mantiene)
     // ============================================================
     document.getElementById('modalCerrar').addEventListener('click', function() {
         document.getElementById('modalDetalles').style.display = 'none';
@@ -254,7 +189,6 @@
                 `;
                 return;
             }
-            // Tomar las 3 más recientes (últimas 3 del array)
             const recientes = datos.publicaciones.slice(-3).reverse();
             let html = '';
             recientes.forEach(pub => {
@@ -312,7 +246,6 @@
                 botones.push({ texto: '📅 Calendario', href: 'calendario_interactivo_personal.html' });
                 break;
         }
-        // Botón de galería siempre visible
         botones.push({ texto: '📸 Galería', href: 'galeria.html' });
 
         botones.forEach(b => {
@@ -345,14 +278,13 @@
                 const ordenadas = salidasVisibles.sort((a,b) => (a.fecha > b.fecha) ? 1 : -1);
                 const mostradas = ordenadas.slice(0, 3);
                 contenedor.innerHTML = mostradas.map(s => {
-                    const salidaJson = JSON.stringify(s).replace(/"/g, '&quot;');
                     return `
                         <div class="tarjeta">
                             <h3>${s.titulo || 'Sin título'}</h3>
                             <p>${s.descripcion || 'Sin descripción'}</p>
                             <p><small>📅 ${s.fecha || 'Fecha no definida'}</small></p>
                             <p><small>👤 ${s.guias.length > 0 ? s.guias.map(g => g.nombre).join(', ') : 'Sin guía'}</small></p>
-                            <button onclick="verDetalles(${salidaJson})">Ver más</button>
+                            <button onclick="irAMisSalidas('${s.id}')">Ver más</button>
                         </div>
                     `;
                 }).join('');
