@@ -131,7 +131,7 @@
 <script src="js/lugares.js"></script>
 <script>
     // ============================================================
-    // mis_salidas.js - Todo el código aquí
+    // mis_salidas.js - Versión completa con soporte para URL ?id=xxx
     // ============================================================
 
     (function() {
@@ -140,7 +140,6 @@
             window.location.href = 'login.html';
             return;
         }
-        // Solo admin, guía o asistente pueden acceder
         if (!['admin', 'guia', 'asistente'].includes(usuario.rol)) {
             alert('No tienes permiso para ver esta página.');
             window.location.href = 'index.html';
@@ -149,17 +148,16 @@
 
         document.getElementById('userBadge').textContent = `${usuario.nombre} ${usuario.apellido || ''} (${usuario.rol})`;
 
-        // Estado
+        // ===== LEER ID DESDE LA URL =====
+        const urlParams = new URLSearchParams(window.location.search);
+        const idDesdeURL = urlParams.get('id');
+
         let todasLasSalidas = [];
         let salidaSeleccionada = null;
         let editando = false;
 
-        // ===== FUNCIONES DE FILTRADO =====
         function getSalidasDelUsuario(todas) {
-            if (usuario.rol === 'admin') {
-                return todas; // admin ve todas
-            }
-            // guía o asistente: solo donde participa
+            if (usuario.rol === 'admin') return todas;
             return todas.filter(s => {
                 const esGuia = s.guias.some(g => g.rut === usuario.rut);
                 const esParticipante = s.participantes.some(p => p.rut === usuario.rut);
@@ -167,23 +165,28 @@
             });
         }
 
-        // ===== CARGAR DATOS =====
         async function cargarDatos() {
             try {
                 todasLasSalidas = await Planificacion.cargarSalidas();
                 const misSalidas = getSalidasDelUsuario(todasLasSalidas);
-                // Ordenar por fecha (más reciente primero)
                 misSalidas.sort((a, b) => (a.fecha > b.fecha) ? -1 : 1);
                 renderizarLista(misSalidas);
-                if (misSalidas.length > 0) {
-                    // Seleccionar la primera por defecto
-                    seleccionarSalida(misSalidas[0].id);
+
+                if (idDesdeURL) {
+                    const salida = misSalidas.find(s => s.id === idDesdeURL);
+                    if (salida) {
+                        seleccionarSalida(idDesdeURL);
+                    } else if (misSalidas.length > 0) {
+                        seleccionarSalida(misSalidas[0].id);
+                    } else {
+                        mostrarSinSalidas();
+                    }
                 } else {
-                    document.getElementById('detalleSalida').innerHTML = `
-                        <div class="mensaje-inicial">
-                            <p>📭 No tienes salidas asignadas.</p>
-                        </div>
-                    `;
+                    if (misSalidas.length > 0) {
+                        seleccionarSalida(misSalidas[0].id);
+                    } else {
+                        mostrarSinSalidas();
+                    }
                 }
             } catch (error) {
                 console.error('Error al cargar salidas:', error);
@@ -191,7 +194,14 @@
             }
         }
 
-        // ===== RENDERIZAR LISTA =====
+        function mostrarSinSalidas() {
+            document.getElementById('detalleSalida').innerHTML = `
+                <div class="mensaje-inicial">
+                    <p>📭 No tienes salidas asignadas.</p>
+                </div>
+            `;
+        }
+
         function renderizarLista(salidas) {
             const contenedor = document.getElementById('listaSalidas');
             if (!salidas || salidas.length === 0) {
@@ -210,86 +220,30 @@
             });
             contenedor.innerHTML = html;
 
-            // Eventos de clic en cada item
             contenedor.querySelectorAll('.item-salida').forEach(el => {
                 el.addEventListener('click', function() {
-                    const id = this.dataset.id;
-                    seleccionarSalida(id);
+                    seleccionarSalida(this.dataset.id);
                 });
             });
         }
 
-        // ===== SELECCIONAR SALIDA =====
-        async function seleccionarSalida(id) {
+        // ===== SELECCIONAR SALIDA (async) =====
+        window.seleccionarSalida = async function(id) {
             const salida = todasLasSalidas.find(s => s.id === id);
             if (!salida) return;
             salidaSeleccionada = salida;
-            // Actualizar lista visual
             document.querySelectorAll('.item-salida').forEach(el => {
                 el.classList.toggle('activa', el.dataset.id === id);
             });
-            // Mostrar detalle
-            mostrarDetalle(salida);
-        }
-
-        // ===== MOSTRAR DETALLE (con toda la info extendida) =====
-        function mostrarDetalle(salida) {
-            const contenedor = document.getElementById('detalleSalida');
-            // Obtener info de lugares
-            const lugaresInfo = typeof lugares !== 'undefined' ? lugares : [];
-
-            // Función para enriquecer actividad con info del lugar
-            function enriquecerActividad(act) {
-                if (act.tipo === 'Lugar') {
-                    const lugar = lugaresInfo.find(l => l.nombre.toLowerCase() === act.descripcion.toLowerCase());
-                    if (lugar) {
-                        return {
-                            ...act,
-                            lugarInfo: lugar
-                        };
-                    }
-                }
-                return act;
-            }
-
-            const rutaEnriquecida = salida.ruta ? salida.ruta.map(enriquecerActividad) : [];
-
-            // Obtener datos completos de participantes desde usuarios.json
-            let participantesCompletos = [];
-            if (salida.participantes && salida.participantes.length > 0) {
-                // Cargar usuarios para obtener edad, teléfono, historial
-                // Hacemos la carga de forma asíncrona, pero la función mostrarDetalle es síncrona,
-                // así que usamos una función async y luego renderizamos.
-                // Para simplificar, llamamos a una función async desde el evento de selección.
-                // Pero mejor: hacemos la carga aquí con async/await y luego renderizamos.
-                // Cambiamos la función a async.
-                // Pero para no romper, la redefinimos como async.
-                // Mejor reescribimos: seleccionarSalida llama a mostrarDetalle, pero podemos hacer que mostrarDetalle sea async.
-                // Como es complejo, lo dejamos síncrono y hacemos una carga aparte.
-                // Lo haré en la función seleccionarSalida.
-                // Vamos a reestructurar: seleccionarSalida llama a mostrarDetalleAsync.
-                // Pero ya que estamos, mejor reescribo.
-                // Para no complicar, voy a usar una función separada.
-                // En realidad, lo más simple es que mostrarDetalle reciba el salida y también los usuarios.
-                // Pero para no hacer múltiples llamadas, lo haré con una promesa.
-            }
-
-            // Para no reescribir todo, vamos a cargar los usuarios una vez y guardarlos en una variable global.
-            // Lo haré al inicio.
-            // Voy a modificar la función principal.
-            // Mejor: creo una función renderizarDetalle que toma salida y usuarios.
-            // La llamaré desde seleccionarSalida después de obtener usuarios.
-            // Ok, reescribo.
-        }
+            await renderizarDetalle(salida);
+        };
 
         // ===== RENDERIZAR DETALLE (async) =====
         async function renderizarDetalle(salida) {
             const contenedor = document.getElementById('detalleSalida');
-            // Cargar usuarios para datos completos
             const datosUsuarios = await GitHub.leer('datos/usuarios.json');
             const usuarios = datosUsuarios ? datosUsuarios.usuarios : [];
 
-            // Enriquecer participantes con info de usuarios
             const participantesConInfo = salida.participantes.map(p => {
                 const user = usuarios.find(u => u.rut === p.rut);
                 return {
@@ -300,16 +254,11 @@
                 };
             });
 
-            // Obtener info de lugares
             const lugaresInfo = typeof lugares !== 'undefined' ? lugares : [];
-
-            // Enriquecer ruta
             const rutaEnriquecida = salida.ruta ? salida.ruta.map(act => {
                 if (act.tipo === 'Lugar') {
                     const lugar = lugaresInfo.find(l => l.nombre.toLowerCase() === act.descripcion.toLowerCase());
-                    if (lugar) {
-                        return { ...act, lugarInfo: lugar };
-                    }
+                    if (lugar) return { ...act, lugarInfo: lugar };
                 }
                 return act;
             }) : [];
@@ -350,16 +299,7 @@
                     <h3>👥 Participantes (${participantesConInfo.length})</h3>
                     ${participantesConInfo.length > 0 ? `
                         <table class="participantes-tabla">
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>RUT</th>
-                                    <th>Rol</th>
-                                    <th>Edad</th>
-                                    <th>Teléfono</th>
-                                    <th>Historial Médico</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Nombre</th><th>RUT</th><th>Rol</th><th>Edad</th><th>Teléfono</th><th>Historial Médico</th></tr></thead>
                             <tbody>
                                 ${participantesConInfo.map(p => `
                                     <tr>
@@ -392,26 +332,20 @@
 
             contenedor.innerHTML = html;
 
-            // Botón editar
             const btnEditar = document.getElementById('btnAbrirEditar');
             if (btnEditar) {
-                btnEditar.addEventListener('click', function() {
-                    abrirModalEdicion(salida);
-                });
+                btnEditar.addEventListener('click', () => abrirModalEdicion(salida));
             }
         }
 
         // ===== ABRIR MODAL DE EDICIÓN =====
         function abrirModalEdicion(salida) {
-            const modal = document.getElementById('modalEditar');
-            // Rellenar campos
             document.getElementById('editId').value = salida.id;
             document.getElementById('editTitulo').value = salida.titulo || '';
             document.getElementById('editFecha').value = salida.fecha || '';
             document.getElementById('editDuracion').value = salida.duracion || '1 dia';
             document.getElementById('editDescripcion').value = salida.descripcion || '';
 
-            // Ruta
             const rutaContainer = document.getElementById('editRutaContainer');
             rutaContainer.innerHTML = '';
             if (salida.ruta && salida.ruta.length > 0) {
@@ -435,7 +369,6 @@
                 rutaContainer.innerHTML = '<p class="muted">No hay actividades.</p>';
             }
 
-            // Participantes
             const participantesContainer = document.getElementById('editParticipantesContainer');
             participantesContainer.innerHTML = '';
             if (salida.participantes && salida.participantes.length > 0) {
@@ -452,27 +385,23 @@
                 participantesContainer.innerHTML = '<p class="muted">No hay participantes.</p>';
             }
 
-            // Transporte
             document.getElementById('editConductor').value = salida.transporte?.conductor || '';
             document.getElementById('editHorarios').value = salida.transporte?.horarios || '';
             document.getElementById('editPrecioTransporte').value = salida.transporte?.precio || '';
             document.getElementById('editDescTransporte').value = salida.transporte?.descripcion || '';
-
-            // Complementarios
             document.getElementById('editCurso').value = salida.curso || '';
             document.getElementById('editPrecio').value = salida.precio || '';
             document.getElementById('editMenu').value = salida.menu || '';
 
-            // Guardar referencia a la salida actual
             editando = true;
-            modal.style.display = 'flex';
+            document.getElementById('modalEditar').style.display = 'flex';
         }
 
-        // ===== CERRAR MODAL =====
         function cerrarModalEdicion() {
             document.getElementById('modalEditar').style.display = 'none';
             editando = false;
         }
+        window.cerrarModalEdicion = cerrarModalEdicion;
 
         // ===== GUARDAR EDICIÓN =====
         async function guardarEdicion(e) {
@@ -488,7 +417,6 @@
                 return;
             }
 
-            // Recolectar ruta
             const rutaItems = document.querySelectorAll('#editRutaContainer .ruta-edit-item');
             const ruta = [];
             rutaItems.forEach(item => {
@@ -496,25 +424,12 @@
                 const desc = item.querySelector('.edit-desc-actividad').value.trim();
                 const inicio = item.querySelector('.edit-hora-inicio').value;
                 const fin = item.querySelector('.edit-hora-fin').value;
-                if (desc) {
-                    ruta.push({ tipo, descripcion: desc, inicio, fin });
-                }
+                if (desc) ruta.push({ tipo, descripcion: desc, inicio, fin });
             });
 
-            // Recolectar participantes (no los editamos directamente aquí, solo los que ya estaban)
-            // Los participantes se manejan con añadir/eliminar en el modal.
-            // Pero necesitamos obtener la lista actual de participantes.
-            // La guardamos en una variable global o la leemos del DOM.
-            // Para simplificar, usaremos los participantes que ya estaban en la salida y los modificamos con los botones.
-            // Pero como no hemos implementado la adición/eliminación de participantes en el modal, lo haremos ahora.
-            // Pero para no complicar, asumiremos que los participantes se mantienen igual.
-            // Mejor: en el modal, los participantes se muestran y se pueden eliminar, y hay un campo para agregar.
-            // Pero para que funcione, necesito implementar eso. Lo haré con eventos.
-            // Por ahora, recolectamos los participantes del DOM.
             const participantes = [];
             document.querySelectorAll('#editParticipantesContainer .participante-edit-item').forEach(item => {
                 const texto = item.textContent.replace('✕', '').trim();
-                // formato: "Nombre (RUT) - Rol"
                 const match = texto.match(/^(.*?)\s*\(([^)]+)\)\s*-\s*(.*)$/);
                 if (match) {
                     participantes.push({
@@ -525,7 +440,6 @@
                 }
             });
 
-            // Transporte
             const transporte = {
                 conductor: document.getElementById('editConductor').value.trim() || 'No especificado',
                 horarios: document.getElementById('editHorarios').value.trim() || 'No especificado',
@@ -537,7 +451,6 @@
             const precio = parseInt(document.getElementById('editPrecio').value) || 0;
             const menu = document.getElementById('editMenu').value.trim() || 'Sin menú';
 
-            // Construir objeto actualizado
             const salidaActualizada = {
                 titulo,
                 fecha,
@@ -552,15 +465,13 @@
                 transporte
             };
 
-            // Guardar
             const ok = await Planificacion.actualizarSalida(id, salidaActualizada);
             if (ok) {
                 alert('✅ Salida actualizada correctamente.');
                 cerrarModalEdicion();
-                // Recargar datos
                 await cargarDatos();
-                // Seleccionar la salida actualizada
-                seleccionarSalida(id);
+                // Seleccionar la misma salida después de recargar
+                window.seleccionarSalida(id);
             } else {
                 alert('❌ Error al actualizar la salida.');
             }
@@ -568,19 +479,14 @@
 
         // ===== EVENTOS DEL MODAL =====
         document.addEventListener('DOMContentLoaded', function() {
-            // Cerrar modal
             document.getElementById('modalCerrar').addEventListener('click', cerrarModalEdicion);
             document.getElementById('btnCancelarEdicion').addEventListener('click', cerrarModalEdicion);
             window.addEventListener('click', function(e) {
-                if (e.target === document.getElementById('modalEditar')) {
-                    cerrarModalEdicion();
-                }
+                if (e.target === document.getElementById('modalEditar')) cerrarModalEdicion();
             });
 
-            // Formulario de edición
             document.getElementById('formEditarSalida').addEventListener('submit', guardarEdicion);
 
-            // Agregar actividad
             document.getElementById('btnAgregarActividad').addEventListener('click', function() {
                 const container = document.getElementById('editRutaContainer');
                 const div = document.createElement('div');
@@ -597,38 +503,29 @@
                     <button type="button" class="btn-eliminar-actividad">✕</button>
                 `;
                 container.appendChild(div);
-                // Evento eliminar
-                div.querySelector('.btn-eliminar-actividad').addEventListener('click', function() {
-                    div.remove();
-                });
+                div.querySelector('.btn-eliminar-actividad').addEventListener('click', () => div.remove());
             });
 
-            // Eliminar actividad (delegado)
             document.getElementById('editRutaContainer').addEventListener('click', function(e) {
                 if (e.target.classList.contains('btn-eliminar-actividad')) {
                     e.target.closest('.ruta-edit-item').remove();
                 }
             });
 
-            // Agregar participante
             document.getElementById('btnAgregarParticipante').addEventListener('click', async function() {
                 const rutInput = document.getElementById('editNuevoParticipante');
                 const rut = rutInput.value.trim();
                 const rol = document.getElementById('editRolParticipante').value;
                 if (!rut) return alert('Ingresa un RUT');
 
-                // Buscar usuario
                 const datos = await GitHub.leer('datos/usuarios.json');
                 if (!datos) return alert('Error al cargar usuarios');
                 const usuario = datos.usuarios.find(u => u.rut === rut);
                 if (!usuario) return alert('Usuario no encontrado');
 
-                // Verificar duplicado
                 const container = document.getElementById('editParticipantesContainer');
-                const existentes = container.querySelectorAll('.participante-edit-item');
-                for (let item of existentes) {
-                    const texto = item.textContent;
-                    if (texto.includes(`(${rut})`)) {
+                for (let item of container.querySelectorAll('.participante-edit-item')) {
+                    if (item.textContent.includes(`(${rut})`)) {
                         return alert('Este participante ya está en la lista.');
                     }
                 }
@@ -643,7 +540,6 @@
                 rutInput.value = '';
             });
 
-            // Eliminar participante (delegado)
             document.getElementById('editParticipantesContainer').addEventListener('click', function(e) {
                 if (e.target.classList.contains('btn-eliminar-participante')) {
                     e.target.closest('.participante-edit-item').remove();
@@ -654,39 +550,7 @@
         // ===== INICIALIZAR =====
         cargarDatos();
 
-        // Exponer funciones para que el HTML las use (aunque usamos eventos)
-        window.seleccionarSalida = seleccionarSalida;
-        window.cerrarModalEdicion = cerrarModalEdicion;
-
-        // Reescribir mostrarDetalle para que sea async y use renderizarDetalle
-        // La función original mostrarDetalle la reemplazamos con renderizarDetalle
-        // Pero ya estamos usando renderizarDetalle dentro de seleccionarSalida.
-        // Modificamos seleccionarSalida para que use renderizarDetalle.
-        // Ya la he definido arriba.
-        // Vamos a redefinir seleccionarSalida para que use renderizarDetalle.
-        // Pero ya la definimos, la reemplazo.
-
-        // Reemplazo la función seleccionarSalida original
-        const seleccionarSalidaOriginal = seleccionarSalida;
-        seleccionarSalida = async function(id) {
-            const salida = todasLasSalidas.find(s => s.id === id);
-            if (!salida) return;
-            salidaSeleccionada = salida;
-            // Actualizar lista visual
-            document.querySelectorAll('.item-salida').forEach(el => {
-                el.classList.toggle('activa', el.dataset.id === id);
-            });
-            // Mostrar detalle con renderizarDetalle
-            await renderizarDetalle(salida);
-        };
-
-        // Sobrescribir la función global
-        window.seleccionarSalida = seleccionarSalida;
-
-        // También actualizar cargarDatos para que use la nueva seleccionarSalida
-        // Pero ya lo hace.
-
-        console.log('✅ mis_salidas.html cargado correctamente');
+        console.log('✅ mis_salidas.html cargado correctamente con soporte para URL');
     })();
 </script>
 </body>
