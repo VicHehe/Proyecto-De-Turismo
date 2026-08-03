@@ -428,28 +428,209 @@ header .user-badge {
     background: #eee;
 }
 
-/* ---- Responsive ---- */
+/* ============================================================
+   MEJORAS PARA MÓVIL Y PANTALLAS PEQUEÑAS
+   ============================================================ */
+
+/* Tablets y móviles en horizontal */
 @media (max-width: 768px) {
     .contenedor-principal {
         flex-direction: column;
     }
+
     .panel-lista {
         max-width: 100%;
-        max-height: 300px;
+        max-height: 250px; /* Altura más reducida para no ocupar mucho */
+        margin-bottom: 10px;
     }
+
     .panel-detalle {
         max-height: none;
         min-width: auto;
+        padding: 12px;
     }
+
+    /* Ajustes en el modal para que se vea mejor */
+    .modal-contenido {
+        padding: 1rem;
+        width: 98%;
+        max-width: 98%;
+    }
+
+    /* Botones más grandes para táctil */
+    .btn-editar,
+    .btn-small,
+    .btn-agregar-actividad,
+    .modal-acciones button {
+        padding: 10px 16px;
+        font-size: 16px;
+        min-height: 44px;
+    }
+
+    .modal-acciones {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .modal-acciones button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Mejorar inputs en móvil */
+    .campo input,
+    .campo select,
+    .campo textarea {
+        font-size: 16px; /* evita zoom automático en iOS */
+        padding: 10px 8px;
+    }
+
+    /* Ruta en edición: apilar elementos */
     .ruta-edit-item {
         flex-direction: column;
         align-items: stretch;
+        gap: 0.5rem;
+        padding: 0.6rem 0;
     }
+
     .ruta-edit-item .edit-hora-inicio,
     .ruta-edit-item .edit-hora-fin {
         width: 100%;
     }
+
+    .ruta-edit-item select,
+    .ruta-edit-item input {
+        font-size: 16px;
+        padding: 8px;
+    }
+
+    /* Participantes: mejor legibilidad */
+    .participante-edit-item {
+        font-size: 15px;
+        padding: 8px 0;
+    }
+
+    .btn-eliminar-participante {
+        font-size: 1.4rem;
+        padding: 0 8px;
+    }
+
+    /* Tabla de participantes: scroll horizontal */
+    .participantes-tabla {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        font-size: 13px;
+    }
+
+    .participantes-tabla th,
+    .participantes-tabla td {
+        padding: 8px 10px;
+        min-width: 80px;
+    }
+
+    /* Botón eliminar actividad más grande */
+    .btn-eliminar-actividad {
+        font-size: 1.4rem;
+        padding: 4px 8px;
+    }
+
+    /* Ajustes en el header */
+    header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    header h1 {
+        text-align: center;
+    }
+
+    .user-badge {
+        align-self: center;
+    }
+
+    .volver {
+        align-self: center;
+    }
+
+    /* Detalle: encabezado */
+    .detalle-header {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .detalle-header h2 {
+        font-size: 16px;
+    }
+}
+
+/* Móviles muy pequeños (menos de 480px) */
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .panel-lista {
+        max-height: 200px;
+    }
+
+    .panel-detalle {
+        padding: 10px;
+    }
+
     .modal-contenido {
-        padding: 1rem;
+        padding: 0.8rem;
+        width: 100%;
+        max-width: 100%;
+        border-width: 1px;
+    }
+
+    .modal-cerrar {
+        font-size: 2rem;
+        top: 4px;
+        right: 10px;
+    }
+
+    .detalle-header h2 {
+        font-size: 15px;
+    }
+
+    .detalle-body p {
+        font-size: 14px;
+    }
+
+    .ruta-lista li {
+        font-size: 14px;
+    }
+
+    .lugar-info {
+        font-size: 13px;
+    }
+
+    .participantes-tabla {
+        font-size: 12px;
+    }
+
+    .participantes-tabla th,
+    .participantes-tabla td {
+        padding: 6px 6px;
+        min-width: 60px;
+    }
+
+    .btn-editar,
+    .btn-small,
+    .btn-agregar-actividad,
+    .modal-acciones button {
+        font-size: 15px;
+        padding: 12px 14px;
+        min-height: 48px;
+    }
+
+    .campo input,
+    .campo select,
+    .campo textarea {
+        font-size: 15px;
+        padding: 12px 8px;
     }
 }
