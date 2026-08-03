@@ -1,230 +1,263 @@
-/* ============================================================
-   MEJORAS VISUALES – PALETA ARAGON16
-   (Agregar al final de planificar.css o en archivo aparte)
-   ============================================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-/* ---- Fondos y bordes orgánicos ---- */
 body {
-    background-color: #f9f8dd;          /* fondo cálido natural */
+    background-color: #f9f8dd;        /* crema – fondo natural */
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    padding: 2rem 1.5rem;
+    color: #272120;                   /* marrón oscuro – texto principal */
+    line-height: 1.5;
 }
 
-.seccion {
-    border-color: #ba9572;              /* marrón claro */
-    background: #ffffff;
-    box-shadow: 0 2px 8px rgba(39, 33, 32, 0.06);
-    border-radius: 4px;
+.contenedor {
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.seccion h2 {
-    border-bottom-color: #876661;       /* marrón */
-    color: #3b473c;                     /* verde oscuro */
-}
-
-/* ---- Títulos ---- */
+/* ===== TÍTULOS ===== */
 h1 {
-    border-bottom-color: #876661;
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border-bottom: 2px solid #876661; /* marrón */
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+    color: #3b473c;                   /* verde muy oscuro */
+}
+
+h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 1.8rem 0 0.8rem 0;
+    border-bottom: 1px solid #ba9572; /* marrón claro */
+    padding-bottom: 0.3rem;
     color: #3b473c;
 }
 
-/* ---- Inputs y selects ---- */
-.busqueda input,
-.busqueda select,
+h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1rem 0 0.3rem 0;
+    color: #3b473c;
+}
+
+/* ===== GRILLAS ===== */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+/* ===== COLUMNAS / TARJETAS ===== */
+.columna {
+    border: 1px solid #ba9572;        /* marrón claro */
+    padding: 1.2rem 1.2rem 1.5rem;
+    background: #f9f8dd;              /* crema */
+    box-shadow: 0 2px 6px rgba(39, 33, 32, 0.06);
+    border-radius: 4px;
+}
+
+.columna-sin-borde {
+    border: none;
+    padding: 0;
+}
+
+/* ===== FORMULARIOS ===== */
+.grupo {
+    margin-bottom: 1.2rem;
+}
+
+.grupo label {
+    display: block;
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+    color: #3b473c;
+}
+
 .grupo input,
 .grupo select,
-.ruta-item .horario-editable input[type="time"] {
-    border-color: #8b8893;              /* gris */
-    background: #ffffff;
+.grupo textarea {
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #8b8893;        /* gris */
+    background: #f9f8dd;              /* crema */
+    font-size: 0.95rem;
     border-radius: 4px;
     transition: border-color 0.2s;
     color: #272120;
 }
-.busqueda input:focus,
-.busqueda select:focus,
+
 .grupo input:focus,
 .grupo select:focus,
-.ruta-item .horario-editable input[type="time"]:focus {
-    border-color: #5c8d58;              /* verde oscuro */
+.grupo textarea:focus {
+    border-color: #5c8d58;            /* verde oscuro */
     outline: none;
 }
 
-/* ---- Lista de items (lugares, ruta) ---- */
-.lista-items {
-    border-color: #ba9572;
-    background: #ffffff;
-    border-radius: 4px;
+.grupo textarea {
+    min-height: 60px;
+    resize: vertical;
 }
 
-.item {
-    border-bottom-color: #d2e291;       /* verde claro */
-}
-.item-eliminar {
-    color: #876661;                     /* marrón */
-}
-.item-eliminar:hover {
-    color: #272120;
-}
-
-/* ---- Tabla de participantes ---- */
-.tabla-participantes th {
-    background: #d2e291;                /* verde claro */
-    color: #3b473c;
-    border-color: #9cab6c;              /* verde oliva */
-}
-.tabla-participantes td {
-    border-color: #e0bf7a;              /* amarillo/marrón */
-}
-.tabla-participantes .btn-eliminar {
-    color: #876661;
-}
-.tabla-participantes .btn-eliminar:hover {
-    color: #272120;
-}
-
-/* ---- Ruta (actividades) ---- */
-.ruta-item {
-    border-bottom-color: #e0bf7a;
-    background: #f9f8dd;                /* fondo sutil */
-    border-radius: 4px;
-    padding: 0.5rem 1rem;
-}
-.ruta-item .tipo {
-    color: #3b473c;
-}
-.ruta-item .horario-editable input[type="time"] {
-    border-color: #8b8893;
-    background: #ffffff;
-}
-.btn-ruta {
-    border-color: #8b8893;
-    color: #3b473c;
-    background: #ffffff;
-    border-radius: 4px;
-    transition: background 0.2s;
-}
-.btn-ruta:hover {
-    background: #d2e291;
-}
-
-/* ---- Botones generales ---- */
+/* ===== BOTONES ===== */
 .btn {
-    border-color: #876661;
-    color: #3b473c;
-    background: #ffffff;
-    border-radius: 4px;
+    background: #f9f8dd;              /* crema */
+    border: 1px solid #876661;        /* marrón */
+    padding: 0.5rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
     transition: background 0.2s, box-shadow 0.2s;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+    color: #3b473c;
+    border-radius: 4px;
+    cursor: default;
 }
+
 .btn:hover {
-    background: #d2e291;
+    background: #d2e291;              /* verde claro */
     box-shadow: 0 1px 4px rgba(39, 33, 32, 0.1);
 }
 
 .btn-primario {
-    background: #5c8d58;
-    border-color: #3b473c;
-    color: #ffffff;
+    background: #5c8d58;              /* verde oscuro */
+    color: #f9f8dd;                   /* crema */
+    border: 1px solid #3b473c;
 }
+
 .btn-primario:hover {
     background: #3b473c;
     border-color: #272120;
 }
 
-/* ---- Transporte ---- */
-.info-transporte {
-    background: #f9f8dd;
-    border-color: #876661;
-    border-radius: 4px;
+/* ===== FILA DE BOTONES ===== */
+.fila-botones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
 }
 
-/* ---- Mensajes ---- */
-.mensaje {
-    border-color: #ba9572;
-    border-radius: 4px;
+/* ===== TABLAS MINI ===== */
+.tabla-mini {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.6rem 0;
+    font-size: 0.9rem;
 }
-.mensaje-exito {
-    background: #d2e291;
-    border-color: #5c8d58;
+
+.tabla-mini th,
+.tabla-mini td {
+    border: 1px solid #ba9572;        /* marrón claro */
+    padding: 0.4rem 0.5rem;
+    text-align: left;
+    vertical-align: top;
+}
+
+.tabla-mini th {
+    background: #d2e291;              /* verde claro */
+    font-weight: 600;
     color: #3b473c;
 }
-.mensaje-error {
-    background: #f9f8dd;
-    border-color: #876661;
-    color: #272120;
+
+.tabla-mini td {
+    background: #f9f8dd;              /* crema */
 }
 
-/* ---- Badge ---- */
+/* ===== BADGE ===== */
 .badge {
-    border-color: #876661;
+    border: 1px solid #876661;
+    padding: 0.15rem 0.6rem;
+    font-size: 0.75rem;
     background: #f9f8dd;
-    color: #3b473c;
+    display: inline-block;
     border-radius: 12px;
-}
-
-/* ---- Header de planificación ---- */
-.header-planificar {
-    border-color: #ba9572;
-    background: #ffffff;
-    border-radius: 4px;
-}
-.header-planificar h1 {
     color: #3b473c;
 }
-.btn-volver {
-    border-color: #876661;
-    color: #3b473c;
-    background: #ffffff;
-    border-radius: 4px;
-    transition: background 0.2s;
-}
-.btn-volver:hover {
-    background: #d2e291;
-}
 
-/* ---- Separador ---- */
+/* ===== SEPARADOR ===== */
 .separador {
-    border-top-color: #ba9572;
+    border-top: 1px solid #ba9572;
+    margin: 1.8rem 0 1rem 0;
 }
 
-/* ---- Datos fijos ---- */
-.dato-fijo {
-    background: #d2e291;
-    border-color: #8b8893;
-    color: #3b473c;
+/* ===== INFO TRANSPORTE ===== */
+.info-transporte {
+    background: #f9f8dd;              /* crema */
+    border: 1px solid #876661;
+    padding: 0.8rem 1rem;
+    margin-top: 0.5rem;
     border-radius: 4px;
 }
 
-/* ---- Texto muted ---- */
+/* ===== LISTA DE LUGARES / ÍTEMS ===== */
+.lugar-item {
+    border-bottom: 1px solid #d2e291; /* verde claro */
+    padding: 0.6rem 0;
+}
+
+.lugar-item:last-child {
+    border-bottom: none;
+}
+
+/* ===== FLEX ===== */
+.flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem 1.5rem;
+}
+
+.flex-item {
+    flex: 1 0 180px;
+}
+
+/* ===== TEXTOS MUTED ===== */
 .muted {
-    color: #54555c;
+    font-size: 0.85rem;
+    color: #54555c;                   /* gris oscuro */
 }
 
-/* ---- Ajustes de sombras y suavizados adicionales ---- */
-.columna,
-.grid-2 .columna,
-.grid-3 .columna {
-    border-color: #ba9572;
-    box-shadow: 0 2px 6px rgba(39, 33, 32, 0.05);
+/* ===== DATO FIJO ===== */
+.dato-fijo {
+    background: #d2e291;              /* verde claro */
+    padding: 0.3rem 0.6rem;
+    border: 1px solid #8b8893;
+    display: inline-block;
     border-radius: 4px;
+    color: #3b473c;
 }
 
-/* ---- Hover en filas de tabla ---- */
-.tabla-participantes tbody tr:hover {
-    background: #f9f8dd;
-}
+/* ===== UTILIDADES ===== */
+.mt-1 { margin-top: 0.8rem; }
+.mb-1 { margin-bottom: 0.8rem; }
+.text-center { text-align: center; }
 
-/* ---- Mejora en los selects de duración ---- */
-.duracion-select {
-    border-color: #8b8893;
-    border-radius: 4px;
-    background: #ffffff;
-    color: #272120;
-}
-.duracion-select:focus {
-    border-color: #5c8d58;
-    outline: none;
-}
-
-/* ---- Ajuste fino en inputs de hora ---- */
-.ruta-item .horario-editable input[type="time"] {
-    border-radius: 4px;
-    padding: 0.2rem 0.4rem;
+/* ============================================================
+   RESPONSIVE (se mantiene igual)
+   ============================================================ */
+@media (max-width: 768px) {
+    .grid-3 {
+        grid-template-columns: 1fr !important;
+    }
+    .grid-2 {
+        grid-template-columns: 1fr !important;
+    }
+    body {
+        padding: 1rem;
+    }
+    h1 {
+        font-size: 1.5rem;
+    }
 }
