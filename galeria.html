@@ -5,42 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Galería de Viajes</title>
     <link rel="stylesheet" href="css/galeria.css" />
-    <style>
-        /* Estilos adicionales para la paginación */
-        #paginacion {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            margin: 20px 0;
-        }
-        .btn-pagina {
-            padding: 8px 16px;
-            background: #2c3e50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.2s;
-        }
-        .btn-pagina:hover:not(:disabled) {
-            background: #1a252f;
-        }
-        .btn-pagina:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        #infoPagina {
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        .pub-imagenes img {
-            max-width: 200px;
-            height: auto;
-            border-radius: 4px;
-        }
-    </style>
 </head>
 <body>
 
@@ -127,7 +91,7 @@
         // ============================================================
         // FUNCIONES PARA TRABAJAR CON EL WORKER
         // ============================================================
-        const WORKER_URL = 'https://green-flower-8734.victortilleria116.workers.dev'; // Cambia si es necesario
+        const WORKER_URL = 'https://green-flower-8734.victortilleria116.workers.dev';
 
         async function subirArchivoGitHub(ruta, contenidoBase64, mensaje = 'Subir archivo') {
             const body = { message: mensaje, content: contenidoBase64 };
@@ -159,6 +123,25 @@
 
         async function obtenerShaArchivo(ruta) {
             return await GitHub.sha(ruta);
+        }
+
+        // ============================================================
+        // OBTENER IMAGEN EN BASE64 DESDE EL WORKER
+        // ============================================================
+        async function obtenerImagenBase64(ruta) {
+            try {
+                const res = await fetch(`${WORKER_URL}?path=${encodeURIComponent(ruta)}`);
+                if (!res.ok) {
+                    console.warn(`Error al obtener imagen ${ruta}: ${res.status}`);
+                    return null;
+                }
+                const data = await res.json();
+                // Devuelve el contenido base64 sin decodificar
+                return data.content || null;
+            } catch (e) {
+                console.error('Error en obtenerImagenBase64:', ruta, e);
+                return null;
+            }
         }
 
         // ============================================================
@@ -219,11 +202,11 @@
                     return;
                 }
                 document.getElementById('paginacion').style.display = 'flex';
-                publicacionesCompletas = indice.publicaciones.slice().reverse(); // más reciente primero
+                publicacionesCompletas = indice.publicaciones.slice().reverse();
                 const totalPaginas = Math.ceil(publicacionesCompletas.length / POR_PAGINA);
                 if (paginaActual >= totalPaginas) paginaActual = totalPaginas - 1;
                 if (paginaActual < 0) paginaActual = 0;
-                renderizarPagina(paginaActual, totalPaginas);
+                await renderizarPagina(paginaActual, totalPaginas);
             } catch (error) {
                 console.error('Error al cargar publicaciones:', error);
                 contenedor.innerHTML = `<div class="mensaje-vacio" style="grid-column: 1 / -1;"><p>⚠️ Error al cargar la galería.</p></div>`;
@@ -231,25 +214,40 @@
             }
         }
 
-        function renderizarPagina(pagina, totalPaginas) {
+        // ============================================================
+        // RENDERIZAR PÁGINA (con carga de imágenes desde Worker)
+        // ============================================================
+        async function renderizarPagina(pagina, totalPaginas) {
             const contenedor = document.getElementById('contenedorPublicaciones');
             const inicio = pagina * POR_PAGINA;
             const fin = Math.min(inicio + POR_PAGINA, publicacionesCompletas.length);
             const publicacionesPagina = publicacionesCompletas.slice(inicio, fin);
             
             let html = '';
-            publicacionesPagina.forEach(pub => {
+            for (const pub of publicacionesPagina) {
                 const esAdmin = usuario.rol === 'admin';
                 const esAutor = pub.autor === `${usuario.nombre} ${usuario.apellido || ''}`.trim() || pub.autor === usuario.rut;
                 const puedeEliminar = esAdmin || (['guia', 'asistente'].includes(usuario.rol) && esAutor);
 
                 let imagenesHtml = '';
                 if (pub.imagenes && pub.imagenes.length > 0) {
+                    const imagenesDataUrls = [];
+                    for (const ruta of pub.imagenes) {
+                        const base64 = await obtenerImagenBase64(ruta);
+                        if (base64) {
+                            imagenesDataUrls.push(`data:image/jpeg;base64,${base64}`);
+                        } else {
+                            imagenesDataUrls.push(null);
+                        }
+                    }
                     imagenesHtml = `<div class="pub-imagenes">`;
-                    pub.imagenes.forEach(ruta => {
-                        const url = `https://raw.githubusercontent.com/${GitHub.owner}/${GitHub.repo}/main/${ruta}`;
-                        imagenesHtml += `<img src="${url}" alt="Imagen" loading="lazy">`;
-                    });
+                    for (const dataUrl of imagenesDataUrls) {
+                        if (dataUrl) {
+                            imagenesHtml += `<img src="${dataUrl}" alt="Imagen" loading="lazy">`;
+                        } else {
+                            imagenesHtml += `<div class="img-placeholder">🖼️ Imagen no disponible</div>`;
+                        }
+                    }
                     imagenesHtml += `</div>`;
                 }
 
@@ -281,15 +279,14 @@
                         </div>
                     </div>
                 `;
-            });
+            }
+
             contenedor.innerHTML = html || `<div class="mensaje-vacio" style="grid-column: 1 / -1;"><p>No hay publicaciones en esta página.</p></div>`;
 
-            // Actualizar controles de paginación
             document.getElementById('infoPagina').textContent = `Página ${pagina+1} de ${totalPaginas}`;
             document.getElementById('btnAnterior').disabled = (pagina === 0);
             document.getElementById('btnSiguiente').disabled = (pagina === totalPaginas - 1);
 
-            // Eventos de eliminar
             document.querySelectorAll('.btn-eliminar').forEach(btn => {
                 btn.addEventListener('click', async function(e) {
                     const id = this.dataset.id;
@@ -315,7 +312,6 @@
                     return;
                 }
 
-                // Eliminar imágenes
                 if (pubData.imagenes && pubData.imagenes.length > 0) {
                     for (const ruta of pubData.imagenes) {
                         try {
@@ -327,11 +323,9 @@
                     }
                 }
 
-                // Eliminar archivo JSON individual
                 const shaPub = await obtenerShaArchivo(`publicaciones/${id}.json`);
                 if (shaPub) await borrarArchivoGitHub(`publicaciones/${id}.json`, shaPub);
 
-                // Eliminar del índice
                 await eliminarDelIndice(id);
 
                 alert('✅ Publicación eliminada completamente.');
@@ -414,7 +408,7 @@
                         const ctx = canvas.getContext('2d');
                         let width = img.width;
                         let height = img.height;
-                        const maxWidth = 200; // COMPRESIÓN EXTREMA
+                        const maxWidth = 200;
                         if (width > maxWidth) {
                             height = (maxWidth / width) * height;
                             width = maxWidth;
