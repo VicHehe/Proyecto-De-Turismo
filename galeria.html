@@ -55,7 +55,7 @@
                 <label>Imágenes (máximo 4, formato JPG/PNG)</label>
                 <input type="file" id="inputImagenes" accept="image/jpeg,image/png" multiple>
                 <div id="previsualizacion" class="preview-container"></div>
-                <p class="muted">Selecciona hasta 4 imágenes. Serán redimensionadas a 200px y comprimidas al máximo.</p>
+                <p class="muted">Selecciona hasta 4 imágenes. Serán redimensionadas a 350px de ancho y comprimidas (calidad 0.5).</p>
             </div>
             <div class="modal-acciones">
                 <button type="button" class="btn-cancelar" id="btnCancelarSubir">Cancelar</button>
@@ -136,7 +136,6 @@
                     return null;
                 }
                 const data = await res.json();
-                // Devuelve el contenido base64 sin decodificar
                 return data.content || null;
             } catch (e) {
                 console.error('Error en obtenerImagenBase64:', ruta, e);
@@ -386,7 +385,7 @@
         }
 
         // ============================================================
-        // PREVISUALIZACIÓN Y COMPRESIÓN MUY FUERTE (200px, calidad 0.3)
+        // PREVISUALIZACIÓN Y COMPRESIÓN (350px, calidad 0.5)
         // ============================================================
         document.getElementById('inputImagenes').addEventListener('change', function(e) {
             const files = e.target.files;
@@ -408,7 +407,7 @@
                         const ctx = canvas.getContext('2d');
                         let width = img.width;
                         let height = img.height;
-                        const maxWidth = 200;
+                        const maxWidth = 350; // NUEVO TAMAÑO
                         if (width > maxWidth) {
                             height = (maxWidth / width) * height;
                             width = maxWidth;
@@ -416,7 +415,7 @@
                         canvas.width = width;
                         canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.3);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.5); // Calidad 0.5
                         imagenesSeleccionadas.push(dataUrl);
 
                         const div = document.createElement('div');
