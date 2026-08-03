@@ -132,7 +132,7 @@
 <script>
     // ============================================================
     // mis_salidas.js - Versión completa con soporte para URL ?id=xxx
-    // y botón de eliminar salida
+    // y botón de eliminar salida (estilo CSS)
     // ============================================================
 
     (function() {
@@ -300,7 +300,7 @@
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
                         ${puedeEditar ? `
                             <button class="btn-editar" id="btnAbrirEditar">✏️ Editar</button>
-                            <button class="btn-editar" id="btnEliminar" style="border-color:#cc0000; color:#cc0000;">🗑️ Eliminar</button>
+                            <button class="btn-eliminar" id="btnEliminar">🗑️ Eliminar</button>
                         ` : ''}
                     </div>
                 </div>
