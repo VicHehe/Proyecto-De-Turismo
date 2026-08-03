@@ -1,5 +1,5 @@
 /* ============================================================
-   mis_salidas.css - Estilos exclusivos para Mis Salidas
+   mis_salidas.css - Con paleta Aragon16
    ============================================================ */
 
 * {
@@ -9,15 +9,15 @@
 }
 
 body {
-    background: #fff;
-    color: #000;
+    background: #f9f8dd;
+    color: #272120;
     font-family: Arial, Helvetica, sans-serif;
     padding: 20px;
 }
 
 /* ---- Header ---- */
 header {
-    border: 1px solid #000;
+    border: 2px solid #272120;
     padding: 12px 16px;
     margin-bottom: 16px;
     display: flex;
@@ -25,31 +25,36 @@ header {
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
+    background: #54555c;
+    color: #f9f8dd;
 }
 
 header h1 {
     font-size: 20px;
     font-weight: bold;
+    color: #f9f8dd;
 }
 
 header .user-badge {
-    border: 1px solid #000;
+    border: 1px solid #f9f8dd;
     padding: 4px 12px;
     font-size: 13px;
+    color: #f9f8dd;
 }
 
 .volver {
-    border: 1px solid #000;
+    border: 1px solid #f9f8dd;
     padding: 4px 12px;
-    background: #fff;
+    background: transparent;
     cursor: pointer;
     text-decoration: none;
-    color: #000;
+    color: #f9f8dd;
     font-size: 13px;
 }
 
 .volver:hover {
-    background: #eee;
+    background: #f9f8dd;
+    color: #272120;
 }
 
 /* ---- Contenedor principal (dos columnas) ---- */
@@ -65,17 +70,19 @@ header .user-badge {
     flex: 1;
     min-width: 220px;
     max-width: 320px;
-    border: 1px solid #000;
+    border: 2px solid #272120;
     padding: 12px;
     max-height: 600px;
     overflow-y: auto;
+    background: #ffffff;
 }
 
 .panel-lista h2 {
     font-size: 15px;
-    border-bottom: 1px solid #000;
+    border-bottom: 2px solid #272120;
     padding-bottom: 6px;
     margin-bottom: 10px;
+    color: #5c8d58;
 }
 
 #listaSalidas {
@@ -86,23 +93,23 @@ header .user-badge {
 
 .item-salida {
     padding: 8px 10px;
-    border: 1px solid #000;
+    border: 2px solid #272120;
     cursor: pointer;
-    background: #fff;
-    transition: 0.1s;
+    background: #f9f8dd;
+    transition: 0.15s;
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
 .item-salida:hover {
-    background: #f5f5f5;
+    background: #d2e291;
 }
 
 .item-salida.activa {
-    background: #000;
-    color: #fff;
-    border-color: #000;
+    background: #3b473c;
+    color: #f9f8dd;
+    border-color: #a8d455;
 }
 
 .item-salida strong {
@@ -121,7 +128,7 @@ header .user-badge {
 .cargando, .vacio, .error {
     padding: 12px;
     text-align: center;
-    color: #666;
+    color: #876661;
     font-style: italic;
 }
 
@@ -134,15 +141,16 @@ header .user-badge {
 .panel-detalle {
     flex: 2;
     min-width: 320px;
-    border: 1px solid #000;
+    border: 2px solid #272120;
     padding: 16px;
     max-height: 600px;
     overflow-y: auto;
+    background: #ffffff;
 }
 
 .mensaje-inicial {
     text-align: center;
-    color: #666;
+    color: #876661;
     font-style: italic;
     padding: 40px 0;
 }
@@ -152,7 +160,7 @@ header .user-badge {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #000;
+    border-bottom: 2px solid #272120;
     padding-bottom: 6px;
     margin-bottom: 12px;
     flex-wrap: wrap;
@@ -162,45 +170,53 @@ header .user-badge {
 .detalle-header h2 {
     font-size: 18px;
     margin: 0;
+    color: #5c8d58;
 }
 
 .btn-editar {
-    background: #fff;
-    border: 1px solid #000;
+    background: #f9f8dd;
+    border: 2px solid #272120;
     padding: 4px 12px;
     cursor: pointer;
     font-size: 13px;
+    font-weight: bold;
+    transition: 0.2s;
 }
 
 .btn-editar:hover {
-    background: #eee;
+    background: #d2e291;
+    border-color: #5c8d58;
 }
 
-/* ---- Botón eliminar (nuevo) ---- */
+/* ---- Botón eliminar ---- */
 .btn-eliminar {
-    background: #fff;
-    border: 1px solid #cc0000;
-    color: #cc0000;
+    background: #f9f8dd;
+    border: 2px solid #876661;
+    color: #876661;
     padding: 4px 12px;
     cursor: pointer;
     font-size: 13px;
+    font-weight: bold;
+    transition: 0.2s;
 }
 
 .btn-eliminar:hover {
-    background: #cc0000;
-    color: #fff;
+    background: #876661;
+    color: #f9f8dd;
 }
 
 .detalle-body h3 {
     font-size: 14px;
     margin: 16px 0 6px 0;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 2px solid #d2e291;
     padding-bottom: 4px;
+    color: #3b473c;
 }
 
 .detalle-body p {
     margin: 4px 0;
     font-size: 13px;
+    color: #54555c;
 }
 
 .ruta-lista {
@@ -210,19 +226,20 @@ header .user-badge {
 
 .ruta-lista li {
     padding: 6px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #d2e291;
     font-size: 13px;
+    color: #272120;
 }
 
 .ruta-lista .horario {
     font-size: 12px;
-    color: #555;
+    color: #876661;
     margin-left: 8px;
 }
 
 .lugar-info {
-    background: #f9f9f9;
-    border: 1px solid #ddd;
+    background: #f9f8dd;
+    border: 1px solid #d2e291;
     padding: 6px 10px;
     margin-top: 4px;
     font-size: 12px;
@@ -243,19 +260,20 @@ header .user-badge {
 
 .participantes-tabla th,
 .participantes-tabla td {
-    border: 1px solid #000;
+    border: 1px solid #272120;
     padding: 4px 6px;
     text-align: left;
     vertical-align: top;
 }
 
 .participantes-tabla th {
-    background: #f0f0f0;
+    background: #8b8893;
     font-weight: 700;
+    color: #f9f8dd;
 }
 
 .participantes-tabla tr:hover {
-    background: #fafafa;
+    background: #f9f8dd;
 }
 
 /* ---- Modal de edición ---- */
@@ -267,14 +285,14 @@ header .user-badge {
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(39, 33, 32, 0.7);
     justify-content: center;
     align-items: center;
 }
 
 .modal-contenido {
-    background: #fff;
-    border: 2px solid #000;
+    background: #f9f8dd;
+    border: 3px solid #272120;
     max-width: 700px;
     width: 95%;
     max-height: 90vh;
@@ -289,20 +307,26 @@ header .user-badge {
     right: 15px;
     font-size: 1.8rem;
     cursor: pointer;
+    color: #272120;
+}
+.modal-cerrar:hover {
+    color: #876661;
 }
 
 .modal-contenido h2 {
     margin-top: 0;
-    border-bottom: 1px solid #000;
+    border-bottom: 2px solid #272120;
     padding-bottom: 0.5rem;
     font-size: 1.3rem;
+    color: #5c8d58;
 }
 
 .modal-contenido h3 {
     font-size: 1rem;
     margin: 1rem 0 0.5rem 0;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 2px solid #d2e291;
     padding-bottom: 0.3rem;
+    color: #3b473c;
 }
 
 .campo {
@@ -314,6 +338,7 @@ header .user-badge {
     font-weight: 600;
     font-size: 0.85rem;
     margin-bottom: 0.15rem;
+    color: #3b473c;
 }
 
 .campo input,
@@ -321,10 +346,18 @@ header .user-badge {
 .campo textarea {
     width: 100%;
     padding: 0.4rem;
-    border: 1px solid #000;
+    border: 2px solid #272120;
     font-size: 0.9rem;
-    background: #fff;
+    background: #ffffff;
     box-sizing: border-box;
+    color: #272120;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+    border-color: #8daad6;
+    outline: none;
 }
 
 .campo textarea {
@@ -339,15 +372,22 @@ header .user-badge {
     gap: 0.3rem;
     align-items: center;
     padding: 0.4rem 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #d2e291;
 }
 
 .ruta-edit-item select,
 .ruta-edit-item input {
     padding: 0.2rem 0.4rem;
-    border: 1px solid #000;
+    border: 2px solid #272120;
     font-size: 0.8rem;
-    background: #fff;
+    background: #ffffff;
+    color: #272120;
+}
+
+.ruta-edit-item select:focus,
+.ruta-edit-item input:focus {
+    border-color: #8daad6;
+    outline: none;
 }
 
 .ruta-edit-item .edit-desc-actividad {
@@ -365,22 +405,28 @@ header .user-badge {
     border: none;
     cursor: pointer;
     font-weight: bold;
-    color: #cc0000;
+    color: #876661;
     font-size: 1rem;
     padding: 0 0.3rem;
 }
+.btn-eliminar-actividad:hover {
+    color: #cc0000;
+}
 
 .btn-agregar-actividad {
-    background: #fff;
-    border: 1px solid #000;
+    background: #f9f8dd;
+    border: 2px solid #272120;
     padding: 0.3rem 0.8rem;
     cursor: pointer;
     font-size: 0.85rem;
     margin: 0.3rem 0;
+    font-weight: bold;
+    transition: 0.2s;
 }
 
 .btn-agregar-actividad:hover {
-    background: #f0f0f0;
+    background: #d2e291;
+    border-color: #5c8d58;
 }
 
 /* ---- Participantes en edición ---- */
@@ -389,7 +435,7 @@ header .user-badge {
     justify-content: space-between;
     align-items: center;
     padding: 0.3rem 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #d2e291;
     font-size: 0.9rem;
 }
 
@@ -398,20 +444,25 @@ header .user-badge {
     border: none;
     cursor: pointer;
     font-weight: bold;
-    color: #cc0000;
+    color: #876661;
     font-size: 1rem;
+}
+.btn-eliminar-participante:hover {
+    color: #cc0000;
 }
 
 .btn-small {
-    background: #fff;
-    border: 1px solid #000;
+    background: #f9f8dd;
+    border: 2px solid #272120;
     padding: 0.2rem 0.6rem;
     cursor: pointer;
     font-size: 0.8rem;
+    font-weight: bold;
+    transition: 0.2s;
 }
 
 .btn-small:hover {
-    background: #eee;
+    background: #d2e291;
 }
 
 /* ---- Acciones del modal ---- */
@@ -420,29 +471,31 @@ header .user-badge {
     gap: 0.5rem;
     justify-content: flex-end;
     margin-top: 1.5rem;
-    border-top: 1px solid #000;
+    border-top: 2px solid #272120;
     padding-top: 1rem;
 }
 
 .modal-acciones button {
     padding: 0.4rem 1.2rem;
-    border: 1px solid #000;
-    background: #fff;
+    border: 2px solid #272120;
+    background: #f9f8dd;
     cursor: pointer;
     font-weight: 600;
+    transition: 0.2s;
 }
 
 .modal-acciones .btn-guardar {
-    background: #000;
-    color: #fff;
+    background: #3b473c;
+    color: #f9f8dd;
+    border-color: #3b473c;
 }
 
 .modal-acciones .btn-guardar:hover {
-    background: #222;
+    background: #5c8d58;
 }
 
 .modal-acciones .btn-cancelar:hover {
-    background: #eee;
+    background: #d2e291;
 }
 
 /* ============================================================
@@ -592,7 +645,7 @@ header .user-badge {
         padding: 0.8rem;
         width: 100%;
         max-width: 100%;
-        border-width: 1px;
+        border-width: 2px;
     }
 
     .modal-cerrar {
