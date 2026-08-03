@@ -50,12 +50,13 @@
                 <label>Imágenes (máximo 4, formato JPG/PNG)</label>
                 <input type="file" id="inputImagenes" accept="image/jpeg,image/png" multiple>
                 <div id="previsualizacion" class="preview-container"></div>
-                <p class="muted">Selecciona hasta 4 imágenes. Serán redimensionadas a 800px de ancho.</p>
+                <p class="muted">Selecciona hasta 4 imágenes. Serán redimensionadas a 600px de ancho y comprimidas.</p>
             </div>
             <div class="modal-acciones">
                 <button type="button" class="btn-cancelar" id="btnCancelarSubir">Cancelar</button>
-                <button type="submit" class="btn-guardar">📤 Publicar</button>
+                <button type="submit" class="btn-guardar" id="btnPublicar">📤 Publicar</button>
             </div>
+            <div id="mensajeSubida" style="margin-top: 10px; color: #555;"></div>
         </form>
     </div>
 </div>
@@ -63,10 +64,6 @@
 <script src="js/github.js"></script>
 <script src="js/auth.js"></script>
 <script>
-    // ============================================================
-    // galeria.js - Con piñas fijas por publicación (sin votación)
-    // ============================================================
-
     (function() {
         // ---- VERIFICAR SESIÓN ----
         const usuario = Auth.getSesion();
@@ -85,7 +82,66 @@
         }
 
         // ---- VARIABLES GLOBALES ----
-        let imagenesSeleccionadas = [];
+        let imagenesSeleccionadas = []; // Array de dataURL (ya comprimidas)
+
+        // ---- FUNCIONES PARA SUBIR/BORRAR ARCHIVOS A GITHUB ----
+        // Estas funciones usan la API de GitHub y el token de github.js
+        async function subirArchivoGitHub(ruta, contenidoBase64, mensaje = 'Subir imagen') {
+            const url = `https://api.github.com/repos/${GitHub.owner}/${GitHub.repo}/contents/${ruta}`;
+            const body = {
+                message: mensaje,
+                content: contenidoBase64,
+                branch: 'main'
+            };
+            const resp = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${GitHub.token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            });
+            if (!resp.ok) {
+                const error = await resp.json();
+                throw new Error(`Error al subir ${ruta}: ${error.message || resp.statusText}`);
+            }
+            return await resp.json();
+        }
+
+        async function borrarArchivoGitHub(ruta, sha, mensaje = 'Eliminar imagen') {
+            const url = `https://api.github.com/repos/${GitHub.owner}/${GitHub.repo}/contents/${ruta}`;
+            const body = {
+                message: mensaje,
+                sha: sha,
+                branch: 'main'
+            };
+            const resp = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `token ${GitHub.token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            });
+            if (!resp.ok) {
+                const error = await resp.json();
+                throw new Error(`Error al borrar ${ruta}: ${error.message || resp.statusText}`);
+            }
+            return await resp.json();
+        }
+
+        async function obtenerShaArchivo(ruta) {
+            const url = `https://api.github.com/repos/${GitHub.owner}/${GitHub.repo}/contents/${ruta}`;
+            const resp = await fetch(url, {
+                headers: { 'Authorization': `token ${GitHub.token}` }
+            });
+            if (!resp.ok) {
+                if (resp.status === 404) return null;
+                throw new Error(`Error al obtener SHA de ${ruta}`);
+            }
+            const data = await resp.json();
+            return data.sha;
+        }
 
         // ---- CARGAR PUBLICACIONES ----
         async function cargarPublicaciones() {
@@ -101,32 +157,29 @@
                     `;
                     return;
                 }
-                // Mostrar más reciente primero
                 const publicaciones = datos.publicaciones.slice().reverse();
                 let html = '';
                 publicaciones.forEach(pub => {
-                    // Determinar si puede eliminar
                     const esAdmin = usuario.rol === 'admin';
                     const esAutor = pub.autor === `${usuario.nombre} ${usuario.apellido || ''}`.trim() || pub.autor === usuario.rut;
                     const puedeEliminar = esAdmin || (['guia', 'asistente'].includes(usuario.rol) && esAutor);
 
-                    // Imágenes
                     let imagenesHtml = '';
                     if (pub.imagenes && pub.imagenes.length > 0) {
                         imagenesHtml = `<div class="pub-imagenes">`;
-                        pub.imagenes.forEach(img => {
-                            imagenesHtml += `<img src="${img}" alt="Imagen de publicación">`;
+                        pub.imagenes.forEach(ruta => {
+                            // Construir URL raw
+                            const url = `https://raw.githubusercontent.com/${GitHub.owner}/${GitHub.repo}/main/${ruta}`;
+                            imagenesHtml += `<img src="${url}" alt="Imagen de publicación">`;
                         });
                         imagenesHtml += `</div>`;
                     }
 
-                    // Generar estrellas (piñas) según la calificación
                     let pinasHtml = '';
                     const pinas = pub.pinas || 0;
                     for (let i = 0; i < pinas; i++) {
                         pinasHtml += `<img src="PiñaDePino.png" alt="Piña" class="pina-icono">`;
                     }
-                    // Si no hay piñas, mostrar "Sin calificación"
                     if (pinas === 0) pinasHtml = '<span class="sin-pinas">Sin calificación</span>';
 
                     const fecha = new Date(pub.fecha).toLocaleDateString('es-CL', {
@@ -153,7 +206,6 @@
                 });
                 contenedor.innerHTML = html;
 
-                // ---- EVENTOS DE ELIMINACIÓN ----
                 document.querySelectorAll('.btn-eliminar').forEach(btn => {
                     btn.addEventListener('click', async function(e) {
                         const id = this.dataset.id;
@@ -169,7 +221,7 @@
             }
         }
 
-        // ---- ELIMINAR PUBLICACIÓN ----
+        // ---- ELIMINAR PUBLICACIÓN (incluye imágenes) ----
         async function eliminarPublicacion(id) {
             try {
                 const datos = await GitHub.leer('datos/galeria.json');
@@ -184,15 +236,30 @@
                 const puedeEliminar = esAdmin || (['guia', 'asistente'].includes(usuario.rol) && esAutor);
                 if (!puedeEliminar) return alert('No tienes permiso para eliminar esta publicación.');
 
-                datos.publicaciones.splice(index, 1);
+                // Eliminar las imágenes del repositorio
+                if (pub.imagenes && pub.imagenes.length > 0) {
+                    for (const ruta of pub.imagenes) {
+                        try {
+                            const sha = await obtenerShaArchivo(ruta);
+                            if (sha) {
+                                await borrarArchivoGitHub(ruta, sha);
+                            }
+                        } catch (err) {
+                            console.warn(`No se pudo borrar ${ruta}:`, err);
+                            // Continuamos aunque falle una imagen
+                        }
+                    }
+                }
 
-                const sha = await GitHub.sha('datos/galeria.json');
-                const ok = await GitHub.escribir('datos/galeria.json', datos, sha);
+                // Eliminar la publicación del JSON
+                datos.publicaciones.splice(index, 1);
+                const shaJson = await GitHub.sha('datos/galeria.json');
+                const ok = await GitHub.escribir('datos/galeria.json', datos, shaJson);
                 if (ok) {
-                    alert('✅ Publicación eliminada.');
+                    alert('✅ Publicación e imágenes eliminadas.');
                     cargarPublicaciones();
                 } else {
-                    alert('❌ Error al eliminar.');
+                    alert('❌ Error al eliminar la publicación del JSON.');
                 }
             } catch (error) {
                 console.error('Error al eliminar:', error);
@@ -208,14 +275,15 @@
             document.getElementById('previsualizacion').innerHTML = '';
             imagenesSeleccionadas = [];
             document.getElementById('inputPinas').value = '3';
+            document.getElementById('mensajeSubida').textContent = '';
+            document.getElementById('btnPublicar').disabled = false;
         }
 
-        // ---- CERRAR MODAL ----
         function cerrarModal() {
             document.getElementById('modalSubir').style.display = 'none';
         }
 
-        // ---- PREVISUALIZACIÓN Y REDIMENSIONADO ----
+        // ---- PREVISUALIZACIÓN Y COMPRESIÓN ----
         document.getElementById('inputImagenes').addEventListener('change', function(e) {
             const files = e.target.files;
             if (files.length > 4) {
@@ -237,7 +305,7 @@
                         const ctx = canvas.getContext('2d');
                         let width = img.width;
                         let height = img.height;
-                        const maxWidth = 800;
+                        const maxWidth = 600; // Reducido para comprimir más
                         if (width > maxWidth) {
                             height = (maxWidth / width) * height;
                             width = maxWidth;
@@ -245,7 +313,8 @@
                         canvas.width = width;
                         canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                        // Calidad 0.6 para reducir tamaño
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
                         imagenesSeleccionadas.push(dataUrl);
 
                         const div = document.createElement('div');
@@ -277,7 +346,7 @@
             });
         });
 
-        // ---- SUBIR PUBLICACIÓN ----
+        // ---- SUBIR PUBLICACIÓN (con imágenes como archivos) ----
         document.getElementById('formSubir').addEventListener('submit', async function(e) {
             e.preventDefault();
             const descripcion = document.getElementById('inputDescripcion').value.trim();
@@ -286,33 +355,77 @@
                 alert('Debes seleccionar al menos una imagen.');
                 return;
             }
-            if (imagenesSeleccionadas.length > 5) {
-                alert('Máximo 5 imágenes.');
+            if (imagenesSeleccionadas.length > 4) {
+                alert('Máximo 4 imágenes.');
                 return;
             }
 
-            const publicacion = {
-                id: `pub_${Date.now()}`,
-                autor: `${usuario.nombre} ${usuario.apellido || ''}`.trim() || usuario.rut,
-                fecha: new Date().toISOString(),
-                descripcion: descripcion || 'Sin descripción',
-                imagenes: imagenesSeleccionadas,
-                pinas: pinas
-            };
+            const btnPublicar = document.getElementById('btnPublicar');
+            const mensajeDiv = document.getElementById('mensajeSubida');
+            btnPublicar.disabled = true;
+            btnPublicar.textContent = '⏳ Subiendo...';
+            mensajeDiv.textContent = 'Subiendo imágenes...';
 
-            let datos = await GitHub.leer('datos/galeria.json');
-            if (!datos) datos = { publicaciones: [] };
-            if (!datos.publicaciones) datos.publicaciones = [];
-            datos.publicaciones.push(publicacion);
+            const id = `pub_${Date.now()}`;
+            const rutasImagenes = [];
 
-            const sha = await GitHub.sha('datos/galeria.json');
-            const ok = await GitHub.escribir('datos/galeria.json', datos, sha);
-            if (ok) {
-                alert('✅ Publicación subida exitosamente.');
-                cerrarModal();
-                cargarPublicaciones();
-            } else {
-                alert('❌ Error al guardar la publicación.');
+            try {
+                // 1. Subir cada imagen como archivo
+                for (let i = 0; i < imagenesSeleccionadas.length; i++) {
+                    const dataUrl = imagenesSeleccionadas[i];
+                    // Extraer solo el contenido base64 (sin el prefijo)
+                    const base64Data = dataUrl.split(',')[1];
+                    const nombre = `imagenes/${id}_${i}.jpg`;
+                    await subirArchivoGitHub(nombre, base64Data, `Subir imagen para publicación ${id}`);
+                    rutasImagenes.push(nombre);
+                    mensajeDiv.textContent = `Subiendo imagen ${i+1}/${imagenesSeleccionadas.length}...`;
+                }
+
+                // 2. Crear la publicación en el JSON
+                const publicacion = {
+                    id: id,
+                    autor: `${usuario.nombre} ${usuario.apellido || ''}`.trim() || usuario.rut,
+                    fecha: new Date().toISOString(),
+                    descripcion: descripcion || 'Sin descripción',
+                    imagenes: rutasImagenes,
+                    pinas: pinas
+                };
+
+                let datos = await GitHub.leer('datos/galeria.json');
+                if (!datos) datos = { publicaciones: [] };
+                if (!datos.publicaciones) datos.publicaciones = [];
+                datos.publicaciones.push(publicacion);
+
+                const sha = await GitHub.sha('datos/galeria.json');
+                const ok = await GitHub.escribir('datos/galeria.json', datos, sha);
+                if (ok) {
+                    alert('✅ Publicación subida exitosamente.');
+                    cerrarModal();
+                    cargarPublicaciones();
+                } else {
+                    // Si falla guardar el JSON, intentar borrar las imágenes subidas
+                    for (const ruta of rutasImagenes) {
+                        try {
+                            const shaImg = await obtenerShaArchivo(ruta);
+                            if (shaImg) await borrarArchivoGitHub(ruta, shaImg);
+                        } catch (e) {}
+                    }
+                    alert('❌ Error al guardar la publicación en el JSON. Las imágenes han sido eliminadas.');
+                }
+            } catch (error) {
+                console.error('Error al subir:', error);
+                alert(`❌ Error: ${error.message}`);
+                // Intentar limpiar imágenes subidas parcialmente
+                for (const ruta of rutasImagenes) {
+                    try {
+                        const shaImg = await obtenerShaArchivo(ruta);
+                        if (shaImg) await borrarArchivoGitHub(ruta, shaImg);
+                    } catch (e) {}
+                }
+            } finally {
+                btnPublicar.disabled = false;
+                btnPublicar.textContent = '📤 Publicar';
+                mensajeDiv.textContent = '';
             }
         });
 
