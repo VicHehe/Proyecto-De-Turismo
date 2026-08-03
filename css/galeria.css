@@ -1,7 +1,7 @@
 /* ============================================================
    galeria.css - Estilos para la galería de viajes
    Estilo en blanco y negro, consistente con el resto del sistema.
-   Incluye votación con piñas y botón eliminar.
+   Con piñas fijas por publicación (sin votación).
    ============================================================ */
 
 * {
@@ -109,7 +109,7 @@ header h1 {
     background: #f0f0f0;
 }
 
-/* ---- Footer de publicación (votación y eliminar) ---- */
+/* ---- Footer de publicación (calificación y eliminar) ---- */
 .pub-footer {
     display: flex;
     justify-content: space-between;
@@ -121,44 +121,29 @@ header h1 {
     gap: 8px;
 }
 
-.votacion {
+.calificacion {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
+}
+
+.pinas-label {
+    font-size: 13px;
+    font-weight: bold;
+    margin-right: 4px;
 }
 
 .pina-icono {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     filter: brightness(0.7) contrast(1.2); /* Ajuste para hacerla más oscura */
-    /* Si quieres más clara: filter: brightness(1.2) contrast(0.8); */
     image-rendering: auto;
 }
 
-.pina-conteo {
-    font-size: 16px;
-    font-weight: bold;
-    min-width: 20px;
-    text-align: center;
-}
-
-.btn-votar {
-    background: #fff;
-    border: 1px solid #000;
-    padding: 2px 10px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-.btn-votar:hover {
-    background: #eee;
-}
-
-.ya-voto {
-    font-size: 12px;
-    color: #008800;
-    font-weight: bold;
+.sin-pinas {
+    font-size: 13px;
+    color: #999;
+    font-style: italic;
 }
 
 .btn-eliminar {
@@ -255,7 +240,8 @@ header h1 {
 }
 
 .campo textarea,
-.campo input[type="file"] {
+.campo input[type="file"],
+.campo select {
     width: 100%;
     padding: 0.4rem;
     border: 1px solid #000;
@@ -369,7 +355,7 @@ header h1 {
         flex-direction: column;
         align-items: stretch;
     }
-    .votacion {
+    .calificacion {
         justify-content: center;
     }
     .btn-eliminar {
