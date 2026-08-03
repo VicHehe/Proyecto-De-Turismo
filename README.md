@@ -287,4 +287,4 @@ El Worker expone endpoints para leer/escribir/eliminar archivos en el repositori
 Este proyecto es de uso interno del Liceo Eduardo Charme. Queda prohibida su reproducción o distribución sin autorización expresa.
 
 ¡Gracias por usar el Sistema de Gestión de Salidas Turísticas!
-Desarrollado con ❤️ por la Especialidad de Turismo y Programación.
+Desarrollado con ❤️ por la Especialidad de Programación.
