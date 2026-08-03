@@ -131,7 +131,8 @@
 <script src="js/lugares.js"></script>
 <script>
     // ============================================================
-    // mis_salidas.js - Con función para eliminar guías
+    // mis_salidas.js - Versión completa con soporte para URL ?id=xxx
+    // y botón de eliminar salida
     // ============================================================
 
     (function() {
@@ -227,7 +228,7 @@
             });
         }
 
-        // ===== SELECCIONAR SALIDA =====
+        // ===== SELECCIONAR SALIDA (async) =====
         window.seleccionarSalida = async function(id) {
             const salida = todasLasSalidas.find(s => s.id === id);
             if (!salida) return;
@@ -238,39 +239,33 @@
             await renderizarDetalle(salida);
         };
 
-        // ===== ELIMINAR GUÍA (función global) =====
-        window.eliminarGuia = async function(rut, salidaId) {
-            if (!confirm(`¿Eliminar al guía con RUT ${rut} de esta salida?`)) return;
-            try {
-                const salidas = await Planificacion.cargarSalidas();
-                const salida = salidas.find(s => s.id === salidaId);
-                if (!salida) return alert('Salida no encontrada');
-
-                // Filtrar participantes
-                salida.participantes = salida.participantes.filter(p => p.rut !== rut);
-                // Filtrar guias
-                salida.guias = salida.guias.filter(g => g.rut !== rut);
-
-                const ok = await Planificacion.actualizarSalida(salidaId, {
-                    participantes: salida.participantes,
-                    guias: salida.guias
-                });
-
-                if (ok) {
-                    alert('✅ Guía eliminado correctamente.');
-                    // Recargar datos y seleccionar la misma salida
-                    await cargarDatos();
-                    window.seleccionarSalida(salidaId);
-                } else {
-                    alert('❌ Error al eliminar el guía.');
-                }
-            } catch (error) {
-                console.error(error);
-                alert('Error al eliminar guía.');
+        // ===== ELIMINAR SALIDA =====
+        async function eliminarSalida(id) {
+            const salida = todasLasSalidas.find(s => s.id === id);
+            if (!salida) return alert('Salida no encontrada.');
+            if (!confirm(`¿Estás seguro de eliminar la salida "${salida.titulo || 'Sin título'}"? Esta acción es permanente.`)) {
+                return;
             }
-        };
 
-        // ===== RENDERIZAR DETALLE =====
+            const ok = await Planificacion.eliminarSalida(id);
+            if (ok) {
+                alert('✅ Salida eliminada correctamente.');
+                // Recargar datos
+                await cargarDatos();
+                // Si la lista no está vacía, seleccionar la primera
+                const misSalidas = getSalidasDelUsuario(todasLasSalidas);
+                if (misSalidas.length > 0) {
+                    seleccionarSalida(misSalidas[0].id);
+                } else {
+                    mostrarSinSalidas();
+                }
+            } else {
+                alert('❌ Error al eliminar la salida.');
+            }
+        }
+        window.eliminarSalida = eliminarSalida;
+
+        // ===== RENDERIZAR DETALLE (async) =====
         async function renderizarDetalle(salida) {
             const contenedor = document.getElementById('detalleSalida');
             const datosUsuarios = await GitHub.leer('datos/usuarios.json');
@@ -302,7 +297,12 @@
             let html = `
                 <div class="detalle-header">
                     <h2>${salida.titulo || 'Sin título'}</h2>
-                    ${puedeEditar ? `<button class="btn-editar" id="btnAbrirEditar">✏️ Editar</button>` : ''}
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        ${puedeEditar ? `
+                            <button class="btn-editar" id="btnAbrirEditar">✏️ Editar</button>
+                            <button class="btn-editar" id="btnEliminar" style="border-color:#cc0000; color:#cc0000;">🗑️ Eliminar</button>
+                        ` : ''}
+                    </div>
                 </div>
                 <div class="detalle-body">
                     <p><strong>Fecha:</strong> ${salida.fecha || 'No definida'}</p>
@@ -331,17 +331,7 @@
                     <h3>👥 Participantes (${participantesConInfo.length})</h3>
                     ${participantesConInfo.length > 0 ? `
                         <table class="participantes-tabla">
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>RUT</th>
-                                    <th>Rol</th>
-                                    <th>Edad</th>
-                                    <th>Teléfono</th>
-                                    <th>Historial Médico</th>
-                                    ${puedeEditar ? '<th>Acciones</th>' : ''}
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Nombre</th><th>RUT</th><th>Rol</th><th>Edad</th><th>Teléfono</th><th>Historial Médico</th></tr></thead>
                             <tbody>
                                 ${participantesConInfo.map(p => `
                                     <tr>
@@ -351,11 +341,6 @@
                                         <td>${p.edad}</td>
                                         <td>${p.telefono}</td>
                                         <td>${p.historial}</td>
-                                        ${puedeEditar ? `
-                                            <td>
-                                                ${p.rol === 'Guía' ? `<button onclick="eliminarGuia('${p.rut}', '${salida.id}')" class="btn-eliminar-guia" title="Eliminar guía">🗑️</button>` : ''}
-                                            </td>
-                                        ` : ''}
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -382,6 +367,11 @@
             const btnEditar = document.getElementById('btnAbrirEditar');
             if (btnEditar) {
                 btnEditar.addEventListener('click', () => abrirModalEdicion(salida));
+            }
+
+            const btnEliminar = document.getElementById('btnEliminar');
+            if (btnEliminar) {
+                btnEliminar.addEventListener('click', () => eliminarSalida(salida.id));
             }
         }
 
@@ -517,6 +507,7 @@
                 alert('✅ Salida actualizada correctamente.');
                 cerrarModalEdicion();
                 await cargarDatos();
+                // Seleccionar la misma salida después de recargar
                 window.seleccionarSalida(id);
             } else {
                 alert('❌ Error al actualizar la salida.');
@@ -596,7 +587,7 @@
         // ===== INICIALIZAR =====
         cargarDatos();
 
-        console.log('✅ mis_salidas.html cargado correctamente con función para eliminar guías');
+        console.log('✅ mis_salidas.html cargado correctamente con soporte para URL y eliminación');
     })();
 </script>
 </body>
