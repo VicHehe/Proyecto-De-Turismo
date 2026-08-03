@@ -1,39 +1,54 @@
+/* ============================================================
+   ESTILO PRINCIPAL – Paleta Aragon16 (colores orgánicos y formales)
+   ============================================================ */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
+
 body {
-    background-color: white;
+    background-color: #f9f8dd;        /* amarillo claro – fondo natural */
     font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
     padding: 2rem 1.5rem;
-    color: #111;
+    color: #272120;                   /* marrón oscuro – texto principal */
     line-height: 1.5;
 }
+
 .contenedor {
     max-width: 1200px;
     margin: 0 auto;
 }
+
+/* ===== TITULOS ===== */
 h1 {
     font-size: 2rem;
     font-weight: 600;
     letter-spacing: -0.01em;
-    border-bottom: 2px solid #000;
+    border-bottom: 2px solid #876661; /* marrón */
     padding-bottom: 0.5rem;
     margin-bottom: 2rem;
+    color: #3b473c;                   /* verde muy oscuro */
 }
+
 h2 {
     font-size: 1.3rem;
     font-weight: 600;
     margin: 1.8rem 0 0.8rem 0;
-    border-bottom: 1px solid #000;
+    border-bottom: 1px solid #ba9572; /* marrón claro */
     padding-bottom: 0.3rem;
+    color: #3b473c;
 }
+
 h3 {
     font-size: 1rem;
     font-weight: 600;
     margin: 1rem 0 0.3rem 0;
+    color: #3b473c;
 }
+
+/* ===== GRILLAS ===== */
 .grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -44,15 +59,20 @@ h3 {
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
 }
+
+/* ===== COLUMNAS / TARJETAS ===== */
 .columna {
-    border: 1px solid #000;
+    border: 1px solid #ba9572;        /* marrón claro */
     padding: 1.2rem 1.2rem 1.5rem;
-    background: white;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(39, 33, 32, 0.06);
 }
 .columna-sin-borde {
     border: none;
     padding: 0;
 }
+
+/* ===== FORMULARIOS ===== */
 .grupo {
     margin-bottom: 1.2rem;
 }
@@ -61,43 +81,62 @@ h3 {
     font-weight: 500;
     font-size: 0.9rem;
     margin-bottom: 0.2rem;
+    color: #3b473c;
 }
-.grupo input, .grupo select, .grupo textarea {
+.grupo input,
+.grupo select,
+.grupo textarea {
     width: 100%;
     padding: 0.45rem 0.6rem;
-    border: 1px solid #222;
-    background: white;
+    border: 1px solid #8b8893;        /* gris */
+    background: #ffffff;
     font-size: 0.95rem;
-    border-radius: 0;
+    border-radius: 4px;               /* toque orgánico */
+    transition: border-color 0.2s;
+    color: #272120;
+}
+.grupo input:focus,
+.grupo select:focus,
+.grupo textarea:focus {
+    border-color: #5c8d58;            /* verde oscuro */
+    outline: none;
 }
 .grupo textarea {
     min-height: 60px;
     resize: vertical;
 }
+
+/* ===== BOTONES ===== */
 .btn {
-    background: white;
-    border: 1px solid #000;
+    background: #ffffff;
+    border: 1px solid #876661;        /* marrón */
     padding: 0.5rem 1.2rem;
     font-size: 0.9rem;
     font-weight: 500;
     cursor: default;
-    transition: none;
+    transition: background 0.2s, box-shadow 0.2s;
     margin-right: 0.5rem;
     margin-bottom: 0.5rem;
     display: inline-block;
-    color: #000;
+    color: #3b473c;
+    border-radius: 4px;
 }
 .btn:hover {
-    background: #f0f0f0;
+    background: #d2e291;              /* verde claro */
+    box-shadow: 0 1px 4px rgba(39, 33, 32, 0.1);
 }
+
 .btn-primario {
-    background: #000;
-    color: white;
-    border: 1px solid #000;
+    background: #5c8d58;              /* verde oscuro */
+    color: #ffffff;
+    border: 1px solid #3b473c;
 }
 .btn-primario:hover {
-    background: #222;
+    background: #3b473c;
+    border-color: #272120;
 }
+
+/* ===== FILA DE BOTONES ===== */
 .fila-botones {
     display: flex;
     flex-wrap: wrap;
@@ -105,46 +144,66 @@ h3 {
     gap: 0.5rem;
     margin-top: 0.8rem;
 }
+
+/* ===== TABLAS MINI ===== */
 .tabla-mini {
     width: 100%;
     border-collapse: collapse;
     margin: 0.6rem 0;
     font-size: 0.9rem;
 }
-.tabla-mini th, .tabla-mini td {
-    border: 1px solid #000;
+.tabla-mini th,
+.tabla-mini td {
+    border: 1px solid #ba9572;        /* marrón claro */
     padding: 0.4rem 0.5rem;
     text-align: left;
     vertical-align: top;
 }
 .tabla-mini th {
-    background: #f5f5f5;
+    background: #d2e291;              /* verde claro */
     font-weight: 600;
+    color: #3b473c;
 }
+.tabla-mini td {
+    background: #ffffff;
+}
+
+/* ===== BADGE ===== */
 .badge {
-    border: 1px solid #000;
+    border: 1px solid #876661;
     padding: 0.15rem 0.6rem;
     font-size: 0.75rem;
-    background: white;
+    background: #f9f8dd;
     display: inline-block;
+    border-radius: 12px;
+    color: #3b473c;
 }
+
+/* ===== SEPARADOR ===== */
 .separador {
-    border-top: 1px solid #000;
+    border-top: 1px solid #ba9572;
     margin: 1.8rem 0 1rem 0;
 }
+
+/* ===== INFO TRANSPORTE ===== */
 .info-transporte {
-    background: #fafafa;
-    border: 1px solid #000;
+    background: #f9f8dd;              /* fondo cálido */
+    border: 1px solid #876661;
     padding: 0.8rem 1rem;
     margin-top: 0.5rem;
+    border-radius: 4px;
 }
+
+/* ===== LISTA DE LUGARES / ÍTEMS ===== */
 .lugar-item {
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #d2e291; /* verde claro */
     padding: 0.6rem 0;
 }
 .lugar-item:last-child {
     border-bottom: none;
 }
+
+/* ===== FLEX ===== */
 .flex {
     display: flex;
     flex-wrap: wrap;
@@ -153,21 +212,228 @@ h3 {
 .flex-item {
     flex: 1 0 180px;
 }
+
+/* ===== TEXTOS MUTED ===== */
 .muted {
     font-size: 0.85rem;
-    color: #222;
+    color: #54555c;                   /* gris oscuro */
 }
+
+/* ===== DATO FIJO ===== */
 .dato-fijo {
-    background: #f5f5f5;
+    background: #d2e291;              /* verde claro */
     padding: 0.3rem 0.6rem;
-    border: 1px solid #aaa;
+    border: 1px solid #8b8893;
     display: inline-block;
+    border-radius: 4px;
+    color: #3b473c;
 }
+
+/* ===== UTILIDADES ===== */
 .mt-1 { margin-top: 0.8rem; }
 .mb-1 { margin-bottom: 0.8rem; }
 .text-center { text-align: center; }
 
-/* ===== RESPONSIVE ===== */
+/* ============================================================
+   ESTILOS ESPECÍFICOS PARA PLANIFICACIÓN (sin cambiar HTML)
+   ============================================================ */
+
+/* Contenedores de búsqueda y lista */
+.busqueda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+    background: #ffffff;
+    padding: 0.8rem 1rem;
+    border: 1px solid #ba9572;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+.busqueda input,
+.busqueda select {
+    flex: 1 0 150px;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #8b8893;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    background: #ffffff;
+    color: #272120;
+}
+.busqueda input:focus,
+.busqueda select:focus {
+    border-color: #5c8d58;
+    outline: none;
+}
+
+.lista-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    background: #ffffff;
+    padding: 0.8rem 1rem;
+    border: 1px solid #ba9572;
+    border-radius: 4px;
+    min-height: 60px;
+    align-items: center;
+}
+.lista-items .item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #f9f8dd;
+    padding: 0.3rem 0.8rem 0.3rem 1rem;
+    border: 1px solid #876661;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #3b473c;
+}
+.lista-items .item-eliminar {
+    cursor: default;
+    font-weight: 700;
+    color: #876661;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0 0.2rem;
+}
+.lista-items .item-eliminar:hover {
+    color: #272120;
+}
+
+/* Tabla de participantes */
+.tabla-participantes {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.8rem;
+    font-size: 0.9rem;
+    background: #ffffff;
+    border: 1px solid #ba9572;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.tabla-participantes th {
+    background: #d2e291;
+    color: #3b473c;
+    font-weight: 600;
+    padding: 0.5rem 0.8rem;
+    border-bottom: 2px solid #9cab6c;
+    text-align: left;
+}
+.tabla-participantes td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid #e0bf7a;
+    color: #272120;
+}
+.tabla-participantes tr:last-child td {
+    border-bottom: none;
+}
+.tabla-participantes .btn-eliminar {
+    background: transparent;
+    border: none;
+    font-size: 1rem;
+    color: #876661;
+    cursor: default;
+    padding: 0 0.3rem;
+}
+.tabla-participantes .btn-eliminar:hover {
+    color: #272120;
+}
+
+/* Lista de ruta */
+.ruta-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 1rem;
+    background: #f9f8dd;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ba9572;
+    border-radius: 4px;
+    width: 100%;
+    margin-bottom: 0.4rem;
+}
+.ruta-item .tipo {
+    font-weight: 600;
+    color: #3b473c;
+    min-width: 70px;
+}
+.ruta-item .desc {
+    flex: 1 0 150px;
+    color: #272120;
+}
+.ruta-item .horario-editable {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+}
+.ruta-item .horario-editable input[type="time"] {
+    padding: 0.2rem 0.4rem;
+    border: 1px solid #8b8893;
+    border-radius: 4px;
+    background: #ffffff;
+    font-size: 0.85rem;
+    color: #272120;
+    width: 90px;
+}
+.ruta-item .horario-editable input[type="time"]:focus {
+    border-color: #5c8d58;
+    outline: none;
+}
+.ruta-item .acciones {
+    display: flex;
+    gap: 0.3rem;
+    margin-left: auto;
+}
+.ruta-item .btn-ruta {
+    background: transparent;
+    border: 1px solid #8b8893;
+    border-radius: 4px;
+    padding: 0 0.5rem;
+    font-size: 0.9rem;
+    cursor: default;
+    color: #3b473c;
+    transition: background 0.2s;
+}
+.ruta-item .btn-ruta:hover {
+    background: #d2e291;
+}
+
+/* Select de duración con estilo */
+.duracion-select {
+    background: #ffffff;
+    border: 1px solid #8b8893;
+    border-radius: 4px;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.95rem;
+    color: #272120;
+    width: 100%;
+}
+
+/* Mensajes de feedback */
+.mensaje {
+    padding: 0.8rem 1.2rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+    font-weight: 500;
+    text-align: center;
+}
+.mensaje-exito {
+    background: #d2e291;
+    border: 1px solid #5c8d58;
+    color: #3b473c;
+}
+.mensaje-error {
+    background: #f9f8dd;
+    border: 1px solid #876661;
+    color: #272120;
+}
+.oculto {
+    display: none;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media (max-width: 768px) {
     .grid-3 {
         grid-template-columns: 1fr !important;
@@ -180,5 +446,28 @@ h3 {
     }
     h1 {
         font-size: 1.5rem;
+    }
+    .busqueda {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .busqueda input,
+    .busqueda select {
+        flex: 1 1 auto;
+    }
+    .ruta-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .ruta-item .acciones {
+        margin-left: 0;
+        justify-content: flex-end;
+    }
+    .tabla-participantes {
+        font-size: 0.8rem;
+    }
+    .tabla-participantes th,
+    .tabla-participantes td {
+        padding: 0.3rem 0.5rem;
     }
 }
