@@ -2,8 +2,6 @@
 (Basado en TextRequerimientos.txt – todo lo demás ya está implementado)
 
 
-
-
 🎨 Diseño visual y experiencia de usuario
 (Cambios exclusivamente en CSS, sin alterar la estructura HTML)
 
@@ -14,6 +12,20 @@ solo falta ajustar colores y estilos.
 ⭐ Ajustes de estilo general
 Refinar tipografía, espaciados, fondos y otros detalles para lograr el look "natural como la naturaleza y formal sin exagerar".
 
+Sebastian
+- Index
+- Login
+- Calendario
+- Mis salidas
+
+Luciano
+- Dashboard
+- Planificar salida
+- La galeria
+- Modificar cuentas
+
+Victor
+- Estilo
 
 
 
