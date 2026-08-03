@@ -1,4 +1,3 @@
-/* Estilos con paleta Aragon16 */
 body {
     font-family: system-ui, -apple-system, sans-serif;
     background: #f9f8dd;
@@ -10,55 +9,66 @@ body {
     align-items: center;
     min-height: 100vh;
 }
+
 .container {
     max-width: 800px;
     width: 100%;
     border: 3px solid #272120;
     padding: 2rem;
-    background: #ffffff;
+    background: #f9f8dd;
 }
+
 h1 {
     border-bottom: 3px solid #272120;
     padding-bottom: 0.5rem;
     margin-top: 0;
     color: #5c8d58;
 }
+
 .form-group {
     margin-bottom: 1rem;
     display: flex;
     flex-direction: column;
 }
+
 .form-group label {
     font-weight: bold;
     margin-bottom: 0.25rem;
     color: #3b473c;
 }
+
 .form-group input {
     padding: 0.5rem;
     border: 2px solid #272120;
     background: #f9f8dd;
     font-size: 1rem;
     color: #272120;
+    border-radius: 4px;
 }
+
 .form-group input:focus {
     border-color: #8daad6;
     outline: none;
 }
+
 .form-row {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
 }
+
 .form-row .form-group {
     flex: 1;
     min-width: 200px;
 }
+
 .botones {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
     margin-top: 1.5rem;
 }
+
 .btn {
     background: #f9f8dd;
     border: 2px solid #272120;
@@ -67,39 +77,45 @@ h1 {
     cursor: pointer;
     transition: 0.15s;
     color: #272120;
+    border-radius: 4px;
 }
+
 .btn:hover {
-    background: #a8d455;
+    background: #d2e291;
     border-color: #5c8d58;
 }
+
 .mensaje {
     border: 2px solid #272120;
     padding: 0.5rem;
     margin: 1rem 0;
     background: #f9f8dd;
 }
+
 .hidden {
     display: none !important;
 }
 
-/* Nuevos estilos que estaban en el <style> de login.html */
 .login-box {
     max-width: 500px;
     width: 100%;
     border: 3px solid #272120;
     padding: 2rem;
-    background: #ffffff;
+    background: #f9f8dd;
     box-shadow: 0 4px 20px rgba(39, 33, 32, 0.15);
 }
+
 .field {
     margin-bottom: 1rem;
 }
+
 .field label {
     display: block;
     font-weight: bold;
     margin-bottom: 0.25rem;
     color: #3b473c;
 }
+
 .field input {
     width: 100%;
     padding: 0.5rem;
@@ -108,16 +124,20 @@ h1 {
     box-sizing: border-box;
     background: #f9f8dd;
     color: #272120;
+    border-radius: 4px;
 }
+
 .field input:focus {
     border-color: #8daad6;
     outline: none;
 }
+
 .tab-btns {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1.5rem;
 }
+
 .tab-btn {
     flex: 1;
     padding: 0.5rem;
@@ -127,15 +147,19 @@ h1 {
     cursor: pointer;
     color: #272120;
     transition: 0.2s;
+    border-radius: 4px;
 }
+
 .tab-btn:hover {
     background: #d2e291;
 }
+
 .tab-btn.active {
     background: #3b473c;
     color: #f9f8dd;
     border-color: #3b473c;
 }
+
 .btn-submit {
     width: 100%;
     padding: 0.7rem;
@@ -145,37 +169,46 @@ h1 {
     font-weight: bold;
     cursor: pointer;
     transition: 0.2s;
+    border-radius: 4px;
 }
+
 .btn-submit:hover:not(:disabled) {
     background: #5c8d58;
 }
+
 .btn-submit:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
 .msg {
     margin-top: 1rem;
     padding: 0.5rem;
     border: 2px solid #272120;
     display: none;
+    border-radius: 4px;
 }
+
 .msg.error {
     display: block;
-    background: #f9e0e0;
+    background: #e0bf7a;
     border-color: #876661;
     color: #272120;
 }
+
 .msg.success {
     display: block;
-    background: #e0f0e0;
+    background: #d2e291;
     border-color: #5c8d58;
-    color: #272120;
+    color: #3b473c;
 }
+
 .rol-info {
     font-size: 12px;
     color: #876661;
     margin-top: 4px;
 }
+
 .panel-hidden {
     display: none !important;
 }
