@@ -1,17 +1,11 @@
-/* ============================================================
-   dashboard.css - Estilos para el panel de admin (Aragon16)
-   ============================================================ */
-
-/* ---- Contenedor general ---- */
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 1.5rem;
-    background-color: #f9f8dd; /* Crema */
-    color: #272120; /* Marrón oscuro */
+    background-color: #f9f8dd;
+    color: #272120;
 }
 
-/* ---- Encabezado ---- */
 .dashboard-header {
     display: flex;
     justify-content: space-between;
@@ -19,15 +13,17 @@
     flex-wrap: wrap;
     gap: 1rem;
     margin-bottom: 1.5rem;
-    border-bottom: 2px solid #3b473c; /* Verde muy oscuro */
+    border-bottom: 2px solid #3b473c;
     padding-bottom: 0.8rem;
 }
+
 .dashboard-header h1 {
     margin: 0;
     font-size: 1.6rem;
     font-weight: 700;
     color: #3b473c;
 }
+
 .header-actions {
     display: flex;
     gap: 0.5rem;
@@ -35,10 +31,9 @@
     flex-wrap: wrap;
 }
 
-/* ---- Botones generales ---- */
 .btn {
     background: #f9f8dd;
-    border: 1.5px solid #876661; /* Marrón */
+    border: 1.5px solid #876661;
     padding: 0.4rem 1rem;
     font-size: 0.85rem;
     font-weight: 600;
@@ -49,35 +44,44 @@
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
+    border-radius: 4px;
 }
+
 .btn:hover {
-    background: #d2e291; /* Verde claro */
+    background: #d2e291;
     color: #3b473c;
 }
+
 .btn-index {
-    border-color: #8daad6; /* Azul claro */
+    border-color: #8daad6;
     color: #3b473c;
 }
+
 .btn-index:hover {
     background: #8daad6;
     color: #f9f8dd;
 }
+
 .btn-excel {
-    border-color: #5c8d58; /* Verde oscuro */
+    border-color: #5c8d58;
     color: #5c8d58;
 }
+
 .btn-excel:hover {
     background: #5c8d58;
     color: #f9f8dd;
 }
+
 .logout-btn {
-    border-color: #876661; /* Marrón */
+    border-color: #876661;
     color: #876661;
 }
+
 .logout-btn:hover {
     background: #876661;
     color: #f9f8dd;
 }
+
 .btn-small {
     padding: 0.3rem 0.7rem;
     font-size: 0.75rem;
@@ -85,32 +89,35 @@
     background: #f9f8dd;
     cursor: pointer;
     color: #272120;
+    border-radius: 4px;
 }
+
 .btn-small:hover {
     background: #d2e291;
 }
 
-/* ---- Contador de usuarios ---- */
 .user-count-badge {
-    border: 1px solid #54555c; /* Gris oscuro */
+    border: 1px solid #54555c;
     padding: 0.2rem 0.8rem;
-    background: #e0bf7a; /* Amarillo/mostaza */
+    background: #e0bf7a;
     font-size: 0.85rem;
     font-weight: 600;
     color: #272120;
+    border-radius: 4px;
 }
 
-/* ---- Barra de búsqueda ---- */
 .search-box {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     background: #f9f8dd;
-    border: 1px solid #8b8893; /* Gris */
+    border: 1px solid #8b8893;
     padding: 0.2rem 0.5rem;
     margin-bottom: 1.5rem;
     max-width: 450px;
+    border-radius: 4px;
 }
+
 .search-box input {
     border: none;
     outline: none;
@@ -120,32 +127,36 @@
     background: transparent;
     color: #272120;
 }
+
 .search-box .lupa {
     font-size: 1rem;
     color: #54555c;
 }
+
 .search-box .btn-small {
     border: none;
     background: #3b473c;
     color: #f9f8dd;
     padding: 0.3rem 0.8rem;
 }
+
 .search-box .btn-small:hover {
     background: #272120;
 }
 
-/* ---- Tabla de usuarios ---- */
 .user-table-container {
     overflow-x: auto;
     margin-top: 0.5rem;
 }
+
 .user-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.85rem;
 }
+
 .user-table th {
-    background: #d2e291; /* Verde claro */
+    background: #d2e291;
     border: 1px solid #272120;
     padding: 0.6rem 0.5rem;
     text-align: left;
@@ -153,23 +164,25 @@
     white-space: nowrap;
     color: #3b473c;
 }
+
 .user-table td {
-    border: 1px solid #ba9572; /* Marrón claro */
+    border: 1px solid #ba9572;
     padding: 0.4rem 0.5rem;
     vertical-align: middle;
     background: #f9f8dd;
 }
+
 .user-table tbody tr:hover td {
-    background: #e0bf7a; /* Mostaza claro */
+    background: #e0bf7a;
 }
 
-/* ---- Acciones en la tabla ---- */
 .acciones {
     display: flex;
     gap: 0.3rem;
     flex-wrap: wrap;
     align-items: center;
 }
+
 .acciones select,
 .acciones button {
     font-size: 0.7rem;
@@ -177,29 +190,35 @@
     border: 1px solid #272120;
     background: #f9f8dd;
     cursor: pointer;
+    border-radius: 4px;
+    color: #272120;
 }
+
 .acciones select:hover,
 .acciones button:hover {
     background: #d2e291;
 }
+
 .btn-editar {
     border-color: #8daad6;
     color: #3b473c;
 }
+
 .btn-editar:hover {
     background: #8daad6;
     color: #f9f8dd;
 }
+
 .btn-danger {
     border-color: #876661;
     color: #876661;
 }
+
 .btn-danger:hover {
     background: #876661;
     color: #f9f8dd;
 }
 
-/* ---- Badge de admin principal ---- */
 .admin-badge {
     font-weight: 700;
     background: #e0bf7a;
@@ -208,25 +227,46 @@
     font-size: 0.7rem;
     display: inline-block;
     color: #3b473c;
+    border-radius: 4px;
 }
 
-/* ---- Estados ---- */
-.estado-activo { color: #5c8d58; font-weight: 600; }
-.estado-kick { color: #ba9572; font-weight: 600; }
-.estado-baneado { color: #876661; font-weight: 600; }
+.estado-activo {
+    color: #5c8d58;
+    font-weight: 600;
+}
 
-/* ---- Mensajes ---- */
+.estado-kick {
+    color: #ba9572;
+    font-weight: 600;
+}
+
+.estado-baneado {
+    color: #876661;
+    font-weight: 600;
+}
+
 .mensaje {
     padding: 0.5rem 1rem;
     margin: 0.5rem 0 1rem 0;
     border: 1px solid #272120;
     background: #f9f8dd;
+    border-radius: 4px;
 }
-.mensaje-exito { background: #d2e291; border-color: #5c8d58; }
-.mensaje-error { background: #e0bf7a; border-color: #876661; }
-.hidden { display: none !important; }
 
-/* ---- Modal de edición ---- */
+.mensaje-exito {
+    background: #d2e291;
+    border-color: #5c8d58;
+}
+
+.mensaje-error {
+    background: #e0bf7a;
+    border-color: #876661;
+}
+
+.hidden {
+    display: none !important;
+}
+
 .modal {
     display: none;
     position: fixed;
@@ -235,10 +275,11 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(39, 33, 32, 0.6); /* Marrón oscuro con opacidad */
+    background: rgba(39, 33, 32, 0.6);
     justify-content: center;
     align-items: center;
 }
+
 .modal-contenido {
     background: #f9f8dd;
     border: 2px solid #272120;
@@ -247,7 +288,9 @@
     padding: 1.5rem 2rem;
     max-height: 80vh;
     overflow-y: auto;
+    border-radius: 4px;
 }
+
 .modal-contenido h2 {
     margin-top: 0;
     border-bottom: 1px solid #54555c;
@@ -255,9 +298,11 @@
     font-size: 1.2rem;
     color: #3b473c;
 }
+
 .modal-contenido .campo {
     margin-bottom: 0.8rem;
 }
+
 .modal-contenido .campo label {
     display: block;
     font-weight: 600;
@@ -265,6 +310,7 @@
     margin-bottom: 0.15rem;
     color: #3b473c;
 }
+
 .modal-contenido .campo input,
 .modal-contenido .campo textarea {
     width: 100%;
@@ -274,17 +320,21 @@
     background: #f9f8dd;
     box-sizing: border-box;
     color: #272120;
+    border-radius: 4px;
 }
+
 .modal-contenido .campo textarea {
     min-height: 50px;
     resize: vertical;
 }
+
 .modal-actions {
     display: flex;
     gap: 0.5rem;
     justify-content: flex-end;
     margin-top: 1rem;
 }
+
 .modal-actions button {
     padding: 0.4rem 1.2rem;
     border: 1px solid #272120;
@@ -292,25 +342,48 @@
     cursor: pointer;
     font-weight: 600;
     color: #272120;
+    border-radius: 4px;
 }
+
 .modal-actions .btn-guardar {
     background: #3b473c;
     color: #f9f8dd;
 }
+
 .modal-actions .btn-guardar:hover {
     background: #272120;
 }
+
 .modal-actions .btn-cerrar:hover {
     background: #d2e291;
 }
 
-/* ---- Responsive ---- */
 @media (max-width: 768px) {
-    .dashboard-header { flex-direction: column; align-items: stretch; gap: 0.5rem; }
-    .header-actions { justify-content: flex-start; flex-wrap: wrap; }
-    .search-box { max-width: 100%; }
-    .user-table { font-size: 0.75rem; }
-    .user-table th, .user-table td { padding: 0.3rem 0.3rem; }
-    .acciones { gap: 0.2rem; }
-    .acciones select, .acciones button { font-size: 0.6rem; padding: 0.1rem 0.3rem; }
+    .dashboard-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    .header-actions {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+    .search-box {
+        max-width: 100%;
+    }
+    .user-table {
+        font-size: 0.75rem;
+    }
+    .user-table th,
+    .user-table td {
+        padding: 0.3rem 0.3rem;
+    }
+    .acciones {
+        gap: 0.2rem;
+    }
+    .acciones select,
+    .acciones button {
+        font-size: 0.6rem;
+        padding: 0.1rem 0.3rem;
+    }
 }
