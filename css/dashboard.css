@@ -1,5 +1,5 @@
 /* ============================================================
-   dashboard.css - Estilos mejorados para el panel de admin
+   dashboard.css - Estilos para el panel de admin (Aragon16)
    ============================================================ */
 
 /* ---- Contenedor general ---- */
@@ -7,6 +7,8 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 1.5rem;
+    background-color: #f9f8dd; /* Crema */
+    color: #272120; /* Marrón oscuro */
 }
 
 /* ---- Encabezado ---- */
@@ -17,13 +19,14 @@
     flex-wrap: wrap;
     gap: 1rem;
     margin-bottom: 1.5rem;
-    border-bottom: 2px solid #000;
+    border-bottom: 2px solid #3b473c; /* Verde muy oscuro */
     padding-bottom: 0.8rem;
 }
 .dashboard-header h1 {
     margin: 0;
     font-size: 1.6rem;
     font-weight: 700;
+    color: #3b473c;
 }
 .header-actions {
     display: flex;
@@ -34,65 +37,67 @@
 
 /* ---- Botones generales ---- */
 .btn {
-    background: #fff;
-    border: 1.5px solid #000;
+    background: #f9f8dd;
+    border: 1.5px solid #876661; /* Marrón */
     padding: 0.4rem 1rem;
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     transition: 0.15s;
     text-decoration: none;
-    color: #000;
+    color: #272120;
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
 }
 .btn:hover {
-    background: #000;
-    color: #fff;
+    background: #d2e291; /* Verde claro */
+    color: #3b473c;
 }
 .btn-index {
-    border-color: #0066cc;
-    color: #0066cc;
+    border-color: #8daad6; /* Azul claro */
+    color: #3b473c;
 }
 .btn-index:hover {
-    background: #0066cc;
-    color: #fff;
+    background: #8daad6;
+    color: #f9f8dd;
 }
 .btn-excel {
-    border-color: #1d6f42;
-    color: #1d6f42;
+    border-color: #5c8d58; /* Verde oscuro */
+    color: #5c8d58;
 }
 .btn-excel:hover {
-    background: #1d6f42;
-    color: #fff;
+    background: #5c8d58;
+    color: #f9f8dd;
 }
 .logout-btn {
-    border-color: #cc0000;
-    color: #cc0000;
+    border-color: #876661; /* Marrón */
+    color: #876661;
 }
 .logout-btn:hover {
-    background: #cc0000;
-    color: #fff;
+    background: #876661;
+    color: #f9f8dd;
 }
 .btn-small {
     padding: 0.3rem 0.7rem;
     font-size: 0.75rem;
-    border: 1px solid #000;
-    background: #fff;
+    border: 1px solid #272120;
+    background: #f9f8dd;
     cursor: pointer;
+    color: #272120;
 }
 .btn-small:hover {
-    background: #eee;
+    background: #d2e291;
 }
 
 /* ---- Contador de usuarios ---- */
 .user-count-badge {
-    border: 1px solid #000;
+    border: 1px solid #54555c; /* Gris oscuro */
     padding: 0.2rem 0.8rem;
-    background: #f0f0f0;
+    background: #e0bf7a; /* Amarillo/mostaza */
     font-size: 0.85rem;
     font-weight: 600;
+    color: #272120;
 }
 
 /* ---- Barra de búsqueda ---- */
@@ -100,8 +105,8 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: #fff;
-    border: 1px solid #000;
+    background: #f9f8dd;
+    border: 1px solid #8b8893; /* Gris */
     padding: 0.2rem 0.5rem;
     margin-bottom: 1.5rem;
     max-width: 450px;
@@ -113,19 +118,20 @@
     font-size: 0.9rem;
     width: 100%;
     background: transparent;
+    color: #272120;
 }
 .search-box .lupa {
     font-size: 1rem;
-    color: #333;
+    color: #54555c;
 }
 .search-box .btn-small {
     border: none;
-    background: #000;
-    color: #fff;
+    background: #3b473c;
+    color: #f9f8dd;
     padding: 0.3rem 0.8rem;
 }
 .search-box .btn-small:hover {
-    background: #333;
+    background: #272120;
 }
 
 /* ---- Tabla de usuarios ---- */
@@ -139,20 +145,22 @@
     font-size: 0.85rem;
 }
 .user-table th {
-    background: #f0f0f0;
-    border: 1px solid #000;
+    background: #d2e291; /* Verde claro */
+    border: 1px solid #272120;
     padding: 0.6rem 0.5rem;
     text-align: left;
     font-weight: 700;
     white-space: nowrap;
+    color: #3b473c;
 }
 .user-table td {
-    border: 1px solid #000;
+    border: 1px solid #ba9572; /* Marrón claro */
     padding: 0.4rem 0.5rem;
     vertical-align: middle;
+    background: #f9f8dd;
 }
-.user-table tbody tr:hover {
-    background: #fafafa;
+.user-table tbody tr:hover td {
+    background: #e0bf7a; /* Mostaza claro */
 }
 
 /* ---- Acciones en la tabla ---- */
@@ -166,55 +174,56 @@
 .acciones button {
     font-size: 0.7rem;
     padding: 0.15rem 0.4rem;
-    border: 1px solid #000;
-    background: #fff;
+    border: 1px solid #272120;
+    background: #f9f8dd;
     cursor: pointer;
-    border-radius: 0;
 }
 .acciones select:hover,
 .acciones button:hover {
-    background: #eee;
+    background: #d2e291;
 }
 .btn-editar {
-    border-color: #0066cc;
-    color: #0066cc;
+    border-color: #8daad6;
+    color: #3b473c;
 }
 .btn-editar:hover {
-    background: #0066cc;
-    color: #fff;
+    background: #8daad6;
+    color: #f9f8dd;
 }
 .btn-danger {
-    border-color: #cc0000;
-    color: #cc0000;
+    border-color: #876661;
+    color: #876661;
 }
 .btn-danger:hover {
-    background: #cc0000;
-    color: #fff;
+    background: #876661;
+    color: #f9f8dd;
 }
 
 /* ---- Badge de admin principal ---- */
 .admin-badge {
     font-weight: 700;
-    background: #ffd700;
+    background: #e0bf7a;
     padding: 0.1rem 0.5rem;
-    border: 1px solid #000;
+    border: 1px solid #272120;
     font-size: 0.7rem;
     display: inline-block;
+    color: #3b473c;
 }
 
 /* ---- Estados ---- */
-.estado-activo { color: #008800; font-weight: 600; }
-.estado-kick { color: #cc8800; font-weight: 600; }
-.estado-baneado { color: #cc0000; font-weight: 600; }
+.estado-activo { color: #5c8d58; font-weight: 600; }
+.estado-kick { color: #ba9572; font-weight: 600; }
+.estado-baneado { color: #876661; font-weight: 600; }
 
 /* ---- Mensajes ---- */
 .mensaje {
     padding: 0.5rem 1rem;
     margin: 0.5rem 0 1rem 0;
-    border: 1px solid #000;
+    border: 1px solid #272120;
+    background: #f9f8dd;
 }
-.mensaje-exito { background: #ebffeb; }
-.mensaje-error { background: #ffebeb; }
+.mensaje-exito { background: #d2e291; border-color: #5c8d58; }
+.mensaje-error { background: #e0bf7a; border-color: #876661; }
 .hidden { display: none !important; }
 
 /* ---- Modal de edición ---- */
@@ -226,13 +235,13 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(39, 33, 32, 0.6); /* Marrón oscuro con opacidad */
     justify-content: center;
     align-items: center;
 }
 .modal-contenido {
-    background: #fff;
-    border: 2px solid #000;
+    background: #f9f8dd;
+    border: 2px solid #272120;
     max-width: 500px;
     width: 90%;
     padding: 1.5rem 2rem;
@@ -241,9 +250,10 @@
 }
 .modal-contenido h2 {
     margin-top: 0;
-    border-bottom: 1px solid #000;
+    border-bottom: 1px solid #54555c;
     padding-bottom: 0.5rem;
     font-size: 1.2rem;
+    color: #3b473c;
 }
 .modal-contenido .campo {
     margin-bottom: 0.8rem;
@@ -253,15 +263,17 @@
     font-weight: 600;
     font-size: 0.85rem;
     margin-bottom: 0.15rem;
+    color: #3b473c;
 }
 .modal-contenido .campo input,
 .modal-contenido .campo textarea {
     width: 100%;
     padding: 0.4rem;
-    border: 1px solid #000;
+    border: 1px solid #8b8893;
     font-size: 0.9rem;
-    background: #fff;
+    background: #f9f8dd;
     box-sizing: border-box;
+    color: #272120;
 }
 .modal-contenido .campo textarea {
     min-height: 50px;
@@ -275,54 +287,30 @@
 }
 .modal-actions button {
     padding: 0.4rem 1.2rem;
-    border: 1px solid #000;
-    background: #fff;
+    border: 1px solid #272120;
+    background: #f9f8dd;
     cursor: pointer;
     font-weight: 600;
+    color: #272120;
 }
 .modal-actions .btn-guardar {
-    background: #000;
-    color: #fff;
+    background: #3b473c;
+    color: #f9f8dd;
 }
 .modal-actions .btn-guardar:hover {
-    background: #222;
+    background: #272120;
 }
 .modal-actions .btn-cerrar:hover {
-    background: #eee;
+    background: #d2e291;
 }
-
-/* ---- Utilidades ---- */
-.text-center { text-align: center; }
-.mt-1 { margin-top: 0.8rem; }
-.mb-1 { margin-bottom: 0.8rem; }
 
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
-    .dashboard-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-    }
-    .header-actions {
-        justify-content: flex-start;
-        flex-wrap: wrap;
-    }
-    .search-box {
-        max-width: 100%;
-    }
-    .user-table {
-        font-size: 0.75rem;
-    }
-    .user-table th,
-    .user-table td {
-        padding: 0.3rem 0.3rem;
-    }
-    .acciones {
-        gap: 0.2rem;
-    }
-    .acciones select,
-    .acciones button {
-        font-size: 0.6rem;
-        padding: 0.1rem 0.3rem;
-    }
+    .dashboard-header { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+    .header-actions { justify-content: flex-start; flex-wrap: wrap; }
+    .search-box { max-width: 100%; }
+    .user-table { font-size: 0.75rem; }
+    .user-table th, .user-table td { padding: 0.3rem 0.3rem; }
+    .acciones { gap: 0.2rem; }
+    .acciones select, .acciones button { font-size: 0.6rem; padding: 0.1rem 0.3rem; }
 }
