@@ -12,16 +12,18 @@ body {
 }
 
 header {
-    border: 2px solid #272120;
-    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 18px;
     margin-bottom: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
-    background: #54555c;
+    background: linear-gradient(135deg, #3b473c, #272120);
     color: #f9f8dd;
+    box-shadow: 0 3px 10px rgba(39, 33, 32, 0.15);
 }
 
 header h1 {
@@ -35,17 +37,19 @@ header .user-badge {
     padding: 4px 12px;
     font-size: 13px;
     color: #f9f8dd;
+    border-radius: 14px;
 }
 
 .volver {
     border: 1px solid #f9f8dd;
-    padding: 4px 12px;
+    padding: 5px 14px;
     background: transparent;
     cursor: pointer;
     text-decoration: none;
     color: #f9f8dd;
     font-size: 13px;
-    border-radius: 4px;
+    border-radius: 20px;
+    transition: 0.2s ease;
 }
 
 .volver:hover {
@@ -64,16 +68,18 @@ header .user-badge {
     flex: 1;
     min-width: 220px;
     max-width: 320px;
-    border: 2px solid #272120;
-    padding: 12px;
+    border: 1px solid #ba9572;
+    border-radius: 8px;
+    padding: 14px;
     max-height: 600px;
     overflow-y: auto;
     background: #f9f8dd;
+    box-shadow: 0 3px 10px rgba(39, 33, 32, 0.06);
 }
 
 .panel-lista h2 {
     font-size: 15px;
-    border-bottom: 2px solid #272120;
+    border-bottom: 2px solid #5c8d58;
     padding-bottom: 6px;
     margin-bottom: 10px;
     color: #5c8d58;
@@ -82,29 +88,31 @@ header .user-badge {
 #listaSalidas {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 }
 
 .item-salida {
-    padding: 8px 10px;
-    border: 2px solid #272120;
+    padding: 9px 12px;
+    border: 1px solid #ba9572;
     cursor: pointer;
     background: #f9f8dd;
-    transition: 0.15s;
+    transition: 0.2s ease;
     display: flex;
     flex-direction: column;
     gap: 2px;
-    border-radius: 4px;
+    border-radius: 8px;
 }
 
 .item-salida:hover {
-    background: #d2e291;
+    background: #eef3dc;
+    border-color: #9cab6c;
 }
 
 .item-salida.activa {
-    background: #3b473c;
+    background: linear-gradient(135deg, #3b473c, #272120);
     color: #f9f8dd;
     border-color: #a8d455;
+    box-shadow: 0 2px 8px rgba(39, 33, 32, 0.2);
 }
 
 .item-salida strong {
@@ -135,11 +143,13 @@ header .user-badge {
 .panel-detalle {
     flex: 2;
     min-width: 320px;
-    border: 2px solid #272120;
-    padding: 16px;
+    border: 1px solid #ba9572;
+    border-radius: 8px;
+    padding: 18px;
     max-height: 600px;
     overflow-y: auto;
     background: #f9f8dd;
+    box-shadow: 0 3px 10px rgba(39, 33, 32, 0.06);
 }
 
 .mensaje-inicial {
@@ -153,7 +163,7 @@ header .user-badge {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #272120;
+    border-bottom: 2px solid #5c8d58;
     padding-bottom: 6px;
     margin-bottom: 12px;
     flex-wrap: wrap;
@@ -168,31 +178,31 @@ header .user-badge {
 
 .btn-editar {
     background: #f9f8dd;
-    border: 2px solid #272120;
-    padding: 4px 12px;
+    border: 1px solid #8daad6;
+    color: #3b473c;
+    padding: 5px 14px;
     cursor: pointer;
     font-size: 13px;
     font-weight: bold;
-    transition: 0.2s;
-    border-radius: 4px;
-    color: #272120;
+    transition: 0.2s ease;
+    border-radius: 20px;
 }
 
 .btn-editar:hover {
-    background: #d2e291;
-    border-color: #5c8d58;
+    background: #8daad6;
+    color: #f9f8dd;
 }
 
 .btn-eliminar {
     background: #f9f8dd;
-    border: 2px solid #876661;
+    border: 1px solid #876661;
     color: #876661;
-    padding: 4px 12px;
+    padding: 5px 14px;
     cursor: pointer;
     font-size: 13px;
     font-weight: bold;
-    transition: 0.2s;
-    border-radius: 4px;
+    transition: 0.2s ease;
+    border-radius: 20px;
 }
 
 .btn-eliminar:hover {
@@ -220,7 +230,7 @@ header .user-badge {
 }
 
 .ruta-lista li {
-    padding: 6px 0;
+    padding: 7px 0;
     border-bottom: 1px solid #d2e291;
     font-size: 13px;
     color: #272120;
@@ -233,12 +243,12 @@ header .user-badge {
 }
 
 .lugar-info {
-    background: #f9f8dd;
+    background: #eef3dc;
     border: 1px solid #d2e291;
-    padding: 6px 10px;
+    padding: 7px 10px;
     margin-top: 4px;
     font-size: 12px;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 .lugar-info div {
@@ -250,24 +260,26 @@ header .user-badge {
     border-collapse: collapse;
     font-size: 12px;
     margin-top: 6px;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
 .participantes-tabla th,
 .participantes-tabla td {
-    border: 1px solid #272120;
-    padding: 4px 6px;
+    border: 1px solid #ba9572;
+    padding: 5px 7px;
     text-align: left;
     vertical-align: top;
 }
 
 .participantes-tabla th {
-    background: #8b8893;
+    background: #9197b6;
     font-weight: 700;
     color: #f9f8dd;
 }
 
-.participantes-tabla tr:hover {
-    background: #f9f8dd;
+.participantes-tabla tr:hover td {
+    background: #f3efc9;
 }
 
 .modal {
@@ -285,14 +297,15 @@ header .user-badge {
 
 .modal-contenido {
     background: #f9f8dd;
-    border: 3px solid #272120;
+    border: none;
+    border-radius: 10px;
     max-width: 700px;
     width: 95%;
     max-height: 90vh;
     overflow-y: auto;
-    padding: 1.5rem 2rem;
+    padding: 1.6rem 2rem;
     position: relative;
-    border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(39, 33, 32, 0.25);
 }
 
 .modal-cerrar {
@@ -310,7 +323,7 @@ header .user-badge {
 
 .modal-contenido h2 {
     margin-top: 0;
-    border-bottom: 2px solid #272120;
+    border-bottom: 2px solid #5c8d58;
     padding-bottom: 0.5rem;
     font-size: 1.3rem;
     color: #5c8d58;
@@ -340,19 +353,20 @@ header .user-badge {
 .campo select,
 .campo textarea {
     width: 100%;
-    padding: 0.4rem;
-    border: 2px solid #272120;
+    padding: 0.45rem;
+    border: 1px solid #8b8893;
     font-size: 0.9rem;
     background: #f9f8dd;
     box-sizing: border-box;
     color: #272120;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 .campo input:focus,
 .campo select:focus,
 .campo textarea:focus {
     border-color: #8daad6;
+    box-shadow: 0 0 0 3px rgba(141, 170, 214, 0.2);
     outline: none;
 }
 
@@ -372,12 +386,12 @@ header .user-badge {
 
 .ruta-edit-item select,
 .ruta-edit-item input {
-    padding: 0.2rem 0.4rem;
-    border: 2px solid #272120;
+    padding: 0.25rem 0.45rem;
+    border: 1px solid #8b8893;
     font-size: 0.8rem;
     background: #f9f8dd;
     color: #272120;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 .ruta-edit-item select:focus,
@@ -412,20 +426,20 @@ header .user-badge {
 
 .btn-agregar-actividad {
     background: #f9f8dd;
-    border: 2px solid #272120;
-    padding: 0.3rem 0.8rem;
+    border: 1px solid #5c8d58;
+    color: #5c8d58;
+    padding: 0.35rem 0.9rem;
     cursor: pointer;
     font-size: 0.85rem;
     margin: 0.3rem 0;
     font-weight: bold;
-    transition: 0.2s;
-    border-radius: 4px;
-    color: #272120;
+    transition: 0.2s ease;
+    border-radius: 20px;
 }
 
 .btn-agregar-actividad:hover {
-    background: #d2e291;
-    border-color: #5c8d58;
+    background: #5c8d58;
+    color: #f9f8dd;
 }
 
 .participante-edit-item {
@@ -452,13 +466,13 @@ header .user-badge {
 
 .btn-small {
     background: #f9f8dd;
-    border: 2px solid #272120;
-    padding: 0.2rem 0.6rem;
+    border: 1px solid #272120;
+    padding: 0.25rem 0.7rem;
     cursor: pointer;
     font-size: 0.8rem;
     font-weight: bold;
-    transition: 0.2s;
-    border-radius: 4px;
+    transition: 0.2s ease;
+    border-radius: 14px;
     color: #272120;
 }
 
@@ -471,18 +485,18 @@ header .user-badge {
     gap: 0.5rem;
     justify-content: flex-end;
     margin-top: 1.5rem;
-    border-top: 2px solid #272120;
+    border-top: 1px solid #e5e0c0;
     padding-top: 1rem;
 }
 
 .modal-acciones button {
-    padding: 0.4rem 1.2rem;
-    border: 2px solid #272120;
+    padding: 0.45rem 1.3rem;
+    border: 1px solid #272120;
     background: #f9f8dd;
     cursor: pointer;
     font-weight: 600;
-    transition: 0.2s;
-    border-radius: 4px;
+    transition: 0.2s ease;
+    border-radius: 6px;
     color: #272120;
 }
 
@@ -617,7 +631,6 @@ header .user-badge {
         padding: 0.8rem;
         width: 100%;
         max-width: 100%;
-        border-width: 2px;
     }
     .modal-cerrar {
         font-size: 2rem;
