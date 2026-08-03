@@ -365,3 +365,15 @@ header h1 {
         gap: 10px;
     }
 }
+
+.img-loading {
+    width: 100%;
+    height: 120px;
+    background: #eee;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 2rem;
+}
