@@ -131,7 +131,7 @@
 <script src="js/lugares.js"></script>
 <script>
     // ============================================================
-    // mis_salidas.js - Versión completa con soporte para URL ?id=xxx
+    // mis_salidas.js - Con función para eliminar guías
     // ============================================================
 
     (function() {
@@ -227,7 +227,7 @@
             });
         }
 
-        // ===== SELECCIONAR SALIDA (async) =====
+        // ===== SELECCIONAR SALIDA =====
         window.seleccionarSalida = async function(id) {
             const salida = todasLasSalidas.find(s => s.id === id);
             if (!salida) return;
@@ -238,7 +238,39 @@
             await renderizarDetalle(salida);
         };
 
-        // ===== RENDERIZAR DETALLE (async) =====
+        // ===== ELIMINAR GUÍA (función global) =====
+        window.eliminarGuia = async function(rut, salidaId) {
+            if (!confirm(`¿Eliminar al guía con RUT ${rut} de esta salida?`)) return;
+            try {
+                const salidas = await Planificacion.cargarSalidas();
+                const salida = salidas.find(s => s.id === salidaId);
+                if (!salida) return alert('Salida no encontrada');
+
+                // Filtrar participantes
+                salida.participantes = salida.participantes.filter(p => p.rut !== rut);
+                // Filtrar guias
+                salida.guias = salida.guias.filter(g => g.rut !== rut);
+
+                const ok = await Planificacion.actualizarSalida(salidaId, {
+                    participantes: salida.participantes,
+                    guias: salida.guias
+                });
+
+                if (ok) {
+                    alert('✅ Guía eliminado correctamente.');
+                    // Recargar datos y seleccionar la misma salida
+                    await cargarDatos();
+                    window.seleccionarSalida(salidaId);
+                } else {
+                    alert('❌ Error al eliminar el guía.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Error al eliminar guía.');
+            }
+        };
+
+        // ===== RENDERIZAR DETALLE =====
         async function renderizarDetalle(salida) {
             const contenedor = document.getElementById('detalleSalida');
             const datosUsuarios = await GitHub.leer('datos/usuarios.json');
@@ -299,7 +331,17 @@
                     <h3>👥 Participantes (${participantesConInfo.length})</h3>
                     ${participantesConInfo.length > 0 ? `
                         <table class="participantes-tabla">
-                            <thead><tr><th>Nombre</th><th>RUT</th><th>Rol</th><th>Edad</th><th>Teléfono</th><th>Historial Médico</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>RUT</th>
+                                    <th>Rol</th>
+                                    <th>Edad</th>
+                                    <th>Teléfono</th>
+                                    <th>Historial Médico</th>
+                                    ${puedeEditar ? '<th>Acciones</th>' : ''}
+                                </tr>
+                            </thead>
                             <tbody>
                                 ${participantesConInfo.map(p => `
                                     <tr>
@@ -309,6 +351,11 @@
                                         <td>${p.edad}</td>
                                         <td>${p.telefono}</td>
                                         <td>${p.historial}</td>
+                                        ${puedeEditar ? `
+                                            <td>
+                                                ${p.rol === 'Guía' ? `<button onclick="eliminarGuia('${p.rut}', '${salida.id}')" class="btn-eliminar-guia" title="Eliminar guía">🗑️</button>` : ''}
+                                            </td>
+                                        ` : ''}
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -470,7 +517,6 @@
                 alert('✅ Salida actualizada correctamente.');
                 cerrarModalEdicion();
                 await cargarDatos();
-                // Seleccionar la misma salida después de recargar
                 window.seleccionarSalida(id);
             } else {
                 alert('❌ Error al actualizar la salida.');
@@ -550,7 +596,7 @@
         // ===== INICIALIZAR =====
         cargarDatos();
 
-        console.log('✅ mis_salidas.html cargado correctamente con soporte para URL');
+        console.log('✅ mis_salidas.html cargado correctamente con función para eliminar guías');
     })();
 </script>
 </body>
