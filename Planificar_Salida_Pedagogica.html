@@ -159,10 +159,11 @@
 <script src="js/lugares.js"></script>
 <script>
     // ============================================================
-    // CÓDIGO COMPLETO DE PLANIFICACIÓN
+    // CÓDIGO COMPLETO DE PLANIFICACIÓN (CORREGIDO)
     // ============================================================
 
-    (function() {
+    document.addEventListener('DOMContentLoaded', function() {
+
         // ---- VERIFICAR SESIÓN ----
         const usuario = Auth.getSesion();
         if (!usuario) {
@@ -183,7 +184,7 @@
 
         // ---- LUGARES: POBLAR DATALIST ----
         const datalistLugares = document.getElementById('listaLugares');
-        if (typeof lugares !== 'undefined') {
+        if (datalistLugares && typeof lugares !== 'undefined') {
             lugares.forEach(l => {
                 const opt = document.createElement('option');
                 opt.value = l.nombre;
@@ -196,6 +197,7 @@
             const datos = await GitHub.leer('datos/usuarios.json');
             if (!datos) return;
             const datalist = document.getElementById('listaParticipantes');
+            if (!datalist) return;
             datos.usuarios.forEach(u => {
                 const opt = document.createElement('option');
                 opt.value = `${u.nombre} ${u.apellido} (${u.rut})`;
@@ -205,41 +207,45 @@
         cargarUsuariosParaDatalist();
 
         // ---- FUNCIÓN: AGREGAR LUGAR A RUTA ----
-        document.getElementById('btnAgregarLugarARuta').addEventListener('click', function() {
-            const input = document.getElementById('buscarLugar');
-            const nombre = input.value.trim();
-            if (!nombre) return alert('Escribe un lugar');
+        const btnAgregarLugar = document.getElementById('btnAgregarLugarARuta');
+        if (btnAgregarLugar) {
+            btnAgregarLugar.addEventListener('click', function() {
+                const input = document.getElementById('buscarLugar');
+                const nombre = input.value.trim();
+                if (!nombre) return alert('Escribe un lugar');
 
-            // Buscar en la base de datos de lugares
-            let lugarInfo = null;
-            if (typeof lugares !== 'undefined') {
-                lugarInfo = lugares.find(l => l.nombre.toLowerCase() === nombre.toLowerCase());
-            }
+                // Buscar en la base de datos de lugares
+                let lugarInfo = null;
+                if (typeof lugares !== 'undefined') {
+                    lugarInfo = lugares.find(l => l.nombre.toLowerCase() === nombre.toLowerCase());
+                }
 
-            // Añadir a la lista de lugares seleccionados
-            lugaresSeleccionados.push({
-                nombre: nombre,
-                descripcion: lugarInfo ? lugarInfo.descripcion : '',
-                ubicacion: lugarInfo ? lugarInfo.ubicacion : '',
-                apertura: lugarInfo ? lugarInfo.apertura : '',
-                cierre: lugarInfo ? lugarInfo.cierre : ''
+                // Añadir a la lista de lugares seleccionados
+                lugaresSeleccionados.push({
+                    nombre: nombre,
+                    descripcion: lugarInfo ? lugarInfo.descripcion : '',
+                    ubicacion: lugarInfo ? lugarInfo.ubicacion : '',
+                    apertura: lugarInfo ? lugarInfo.apertura : '',
+                    cierre: lugarInfo ? lugarInfo.cierre : ''
+                });
+
+                // También añadir como actividad en la ruta
+                rutaActividades.push({
+                    tipo: 'Lugar',
+                    descripcion: nombre,
+                    inicio: document.getElementById('horaInicio').value || '09:00',
+                    fin: document.getElementById('horaFin').value || '10:00'
+                });
+
+                renderizarLugaresSeleccionados();
+                renderizarRuta();
+                input.value = '';
             });
-
-            // También añadir como actividad en la ruta
-            rutaActividades.push({
-                tipo: 'Lugar',
-                descripcion: nombre,
-                inicio: document.getElementById('horaInicio').value || '09:00',
-                fin: document.getElementById('horaFin').value || '10:00'
-            });
-
-            renderizarLugaresSeleccionados();
-            renderizarRuta();
-            input.value = '';
-        });
+        }
 
         function renderizarLugaresSeleccionados() {
             const contenedor = document.getElementById('listaLugaresSeleccionados');
+            if (!contenedor) return;
             if (lugaresSeleccionados.length === 0) {
                 contenedor.innerHTML = `<p class="muted" style="text-align:center; width:100%;">No hay lugares añadidos aún.</p>`;
                 return;
@@ -265,43 +271,47 @@
         };
 
         // ---- FUNCIÓN: AGREGAR PARTICIPANTE ----
-        document.getElementById('btnAgregarParticipante').addEventListener('click', async function() {
-            const input = document.getElementById('buscarParticipante');
-            const texto = input.value.trim();
-            if (!texto) return alert('Escribe un nombre o RUT');
+        const btnAgregarParticipante = document.getElementById('btnAgregarParticipante');
+        if (btnAgregarParticipante) {
+            btnAgregarParticipante.addEventListener('click', async function() {
+                const input = document.getElementById('buscarParticipante');
+                const texto = input.value.trim();
+                if (!texto) return alert('Escribe un nombre o RUT');
 
-            // Extraer RUT del texto (entre paréntesis)
-            const matchRut = texto.match(/\(([^)]+)\)/);
-            let rut = matchRut ? matchRut[1] : texto;
-            // Limpiar RUT
-            rut = rut.replace(/\./g, '').toUpperCase().trim();
+                // Extraer RUT del texto (entre paréntesis)
+                const matchRut = texto.match(/\(([^)]+)\)/);
+                let rut = matchRut ? matchRut[1] : texto;
+                // Limpiar RUT
+                rut = rut.replace(/\./g, '').toUpperCase().trim();
 
-            // Buscar usuario en la base
-            const datos = await GitHub.leer('datos/usuarios.json');
-            if (!datos) return alert('Error al cargar usuarios');
-            const usuarioEncontrado = datos.usuarios.find(u => u.rut === rut);
-            if (!usuarioEncontrado) return alert('Usuario no encontrado');
+                // Buscar usuario en la base
+                const datos = await GitHub.leer('datos/usuarios.json');
+                if (!datos) return alert('Error al cargar usuarios');
+                const usuarioEncontrado = datos.usuarios.find(u => u.rut === rut);
+                if (!usuarioEncontrado) return alert('Usuario no encontrado');
 
-            const rol = document.getElementById('rolSeleccionado').value;
+                const rol = document.getElementById('rolSeleccionado').value;
 
-            // Verificar duplicado
-            if (participantes.some(p => p.rut === rut)) {
-                alert('Este usuario ya está en la lista');
-                return;
-            }
+                // Verificar duplicado
+                if (participantes.some(p => p.rut === rut)) {
+                    alert('Este usuario ya está en la lista');
+                    return;
+                }
 
-            participantes.push({
-                nombre: `${usuarioEncontrado.nombre} ${usuarioEncontrado.apellido}`,
-                rut: rut,
-                rol: rol
+                participantes.push({
+                    nombre: `${usuarioEncontrado.nombre} ${usuarioEncontrado.apellido}`,
+                    rut: rut,
+                    rol: rol
+                });
+
+                renderizarParticipantes();
+                input.value = '';
             });
-
-            renderizarParticipantes();
-            input.value = '';
-        });
+        }
 
         function renderizarParticipantes() {
             const tbody = document.getElementById('cuerpoParticipantes');
+            if (!tbody) return;
             if (participantes.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#666;">No hay participantes añadidos</td></tr>`;
                 return;
@@ -322,21 +332,25 @@
         };
 
         // ---- FUNCIÓN: AGREGAR ACTIVIDAD A RUTA ----
-        document.getElementById('btnAgregarActividad').addEventListener('click', function() {
-            const tipo = document.getElementById('tipoActividad').value;
-            const desc = document.getElementById('descActividad').value.trim();
-            const inicio = document.getElementById('horaInicio').value;
-            const fin = document.getElementById('horaFin').value;
+        const btnAgregarActividad = document.getElementById('btnAgregarActividad');
+        if (btnAgregarActividad) {
+            btnAgregarActividad.addEventListener('click', function() {
+                const tipo = document.getElementById('tipoActividad').value;
+                const desc = document.getElementById('descActividad').value.trim();
+                const inicio = document.getElementById('horaInicio').value;
+                const fin = document.getElementById('horaFin').value;
 
-            if (!desc) return alert('Escribe una descripción para la actividad');
+                if (!desc) return alert('Escribe una descripción para la actividad');
 
-            rutaActividades.push({ tipo, descripcion: desc, inicio, fin });
-            renderizarRuta();
-            document.getElementById('descActividad').value = '';
-        });
+                rutaActividades.push({ tipo, descripcion: desc, inicio, fin });
+                renderizarRuta();
+                document.getElementById('descActividad').value = '';
+            });
+        }
 
         function renderizarRuta() {
             const contenedor = document.getElementById('contenedorRuta');
+            if (!contenedor) return;
             if (rutaActividades.length === 0) {
                 contenedor.innerHTML = `<p class="muted" style="text-align:center; width:100%;">No hay actividades en la ruta.</p>`;
                 return;
@@ -380,67 +394,74 @@
         };
 
         // ---- GUARDAR SALIDA ----
-        document.getElementById('btnGuardarSalida').addEventListener('click', async function() {
-            // Recoger datos
-            const titulo = document.getElementById('inputTitulo').value.trim();
-            const fecha = document.getElementById('inputFecha').value;
-            const duracion = document.getElementById('inputDuracion').value;
-            const curso = document.getElementById('inputCurso').value.trim();
-            const precio = document.getElementById('inputPrecio').value.trim();
-            const menu = document.getElementById('inputMenu').value.trim();
-            const conductor = document.getElementById('inputConductor').value.trim();
-            const horarios = document.getElementById('inputHorarios').value.trim();
-            const precioTransporte = document.getElementById('inputPrecioTransporte').value.trim();
-            const descTransporte = document.getElementById('inputDescTransporte').value.trim();
+        const btnGuardarSalida = document.getElementById('btnGuardarSalida');
+        if (btnGuardarSalida) {
+            btnGuardarSalida.addEventListener('click', async function() {
+                // Recoger datos
+                const titulo = document.getElementById('inputTitulo').value.trim();
+                const fecha = document.getElementById('inputFecha').value;
+                const duracion = document.getElementById('inputDuracion').value;
+                const curso = document.getElementById('inputCurso').value.trim();
+                const precio = document.getElementById('inputPrecio').value.trim();
+                const menu = document.getElementById('inputMenu').value.trim();
+                const conductor = document.getElementById('inputConductor').value.trim();
+                const horarios = document.getElementById('inputHorarios').value.trim();
+                const precioTransporte = document.getElementById('inputPrecioTransporte').value.trim();
+                const descTransporte = document.getElementById('inputDescTransporte').value.trim();
 
-            // Validaciones
-            if (!titulo) return alert('El título es obligatorio');
-            if (!fecha) return alert('La fecha es obligatoria');
-            if (participantes.length === 0) return alert('Agrega al menos un participante');
-            if (rutaActividades.length === 0) return alert('Agrega al menos una actividad a la ruta');
+                // Validaciones
+                if (!titulo) return alert('El título es obligatorio');
+                if (!fecha) return alert('La fecha es obligatoria');
+                if (participantes.length === 0) return alert('Agrega al menos un participante');
+                if (rutaActividades.length === 0) return alert('Agrega al menos una actividad a la ruta');
 
-            // Construir objeto salida
-            const salida = {
-                titulo: titulo,
-                fecha: fecha,
-                duracion: duracion,
-                descripcion: `Ruta con ${rutaActividades.length} actividades.`,
-                ruta: rutaActividades,
-                participantes: participantes,
-                guias: participantes.filter(p => p.rol === 'Guía'),
-                precio: parseInt(precio) || 0,
-                curso: curso || 'Sin curso',
-                menu: menu || 'Sin menú',
-                transporte: {
-                    conductor: conductor || 'No especificado',
-                    horarios: horarios || 'No especificado',
-                    precio: precioTransporte || 'No especificado',
-                    descripcion: descTransporte || 'No especificado'
+                // Construir objeto salida
+                const salida = {
+                    titulo: titulo,
+                    fecha: fecha,
+                    duracion: duracion,
+                    descripcion: `Ruta con ${rutaActividades.length} actividades.`,
+                    ruta: rutaActividades,
+                    participantes: participantes,
+                    guias: participantes.filter(p => p.rol === 'Guía'),
+                    precio: parseInt(precio) || 0,
+                    curso: curso || 'Sin curso',
+                    menu: menu || 'Sin menú',
+                    transporte: {
+                        conductor: conductor || 'No especificado',
+                        horarios: horarios || 'No especificado',
+                        precio: precioTransporte || 'No especificado',
+                        descripcion: descTransporte || 'No especificado'
+                    }
+                };
+
+                // Guardar
+                const ok = await Planificacion.guardarSalida(salida);
+                const mensajeDiv = document.getElementById('mensajeFeedback');
+                mensajeDiv.classList.remove('oculto');
+                if (ok) {
+                    mensajeDiv.className = 'mensaje mensaje-exito';
+                    mensajeDiv.textContent = '✅ Salida guardada exitosamente. Redirigiendo...';
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    mensajeDiv.className = 'mensaje mensaje-error';
+                    mensajeDiv.textContent = '❌ Error al guardar la salida. Intenta de nuevo.';
                 }
-            };
+            });
+        }
 
-            // Guardar
-            const ok = await Planificacion.guardarSalida(salida);
-            const mensajeDiv = document.getElementById('mensajeFeedback');
-            mensajeDiv.classList.remove('oculto');
-            if (ok) {
-                mensajeDiv.className = 'mensaje mensaje-exito';
-                mensajeDiv.textContent = '✅ Salida guardada exitosamente. Redirigiendo...';
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 2000);
-            } else {
-                mensajeDiv.className = 'mensaje mensaje-error';
-                mensajeDiv.textContent = '❌ Error al guardar la salida. Intenta de nuevo.';
-            }
-        });
+        // ---- DOBLE CLIC PARA VOLVER (opcional) ----
+        const tituloPrincipal = document.querySelector('.contenedor h1');
+        if (tituloPrincipal) {
+            tituloPrincipal.addEventListener('dblclick', function() {
+                window.location.href = 'index.html';
+            });
+        }
 
-        // ---- FUNCIÓN PARA VOLVER ----
-        document.querySelector('.contenedor h1').addEventListener('dblclick', function() {
-            window.location.href = 'index.html';
-        });
-
-    })();
+        console.log('✅ Planificación cargada correctamente');
+    });
 </script>
 </body>
 </html>
