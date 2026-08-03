@@ -43,7 +43,7 @@
     </p>
 </section>
 
-<!-- SECCIÓN DE PROMOCIÓN DE GALERÍA (las imágenes del admin) -->
+<!-- SECCIÓN DE PROMOCIÓN DE GALERÍA -->
 <section class="galeria-promo" id="seccionGaleriaPromo">
     <h2>📸 Destinos destacados</h2>
     <div id="promoGrid" class="promo-grid">
@@ -76,8 +76,27 @@
 <script src="js/planificacion.js"></script>
 <script>
     // ============================================================
-    // CÓDIGO COMPLETO DE index.html
+    // CONFIGURACIÓN Y SESIÓN
     // ============================================================
+    const WORKER_URL = 'https://green-flower-8734.victortilleria116.workers.dev';
+
+    // ============================================================
+    // OBTENER IMAGEN EN BASE64 DESDE EL WORKER (para promoción)
+    // ============================================================
+    async function obtenerImagenBase64(ruta) {
+        try {
+            const res = await fetch(`${WORKER_URL}?path=${encodeURIComponent(ruta)}`);
+            if (!res.ok) {
+                console.warn(`Error al obtener imagen ${ruta}: ${res.status}`);
+                return null;
+            }
+            const data = await res.json();
+            return data.content || null;
+        } catch (e) {
+            console.error('Error en obtenerImagenBase64:', ruta, e);
+            return null;
+        }
+    }
 
     // ============================================================
     // FUNCIÓN PARA OBTENER SALIDAS SEGÚN PERMISOS
@@ -116,18 +135,7 @@
     window.irAMisSalidas = irAMisSalidas;
 
     // ============================================================
-    // MOSTRAR DETALLES (MODAL) - Ya no se usa, pero se mantiene
-    // ============================================================
-    function verDetalles(salida) {
-        // Esta función ya no se usa, pero se conserva para no romper nada
-        // Si se llama, redirige a mis_salidas con el ID
-        if (salida && salida.id) {
-            irAMisSalidas(salida.id);
-        }
-    }
-
-    // ============================================================
-    // INSCRIPCIÓN EN SALIDA (se mantiene igual)
+    // INSCRIPCIÓN EN SALIDA
     // ============================================================
     async function inscribirEnSalida(id) {
         const usuario = Auth.getSesion();
@@ -158,7 +166,6 @@
             alert('❌ Error al inscribir');
         }
     }
-
     window.inscribirEnSalida = inscribirEnSalida;
 
     // ============================================================
@@ -174,13 +181,14 @@
     });
 
     // ============================================================
-    // CARGAR PUBLICACIONES DE GALERÍA PARA PROMOCIÓN
+    // CARGAR PUBLICACIONES DE GALERÍA PARA PROMOCIÓN (adaptado)
     // ============================================================
     async function cargarGaleriaPromo() {
         const container = document.getElementById('promoGrid');
         try {
-            const datos = await GitHub.leer('datos/galeria.json');
-            if (!datos || !datos.publicaciones || datos.publicaciones.length === 0) {
+            // Leer el nuevo índice
+            const indice = await GitHub.leer('publicaciones/indice.json');
+            if (!indice || !indice.publicaciones || indice.publicaciones.length === 0) {
                 container.innerHTML = `
                     <div class="mensaje-vacio" style="width:100%;">
                         <p>📭 No hay imágenes en la galería aún.</p>
@@ -189,19 +197,34 @@
                 `;
                 return;
             }
-            const recientes = datos.publicaciones.slice(-3).reverse();
+            // Tomar las 3 más recientes
+            const recientes = indice.publicaciones.slice(-3).reverse();
             let html = '';
-            recientes.forEach(pub => {
+            for (const pub of recientes) {
                 if (pub.imagenes && pub.imagenes.length > 0) {
-                    html += `
-                        <div class="promo-item">
-                            <img src="${pub.imagenes[0]}" alt="${pub.descripcion || 'Imagen de viaje'}">
-                            <div class="desc">${pub.descripcion ? pub.descripcion.substring(0, 60) + (pub.descripcion.length > 60 ? '...' : '') : 'Sin descripción'}</div>
-                            <div class="autor">${pub.autor || 'Anónimo'}</div>
-                        </div>
-                    `;
+                    // Obtener la primera imagen en base64
+                    const base64 = await obtenerImagenBase64(pub.imagenes[0]);
+                    if (base64) {
+                        const dataUrl = `data:image/jpeg;base64,${base64}`;
+                        html += `
+                            <div class="promo-item">
+                                <img src="${dataUrl}" alt="${pub.descripcion || 'Imagen de viaje'}">
+                                <div class="desc">${pub.descripcion ? pub.descripcion.substring(0, 60) + (pub.descripcion.length > 60 ? '...' : '') : 'Sin descripción'}</div>
+                                <div class="autor">${pub.autor || 'Anónimo'}</div>
+                            </div>
+                        `;
+                    } else {
+                        // Si falla, mostrar placeholder
+                        html += `
+                            <div class="promo-item">
+                                <div style="width:100%;height:150px;background:#f0f0f0;border:1px solid #999;display:flex;align-items:center;justify-content:center;color:#666;font-size:12px;">🖼️ Imagen no disponible</div>
+                                <div class="desc">${pub.descripcion ? pub.descripcion.substring(0, 60) + (pub.descripcion.length > 60 ? '...' : '') : 'Sin descripción'}</div>
+                                <div class="autor">${pub.autor || 'Anónimo'}</div>
+                            </div>
+                        `;
+                    }
                 }
-            });
+            }
             container.innerHTML = html || '<div class="mensaje-vacio" style="width:100%;"><p>No hay publicaciones con imágenes.</p></div>';
         } catch (error) {
             console.error('Error al cargar galería promocional:', error);
