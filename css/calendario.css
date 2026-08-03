@@ -3,12 +3,14 @@
     margin: 0;
     padding: 0;
 }
+
 body {
     background: #f9f8dd;
     color: #272120;
     font-family: Arial, Helvetica, sans-serif;
     padding: 20px;
 }
+
 header {
     border: 2px solid #272120;
     padding: 12px 16px;
@@ -21,17 +23,20 @@ header {
     background: #54555c;
     color: #f9f8dd;
 }
+
 header h1 {
     font-size: 20px;
     font-weight: bold;
     color: #f9f8dd;
 }
+
 header .user-badge {
     border: 1px solid #f9f8dd;
     padding: 4px 12px;
     font-size: 13px;
     color: #f9f8dd;
 }
+
 .volver {
     border: 1px solid #f9f8dd;
     padding: 4px 12px;
@@ -40,22 +45,27 @@ header .user-badge {
     text-decoration: none;
     color: #f9f8dd;
     font-size: 13px;
+    border-radius: 4px;
 }
+
 .volver:hover {
     background: #f9f8dd;
     color: #272120;
 }
+
 .calendario-wrap {
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
 }
+
 .calendario {
     border: 2px solid #272120;
     flex: 2;
     min-width: 320px;
     background: #f9f8dd;
 }
+
 .cal-header {
     border-bottom: 2px solid #272120;
     padding: 10px;
@@ -68,6 +78,7 @@ header .user-badge {
     background: #8b8893;
     color: #f9f8dd;
 }
+
 .cal-header button {
     background: #f9f8dd;
     border: 1px solid #272120;
@@ -75,10 +86,13 @@ header .user-badge {
     cursor: pointer;
     font-weight: bold;
     color: #272120;
+    border-radius: 4px;
 }
+
 .cal-header button:hover {
     background: #d2e291;
 }
+
 .dias-semana {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -86,6 +100,7 @@ header .user-badge {
     background: #9197b6;
     color: #f9f8dd;
 }
+
 .dias-semana div {
     text-align: center;
     font-size: 11px;
@@ -93,14 +108,17 @@ header .user-badge {
     padding: 6px 0;
     border-right: 1px solid #272120;
 }
+
 .dias-semana div:last-child {
     border-right: none;
 }
+
 .dias-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     grid-auto-rows: 70px;
 }
+
 .dia {
     border-right: 1px solid #272120;
     border-bottom: 1px solid #272120;
@@ -112,16 +130,20 @@ header .user-badge {
     background: #f9f8dd;
     color: #272120;
 }
+
 .dia:nth-child(7n) {
     border-right: none;
 }
+
 .dia.vacio {
     background: repeating-linear-gradient(45deg, #f9f8dd, #f9f8dd 4px, #e0bf7a 4px, #e0bf7a 5px);
 }
+
 .dia .num-dia {
     font-weight: bold;
     color: #3b473c;
 }
+
 .dia .evento {
     margin-top: 2px;
     font-size: 8.5px;
@@ -133,14 +155,18 @@ header .user-badge {
     text-overflow: ellipsis;
     background: #d2e291;
     color: #272120;
+    border-radius: 2px;
 }
+
 .dia .evento.multiple {
     background: #8b8893;
     color: #f9f8dd;
 }
+
 .dia:hover {
     background: #e0bf7a;
 }
+
 .detalle {
     flex: 1;
     min-width: 260px;
@@ -150,6 +176,7 @@ header .user-badge {
     overflow-y: auto;
     background: #f9f8dd;
 }
+
 .detalle h2 {
     font-size: 15px;
     border-bottom: 2px solid #272120;
@@ -157,24 +184,29 @@ header .user-badge {
     margin-bottom: 10px;
     color: #3b473c;
 }
+
 .tarjeta {
     border: 2px solid #272120;
     padding: 8px 10px;
     margin-bottom: 10px;
     font-size: 12.5px;
-    background: #ffffff;
+    background: #f9f8dd;
     color: #272120;
+    border-radius: 4px;
 }
+
 .tarjeta .titulo {
     font-weight: bold;
     font-size: 13px;
     margin-bottom: 4px;
     color: #5c8d58;
 }
+
 .tarjeta ul {
     margin: 6px 0 0 16px;
     list-style-type: disc;
 }
+
 .tarjeta .etiqueta {
     display: inline-block;
     border: 1px solid #272120;
@@ -183,7 +215,9 @@ header .user-badge {
     margin-bottom: 4px;
     background: #d2e291;
     color: #272120;
+    border-radius: 4px;
 }
+
 .nota {
     font-size: 11px;
     margin-top: 10px;
@@ -191,6 +225,7 @@ header .user-badge {
     border-top: 1px solid #272120;
     color: #54555c;
 }
+
 footer {
     margin-top: 16px;
     border: 2px solid #272120;
@@ -198,7 +233,9 @@ footer {
     font-size: 11px;
     background: #54555c;
     color: #f9f8dd;
+    border-radius: 4px;
 }
+
 .no-eventos {
     color: #876661;
     font-style: italic;
