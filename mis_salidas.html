@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Salidas</title>
     <link rel="stylesheet" href="css/mis_salidas.css">
+    <!-- Librería para generar PDF directamente desde el navegador -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
 
@@ -126,7 +128,7 @@
 <script>
     // ============================================================
     // mis_salidas.js - Versión completa con soporte para URL ?id=xxx,
-    // botón de eliminar salida (estilo CSS) y exportar PDF
+    // botón de eliminar salida (estilo CSS) y exportar PDF directo
     // ============================================================
 
     (function() {
@@ -254,36 +256,36 @@
         }
         window.eliminarSalida = eliminarSalida;
 
-        // ===== EXPORTAR PDF =====
+        // ===== EXPORTAR PDF (descarga directa) =====
         function exportarPDF(salida) {
             const p = salida._participantesConInfo || salida.participantes || [];
             const r = salida._rutaEnriquecida || salida.ruta || [];
 
             const participantesHTML = p.length > 0
-                ? `<table>
+                ? `<table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:4px;">
                     <thead>
-                        <tr><th>Nombre</th><th>RUT</th><th>Rol</th><th>Edad</th><th>Teléfono</th><th>Historial Médico</th></tr>
+                        <tr><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left; font-weight:600;">Nombre</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left; font-weight:600;">RUT</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left; font-weight:600;">Rol</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left; font-weight:600;">Edad</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left; font-weight:600;">Teléfono</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left; font-weight:600;">Historial Médico</th></tr>
                     </thead>
                     <tbody>
                         ${p.map(pt => `<tr>
-                            <td>${pt.nombre || ''}</td>
-                            <td>${pt.rut || ''}</td>
-                            <td>${pt.rol || ''}</td>
-                            <td>${pt.edad || '—'}</td>
-                            <td>${pt.telefono || '—'}</td>
-                            <td>${pt.historial || 'Sin información'}</td>
+                            <td style="border:1px solid #bbb; padding:4px 6px; vertical-align:top;">${pt.nombre || ''}</td>
+                            <td style="border:1px solid #bbb; padding:4px 6px; vertical-align:top;">${pt.rut || ''}</td>
+                            <td style="border:1px solid #bbb; padding:4px 6px; vertical-align:top;">${pt.rol || ''}</td>
+                            <td style="border:1px solid #bbb; padding:4px 6px; vertical-align:top;">${pt.edad || '—'}</td>
+                            <td style="border:1px solid #bbb; padding:4px 6px; vertical-align:top;">${pt.telefono || '—'}</td>
+                            <td style="border:1px solid #bbb; padding:4px 6px; vertical-align:top;">${pt.historial || 'Sin información'}</td>
                         </tr>`).join('')}
                     </tbody>
                    </table>`
                 : '<p>No hay participantes registrados.</p>';
 
             const rutaHTML = r.length > 0
-                ? `<ul>${r.map(act => `
-                    <li>
+                ? `<ul style="list-style:none; padding:0;">${r.map(act => `
+                    <li style="padding:5px 0; border-bottom:1px solid #ddd; font-size:12px;">
                         <strong>${act.tipo}:</strong> ${act.descripcion}
-                        <span class="horario">(${act.inicio || '—'} – ${act.fin || '—'})</span>
+                        <span class="horario" style="color:#776; margin-left:8px; font-size:11px;">(${act.inicio || '—'} – ${act.fin || '—'})</span>
                         ${act.lugarInfo ? `
-                            <div class="lugar-extra">
+                            <div style="background:#f5f5e8; border:1px solid #dde; padding:4px 8px; margin-top:4px; border-radius:4px; font-size:11px;">
                                 <div><b>Ubicación:</b> ${act.lugarInfo.ubicacion || '—'}</div>
                                 <div><b>Horario lugar:</b> ${act.lugarInfo.apertura || '—'} – ${act.lugarInfo.cierre || '—'}</div>
                                 ${act.lugarInfo.descripcion ? `<div><b>Descripción:</b> ${act.lugarInfo.descripcion}</div>` : ''}
@@ -300,63 +302,61 @@
 
             const fechaGenerado = new Date().toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            const win = window.open('', '_blank');
-            win.document.write(`<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Salida - ${salida.titulo || 'Sin título'}</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #222; padding: 28px 36px; }
-        .cabecera { border-bottom: 3px solid #3b473c; margin-bottom: 14px; padding-bottom: 10px; }
-        .cabecera h1 { font-size: 20px; color: #3b473c; margin-bottom: 6px; }
-        .cabecera .meta { font-size: 11px; color: #555; margin-top: 3px; }
-        h2 { font-size: 12px; background: #3b473c; color: #f9f8dd; padding: 4px 10px; margin: 14px 0 8px 0; border-radius: 4px; letter-spacing: 0.3px; }
-        p { margin: 3px 0; font-size: 12px; }
-        ul { list-style: none; padding: 0; }
-        ul li { padding: 5px 0; border-bottom: 1px solid #ddd; font-size: 12px; }
-        .horario { color: #776; margin-left: 8px; font-size: 11px; }
-        .lugar-extra { background: #f5f5e8; border: 1px solid #dde; padding: 4px 8px; margin-top: 4px; border-radius: 4px; font-size: 11px; }
-        .lugar-extra div { margin: 2px 0; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 4px; }
-        th { background: #3b473c; color: #f9f8dd; padding: 5px 6px; text-align: left; font-weight: 600; }
-        td { border: 1px solid #bbb; padding: 4px 6px; vertical-align: top; }
-        tr:nth-child(even) td { background: #f5f5e8; }
-        .footer { margin-top: 22px; border-top: 1px solid #bbb; padding-top: 8px; font-size: 10px; color: #888; text-align: right; }
-        @media print {
-            body { padding: 10px 14px; }
-        }
-    </style>
-</head>
-<body>
-    <div class="cabecera">
-        <h1>📋 ${salida.titulo || 'Sin título'}</h1>
-        <div class="meta"><b>Fecha:</b> ${salida.fecha || '—'} &nbsp;|&nbsp; <b>Duración:</b> ${salida.duracion || '—'} &nbsp;|&nbsp; <b>Curso:</b> ${salida.curso || '—'}</div>
-        <div class="meta"><b>Precio/persona:</b> ${salida.precio ? '$' + salida.precio : '—'} &nbsp;|&nbsp; <b>Menú:</b> ${salida.menu || '—'}</div>
-        ${salida.descripcion ? `<div class="meta" style="margin-top:6px;"><b>Descripción:</b> ${salida.descripcion}</div>` : ''}
-    </div>
+            // Construimos el HTML que irá dentro del PDF
+            const contenidoHTML = `
+                <div id="pdf-contenido" style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #222; padding: 28px 36px; background: white;">
+                    <div style="border-bottom: 3px solid #3b473c; margin-bottom: 14px; padding-bottom: 10px;">
+                        <h1 style="font-size: 20px; color: #3b473c; margin-bottom: 6px;">📋 ${salida.titulo || 'Sin título'}</h1>
+                        <div style="font-size: 11px; color: #555; margin-top: 3px;"><b>Fecha:</b> ${salida.fecha || '—'} &nbsp;|&nbsp; <b>Duración:</b> ${salida.duracion || '—'} &nbsp;|&nbsp; <b>Curso:</b> ${salida.curso || '—'}</div>
+                        <div style="font-size: 11px; color: #555; margin-top: 3px;"><b>Precio/persona:</b> ${salida.precio ? '$' + salida.precio : '—'} &nbsp;|&nbsp; <b>Menú:</b> ${salida.menu || '—'}</div>
+                        ${salida.descripcion ? `<div style="font-size:11px; color:#555; margin-top:6px;"><b>Descripción:</b> ${salida.descripcion}</div>` : ''}
+                    </div>
 
-    <h2>📍 Ruta</h2>
-    ${rutaHTML}
+                    <h2 style="font-size: 14px; background: #3b473c; color: #f9f8dd; padding: 4px 10px; margin: 14px 0 8px 0; border-radius: 4px; letter-spacing: 0.3px;">📍 Ruta</h2>
+                    ${rutaHTML}
 
-    <h2>👥 Participantes (${p.length})</h2>
-    ${participantesHTML}
+                    <h2 style="font-size: 14px; background: #3b473c; color: #f9f8dd; padding: 4px 10px; margin: 14px 0 8px 0; border-radius: 4px; letter-spacing: 0.3px;">👥 Participantes (${p.length})</h2>
+                    ${participantesHTML}
 
-    <h2>🚌 Transporte</h2>
-    ${transporteHTML}
+                    <h2 style="font-size: 14px; background: #3b473c; color: #f9f8dd; padding: 4px 10px; margin: 14px 0 8px 0; border-radius: 4px; letter-spacing: 0.3px;">🚌 Transporte</h2>
+                    ${transporteHTML}
 
-    <h2>📋 Datos complementarios</h2>
-    <p><b>Curso:</b> ${salida.curso || 'Sin curso'}</p>
-    <p><b>Precio por persona:</b> ${salida.precio ? '$' + salida.precio : 'No especificado'}</p>
-    <p><b>Menú:</b> ${salida.menu || 'Sin menú'}</p>
+                    <h2 style="font-size: 14px; background: #3b473c; color: #f9f8dd; padding: 4px 10px; margin: 14px 0 8px 0; border-radius: 4px; letter-spacing: 0.3px;">📋 Datos complementarios</h2>
+                    <p><b>Curso:</b> ${salida.curso || 'Sin curso'}</p>
+                    <p><b>Precio por persona:</b> ${salida.precio ? '$' + salida.precio : 'No especificado'}</p>
+                    <p><b>Menú:</b> ${salida.menu || 'Sin menú'}</p>
 
-    <div class="footer">Generado el ${fechaGenerado}</div>
+                    <div style="margin-top: 22px; border-top: 1px solid #bbb; padding-top: 8px; font-size: 10px; color: #888; text-align: right;">Generado el ${fechaGenerado}</div>
+                </div>
+            `;
 
-    <script>window.addEventListener('load', function() { setTimeout(function() { window.print(); }, 400); });<\/script>
-</body>
-</html>`);
-            win.document.close();
+            // Creamos un contenedor oculto para renderizar el PDF
+            const container = document.createElement('div');
+            container.style.position = 'fixed';
+            container.style.left = '-9999px';
+            container.style.top = '0';
+            container.style.width = '100%';
+            container.style.background = 'white';
+            container.innerHTML = contenidoHTML;
+            document.body.appendChild(container);
+
+            // Configuración para html2pdf
+            const opt = {
+                margin: 0.5,
+                filename: `Salida_${salida.titulo || 'sin_titulo'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Generar y descargar el PDF
+            html2pdf().set(opt).from(container).save().then(() => {
+                document.body.removeChild(container);
+            }).catch(err => {
+                console.error('Error al generar PDF:', err);
+                alert('Error al generar el PDF. Inténtalo de nuevo.');
+                document.body.removeChild(container);
+            });
         }
         window.exportarPDF = exportarPDF;
 
@@ -688,7 +688,7 @@
         // ===== INICIALIZAR =====
         cargarDatos();
 
-        console.log('✅ mis_salidas.html cargado correctamente con soporte para URL, eliminación y exportar PDF');
+        console.log('✅ mis_salidas.html cargado correctamente con soporte para URL, eliminación y exportar PDF directo');
     })();
 </script>
 </body>
