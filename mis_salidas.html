@@ -17,7 +17,6 @@
 </header>
 
 <div class="contenedor-principal">
-    <!-- Panel izquierdo: listado de salidas -->
     <aside class="panel-lista">
         <h2>Mis salidas</h2>
         <div id="listaSalidas">
@@ -25,7 +24,6 @@
         </div>
     </aside>
 
-    <!-- Panel derecho: detalle y edición -->
     <main class="panel-detalle">
         <div id="detalleSalida">
             <div class="mensaje-inicial">
@@ -66,15 +64,11 @@
             </div>
 
             <h3>📍 Ruta (actividades)</h3>
-            <div id="editRutaContainer">
-                <!-- Se llena dinámicamente -->
-            </div>
+            <div id="editRutaContainer"></div>
             <button type="button" class="btn-agregar-actividad" id="btnAgregarActividad">➕ Agregar actividad</button>
 
             <h3>👥 Participantes</h3>
-            <div id="editParticipantesContainer">
-                <!-- Se llena dinámicamente -->
-            </div>
+            <div id="editParticipantesContainer"></div>
             <div class="campo" style="display:flex; gap:0.5rem; align-items:center;">
                 <input type="text" id="editNuevoParticipante" placeholder="RUT del participante">
                 <select id="editRolParticipante">
@@ -131,8 +125,8 @@
 <script src="js/lugares.js"></script>
 <script>
     // ============================================================
-    // mis_salidas.js - Versión completa con soporte para URL ?id=xxx
-    // y botón de eliminar salida (estilo CSS)
+    // mis_salidas.js - Versión completa con soporte para URL ?id=xxx,
+    // botón de eliminar salida (estilo CSS) y exportar PDF
     // ============================================================
 
     (function() {
@@ -149,7 +143,6 @@
 
         document.getElementById('userBadge').textContent = `${usuario.nombre} ${usuario.apellido || ''} (${usuario.rol})`;
 
-        // ===== LEER ID DESDE LA URL =====
         const urlParams = new URLSearchParams(window.location.search);
         const idDesdeURL = urlParams.get('id');
 
@@ -228,7 +221,6 @@
             });
         }
 
-        // ===== SELECCIONAR SALIDA (async) =====
         window.seleccionarSalida = async function(id) {
             const salida = todasLasSalidas.find(s => s.id === id);
             if (!salida) return;
@@ -239,7 +231,6 @@
             await renderizarDetalle(salida);
         };
 
-        // ===== ELIMINAR SALIDA =====
         async function eliminarSalida(id) {
             const salida = todasLasSalidas.find(s => s.id === id);
             if (!salida) return alert('Salida no encontrada.');
@@ -250,9 +241,7 @@
             const ok = await Planificacion.eliminarSalida(id);
             if (ok) {
                 alert('✅ Salida eliminada correctamente.');
-                // Recargar datos
                 await cargarDatos();
-                // Si la lista no está vacía, seleccionar la primera
                 const misSalidas = getSalidasDelUsuario(todasLasSalidas);
                 if (misSalidas.length > 0) {
                     seleccionarSalida(misSalidas[0].id);
@@ -264,6 +253,112 @@
             }
         }
         window.eliminarSalida = eliminarSalida;
+
+        // ===== EXPORTAR PDF =====
+        function exportarPDF(salida) {
+            const p = salida._participantesConInfo || salida.participantes || [];
+            const r = salida._rutaEnriquecida || salida.ruta || [];
+
+            const participantesHTML = p.length > 0
+                ? `<table>
+                    <thead>
+                        <tr><th>Nombre</th><th>RUT</th><th>Rol</th><th>Edad</th><th>Teléfono</th><th>Historial Médico</th></tr>
+                    </thead>
+                    <tbody>
+                        ${p.map(pt => `<tr>
+                            <td>${pt.nombre || ''}</td>
+                            <td>${pt.rut || ''}</td>
+                            <td>${pt.rol || ''}</td>
+                            <td>${pt.edad || '—'}</td>
+                            <td>${pt.telefono || '—'}</td>
+                            <td>${pt.historial || 'Sin información'}</td>
+                        </tr>`).join('')}
+                    </tbody>
+                   </table>`
+                : '<p>No hay participantes registrados.</p>';
+
+            const rutaHTML = r.length > 0
+                ? `<ul>${r.map(act => `
+                    <li>
+                        <strong>${act.tipo}:</strong> ${act.descripcion}
+                        <span class="horario">(${act.inicio || '—'} – ${act.fin || '—'})</span>
+                        ${act.lugarInfo ? `
+                            <div class="lugar-extra">
+                                <div><b>Ubicación:</b> ${act.lugarInfo.ubicacion || '—'}</div>
+                                <div><b>Horario lugar:</b> ${act.lugarInfo.apertura || '—'} – ${act.lugarInfo.cierre || '—'}</div>
+                                ${act.lugarInfo.descripcion ? `<div><b>Descripción:</b> ${act.lugarInfo.descripcion}</div>` : ''}
+                            </div>` : ''}
+                    </li>`).join('')}</ul>`
+                : '<p>Sin ruta definida.</p>';
+
+            const transporteHTML = salida.transporte
+                ? `<p><b>Conductor:</b> ${salida.transporte.conductor || '—'}</p>
+                   <p><b>Horarios:</b> ${salida.transporte.horarios || '—'}</p>
+                   <p><b>Precio servicio:</b> ${salida.transporte.precio || '—'}</p>
+                   <p><b>Descripción vehículo:</b> ${salida.transporte.descripcion || '—'}</p>`
+                : '<p>Sin información de transporte.</p>';
+
+            const fechaGenerado = new Date().toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            const win = window.open('', '_blank');
+            win.document.write(`<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Salida - ${salida.titulo || 'Sin título'}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #222; padding: 28px 36px; }
+        .cabecera { border-bottom: 3px solid #3b473c; margin-bottom: 14px; padding-bottom: 10px; }
+        .cabecera h1 { font-size: 20px; color: #3b473c; margin-bottom: 6px; }
+        .cabecera .meta { font-size: 11px; color: #555; margin-top: 3px; }
+        h2 { font-size: 12px; background: #3b473c; color: #f9f8dd; padding: 4px 10px; margin: 14px 0 8px 0; border-radius: 4px; letter-spacing: 0.3px; }
+        p { margin: 3px 0; font-size: 12px; }
+        ul { list-style: none; padding: 0; }
+        ul li { padding: 5px 0; border-bottom: 1px solid #ddd; font-size: 12px; }
+        .horario { color: #776; margin-left: 8px; font-size: 11px; }
+        .lugar-extra { background: #f5f5e8; border: 1px solid #dde; padding: 4px 8px; margin-top: 4px; border-radius: 4px; font-size: 11px; }
+        .lugar-extra div { margin: 2px 0; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 4px; }
+        th { background: #3b473c; color: #f9f8dd; padding: 5px 6px; text-align: left; font-weight: 600; }
+        td { border: 1px solid #bbb; padding: 4px 6px; vertical-align: top; }
+        tr:nth-child(even) td { background: #f5f5e8; }
+        .footer { margin-top: 22px; border-top: 1px solid #bbb; padding-top: 8px; font-size: 10px; color: #888; text-align: right; }
+        @media print {
+            body { padding: 10px 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cabecera">
+        <h1>📋 ${salida.titulo || 'Sin título'}</h1>
+        <div class="meta"><b>Fecha:</b> ${salida.fecha || '—'} &nbsp;|&nbsp; <b>Duración:</b> ${salida.duracion || '—'} &nbsp;|&nbsp; <b>Curso:</b> ${salida.curso || '—'}</div>
+        <div class="meta"><b>Precio/persona:</b> ${salida.precio ? '$' + salida.precio : '—'} &nbsp;|&nbsp; <b>Menú:</b> ${salida.menu || '—'}</div>
+        ${salida.descripcion ? `<div class="meta" style="margin-top:6px;"><b>Descripción:</b> ${salida.descripcion}</div>` : ''}
+    </div>
+
+    <h2>📍 Ruta</h2>
+    ${rutaHTML}
+
+    <h2>👥 Participantes (${p.length})</h2>
+    ${participantesHTML}
+
+    <h2>🚌 Transporte</h2>
+    ${transporteHTML}
+
+    <h2>📋 Datos complementarios</h2>
+    <p><b>Curso:</b> ${salida.curso || 'Sin curso'}</p>
+    <p><b>Precio por persona:</b> ${salida.precio ? '$' + salida.precio : 'No especificado'}</p>
+    <p><b>Menú:</b> ${salida.menu || 'Sin menú'}</p>
+
+    <div class="footer">Generado el ${fechaGenerado}</div>
+
+    <script>window.addEventListener('load', function() { setTimeout(function() { window.print(); }, 400); });<\/script>
+</body>
+</html>`);
+            win.document.close();
+        }
+        window.exportarPDF = exportarPDF;
 
         // ===== RENDERIZAR DETALLE (async) =====
         async function renderizarDetalle(salida) {
@@ -290,6 +385,10 @@
                 return act;
             }) : [];
 
+            // Guardamos los datos enriquecidos en el objeto para usarlos en el PDF
+            salida._participantesConInfo = participantesConInfo;
+            salida._rutaEnriquecida = rutaEnriquecida;
+
             const esAdmin = usuario.rol === 'admin';
             const esGuia = usuario.rol === 'guia' || usuario.rol === 'asistente';
             const puedeEditar = esAdmin || esGuia;
@@ -298,6 +397,7 @@
                 <div class="detalle-header">
                     <h2>${salida.titulo || 'Sin título'}</h2>
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn-pdf" id="btnExportarPDF">🖨️ Exportar PDF</button>
                         ${puedeEditar ? `
                             <button class="btn-editar" id="btnAbrirEditar">✏️ Editar</button>
                             <button class="btn-eliminar" id="btnEliminar">🗑️ Eliminar</button>
@@ -363,6 +463,8 @@
             `;
 
             contenedor.innerHTML = html;
+
+            document.getElementById('btnExportarPDF').addEventListener('click', () => exportarPDF(salida));
 
             const btnEditar = document.getElementById('btnAbrirEditar');
             if (btnEditar) {
@@ -507,7 +609,6 @@
                 alert('✅ Salida actualizada correctamente.');
                 cerrarModalEdicion();
                 await cargarDatos();
-                // Seleccionar la misma salida después de recargar
                 window.seleccionarSalida(id);
             } else {
                 alert('❌ Error al actualizar la salida.');
@@ -587,7 +688,7 @@
         // ===== INICIALIZAR =====
         cargarDatos();
 
-        console.log('✅ mis_salidas.html cargado correctamente con soporte para URL y eliminación');
+        console.log('✅ mis_salidas.html cargado correctamente con soporte para URL, eliminación y exportar PDF');
     })();
 </script>
 </body>
