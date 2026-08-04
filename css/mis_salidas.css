@@ -210,6 +210,24 @@ header .user-badge {
     color: #f9f8dd;
 }
 
+/* === BOTÓN EXPORTAR PDF === */
+.btn-pdf {
+    background: #f9f8dd;
+    border: 1px solid #9197b6;
+    color: #9197b6;
+    padding: 5px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    transition: 0.2s ease;
+    border-radius: 20px;
+}
+
+.btn-pdf:hover {
+    background: #9197b6;
+    color: #f9f8dd;
+}
+
 .detalle-body h3 {
     font-size: 14px;
     margin: 16px 0 6px 0;
@@ -535,6 +553,7 @@ header .user-badge {
     }
     .btn-editar,
     .btn-eliminar,
+    .btn-pdf,
     .btn-small,
     .btn-agregar-actividad,
     .modal-acciones button {
@@ -659,6 +678,7 @@ header .user-badge {
     }
     .btn-editar,
     .btn-eliminar,
+    .btn-pdf,
     .btn-small,
     .btn-agregar-actividad,
     .modal-acciones button {
