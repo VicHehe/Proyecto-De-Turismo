@@ -3,7 +3,7 @@
 
 ![Logo de la especialidad](Icon.png)
 
-Bienvenido al sistema de gestión de salidas pedagógicas y turísticas del Liceo Eduardo Charme. Esta plataforma ha sido diseñada para facilitar la planificación, inscripción y seguimiento de las actividades turísticas realizadas por los estudiantes de la especialidad.
+Bienvenido al sistema de gestión de salidas pedagógicas y turísticas del Liceo Eduardo Charme. Esta plataforma ha sido diseñada para facilitar la planificación, seguimiento y visualización de las actividades turísticas realizadas por los estudiantes de la especialidad.
 
 **Acceso en línea:** [https://vichehe.github.io/Proyecto-De-Turismo/index.html](https://vichehe.github.io/Proyecto-De-Turismo/index.html)
 
@@ -14,8 +14,8 @@ Bienvenido al sistema de gestión de salidas pedagógicas y turísticas del Lice
 Es una herramienta web completa que permite:
 
 - **Planificar salidas turísticas** (rutas, participantes, transporte, etc.).
-- **Inscribir a estudiantes** en salidas disponibles.
-- **Consultar un calendario** con todas las actividades programadas.
+- **Gestionar participantes** en las salidas (solo guías y administradores pueden agregar o quitar participantes).
+- **Consultar un calendario** con todas las actividades programadas según tu rol.
 - **Gestionar usuarios** (solo para administradores).
 - **Visualizar fichas médicas** de los participantes (solo para guías y administradores).
 - **Compartir fotos y experiencias** a través de una galería de viajes con calificación por "piñas".
@@ -25,13 +25,13 @@ Es una herramienta web completa que permite:
 
 ## 👥 Roles y permisos
 
-El sistema tiene cuatro tipos de usuarios, cada uno con funciones específicas:
+El sistema tiene cuatro tipos de usuarios (roles), cada uno con funciones específicas. Los roles se asignan al momento del registro (si el RUT está en la lista de autorizados) o posteriormente por un administrador.
 
 | Rol | ¿Quiénes son? | ¿Qué pueden hacer? |
 |-----|---------------|-------------------|
-| **Estudiante** | Alumnos de la especialidad de Turismo (y otros que participen en salidas). | - Ver salidas futuras donde están inscritos.<br>- Inscribirse en salidas disponibles.<br>- Consultar el calendario personal.<br>- Ver detalles básicos de las salidas (sin RUT ni fichas médicas). |
-| **Guía / Asistente** | Estudiantes de Turismo que lideran o asisten en salidas (pueden ser varios por salida). | - **Planificar nuevas salidas** (crear rutas, añadir participantes, definir transporte).<br>- Ver todas las salidas donde participan como guías o asistentes.<br>- Acceder a los RUT y fichas médicas de los participantes.<br>- Editar sus propias salidas (fechas, rutas, participantes, etc.).<br>- Consultar el calendario con sus salidas.<br>- Subir fotos a la galería y eliminar las propias. |
-| **Administrador** | Profesores jefes, funcionarios del liceo o estudiantes de Programación que mantienen el sistema. | - **Gestionar usuarios** (cambiar roles, editar datos, activar/desactivar cuentas).<br>- Ver **todas las salidas** del sistema (futuras y pasadas).<br>- Acceder a toda la información (RUT, fichas médicas, etc.).<br>- Supervisar y moderar la galería (puede eliminar cualquier publicación).<br>- Supervisar el correcto funcionamiento del sistema. |
+| **Visitante / Estudiante** | Alumnos de la especialidad (y otros que participen en salidas). Por defecto, al registrarse se asigna el rol `visitante`. El administrador puede cambiarlo a `estudiante` si se desea, pero ambos tienen los mismos permisos. | - Ver salidas futuras **donde están inscritos** como participantes.<br>- Consultar el calendario personal con esas salidas.<br>- Ver detalles básicos de las salidas (sin RUT ni fichas médicas de otros).<br>**No pueden inscribirse por sí mismos**; deben ser agregados por un guía o administrador. |
+| **Guía / Asistente** | Estudiantes o profesionales que lideran o asisten en salidas. Pueden ser varios por salida. | - **Planificar nuevas salidas** (crear rutas, añadir participantes, definir transporte).<br>- Ver todas las salidas donde participan como guías o asistentes.<br>- Acceder a los RUT y fichas médicas de los participantes.<br>- **Editar** cualquier salida en la que sean guías o asistentes (no solo las que ellos crearon).<br>- Consultar el calendario con sus salidas.<br>- Subir fotos a la galería y eliminar las propias. |
+| **Administrador** | Profesores, funcionarios o encargados de la plataforma. | - **Gestionar usuarios** (cambiar roles, editar datos personales, activar/desactivar cuentas, eliminar).<br>- Ver **todas las salidas** (futuras y pasadas).<br>- Acceder a toda la información (RUT, fichas médicas, etc.).<br>- Editar y eliminar **cualquier salida** directamente.<br>- Supervisar y moderar la galería (puede eliminar cualquier publicación). |
 
 ---
 
@@ -39,18 +39,18 @@ El sistema tiene cuatro tipos de usuarios, cada uno con funciones específicas:
 
 ### 1. Acceder al sistema
 
-- Abre tu navegador y ve a la dirección: [https://vichehe.github.io/Proyecto-De-Turismo/index.html](https://vichehe.github.io/Proyecto-De-Turismo/index.html)
+- Abre tu navegador y ve a: [https://vichehe.github.io/Proyecto-De-Turismo/index.html](https://vichehe.github.io/Proyecto-De-Turismo/index.html)
 - Haz clic en **"Iniciar sesión"**.
 - Ingresa tu **RUT** (con guión) y tu **contraseña**.
 - Si es tu primera vez, regístrate con el botón **"Registrarse"**. Necesitarás:
-  - RUT (con guión).
+  - RUT (con guión, ej: `12345678-9`).
   - Nombre y apellido.
   - Edad.
   - Teléfono y correo electrónico.
   - Historial médico (opcional pero recomendado).
   - Contraseña (mínimo 6 caracteres).
 
-> ⚠️ **Importante:** Si tu RUT está autorizado por el administrador, obtendrás el rol correspondiente (guía o admin). Si no, serás registrado como **estudiante**.
+> ⚠️ **Importante:** Si tu RUT está en la lista de autorizados (definida por el administrador), obtendrás automáticamente el rol correspondiente (admin o guía). En caso contrario, se te asignará el rol `visitante`. El administrador podrá cambiarlo después si es necesario.
 
 ---
 
@@ -60,26 +60,24 @@ Por ahora, contacta a un administrador para restablecerla. En futuras versiones 
 
 ---
 
-## 📋 Para estudiantes
+## 📋 Para estudiantes / visitantes
 
-### Ver salidas disponibles
+### Ver salidas donde estás inscrito
 - Al iniciar sesión, irás al **Lobby**.
-- Verás las salidas futuras en las que estás **inscrito**.
+- Verás las salidas futuras en las que estás **inscrito como participante**.
 - Si no hay salidas, aparecerá un mensaje indicándolo.
 
-### Inscribirse en una salida
-- Haz clic en **"Ver más"** en una tarjeta de salida.
-- Si la salida es futura y aún no estás inscrito, verás un botón **"✅ Inscribirme"**.
-- Haz clic en él para confirmar tu inscripción.
+### ¿Cómo me inscribo en una salida?
+- **Los estudiantes no pueden inscribirse por sí mismos.** Debes pedir a un guía o al administrador que te agregue como participante en la salida deseada. Ellos lo harán desde el panel de planificación o edición.
 
 ### Consultar el calendario
 - En el menú superior, haz clic en **"📅 Calendario"**.
-- Verás un calendario con los días que tienen eventos (salidas).
-- Haz clic en un día con eventos para ver los detalles de las salidas programadas.
+- Verás un calendario con los días que tienen eventos (salidas donde estás inscrito).
+- Haz clic en un día con eventos para ver los detalles de las salidas.
 
 ### Ver detalles de una salida
-- Desde el Lobby o el Calendario, haz clic en **"Ver más"** o en el día correspondiente.
-- Podrás ver:
+- Desde el Lobby, haz clic en **"Ver más"** en una tarjeta de salida.
+- Serás redirigido a la vista detallada donde podrás ver:
   - Título y fecha.
   - Descripción.
   - Ruta (actividades y horarios).
@@ -102,21 +100,21 @@ Por ahora, contacta a un administrador para restablecerla. En futuras versiones 
    - **Plan de Ruta:** Ordena las actividades con sus horarios.
    - **Datos complementarios:** Título, fecha, duración, curso, precio y menú.
 3. Haz clic en **"✅ Guardar Salida"**.
-4. La salida aparecerá en el Lobby y en el Calendario.
+4. La salida aparecerá en el Lobby y en el Calendario de los participantes.
 
 ### Editar una salida existente
 - Ve al **Lobby** o al **Calendario**.
-- Encuentra la salida que creaste (debes ser el guía principal).
-- Haz clic en **"Ver más"**.
-- Busca el botón **"✏️ Editar salida"** (si está disponible).
+- Encuentra la salida que deseas editar (debes ser guía o asistente en ella).
+- Haz clic en **"Ver más"** para ir a la vista detallada.
+- Busca el botón **"✏️ Editar"** (aparece si tienes permisos).
 - Modifica los datos necesarios y guarda los cambios.
 
-> ⚠️ **Importante:** Solo puedes editar salidas que tú mismo creaste. Si eres guía asistente, no podrás editarlas.
+> ⚠️ **Importante:** Puedes editar **cualquier salida en la que participes como guía o asistente**, no solo las que creaste.
 
 ### Ver fichas médicas
-- Desde los detalles de una salida, busca la tabla de participantes.
-- Haz clic en **"Ver"** en la columna "Ficha Médica" de cada participante.
-- Se mostrará la información médica registrada (alergias, condiciones, etc.).
+- Desde la vista detallada de una salida, desplázate hasta la tabla de **Participantes**.
+- Si tienes permisos (guía o admin), verás una columna **"Historial Médico"** con la información de cada participante.
+- No es necesario hacer clic en ningún botón adicional; la información se muestra directamente.
 
 ---
 
@@ -130,14 +128,14 @@ Por ahora, contacta a un administrador para restablecerla. En futuras versiones 
    - **Cambiar su estado** (Activo, Kickeado, Baneado).
    - **Eliminar su cuenta** (permanente).
 4. También puedes buscar usuarios por RUT, nombre o apellido.
-5. Exportar la lista a CSV (Excel).
+5. Exportar la lista a CSV (Excel) con el botón **"📊 Exportar a Excel"**.
 
-> 🔒 **Nota:** El administrador principal (RUT: 22785939-3) no puede ser modificado ni eliminado.
+> 🔒 **Nota:** El administrador principal (RUT: `22785939-3`) no puede ser modificado ni eliminado.
 
-### Supervisar salidas
-- Desde el Lobby o el Calendario, los administradores ven **todas las salidas** (futuras y pasadas).
+### Supervisar y editar salidas
+- Desde el Lobby o el Calendario, los administradores ven **todas las salidas** (futuras y pasadas) en la sección "Mis Salidas".
 - Pueden ver todos los detalles, incluyendo RUT y fichas médicas.
-- En futuras versiones, podrán editar o eliminar cualquier salida directamente.
+- Pueden **editar** o **eliminar** cualquier salida directamente desde la vista detallada.
 
 ---
 
@@ -145,8 +143,8 @@ Por ahora, contacta a un administrador para restablecerla. En futuras versiones 
 
 Todos los usuarios tienen acceso a un calendario que muestra las salidas según su rol:
 
-- **Estudiantes:** Solo ven las salidas futuras en las que están inscritos.
-- **Guías:** Ven las salidas futuras donde participan como guías o asistentes.
+- **Visitantes/Estudiantes:** Solo ven las salidas futuras en las que están inscritos como participantes.
+- **Guías/Asistentes:** Ven las salidas futuras donde participan como guías o asistentes.
 - **Administradores:** Ven todas las salidas futuras del sistema.
 
 Para usarlo:
@@ -184,17 +182,17 @@ Haz clic en tu nombre en la esquina superior derecha (badge) para acceder a la e
 
 ## ❓ Preguntas frecuentes
 
-### ¿Puedo inscribirme en una salida pasada?
-No. Solo se pueden inscribir en salidas con fecha igual o posterior a hoy.
+### ¿Cómo me inscribo en una salida?
+Los estudiantes **no pueden inscribirse por sí mismos**. Debes contactar a un guía o al administrador para que te agregue como participante. Ellos pueden hacerlo al planificar o editar una salida.
 
 ### ¿Por qué no veo una salida en el Lobby?
 Puede ser porque:
 - La salida ya pasó (solo se muestran futuras).
-- No estás inscrito en ella (estudiantes).
-- No eres guía ni participante en ella (guías).
+- No estás inscrito en ella (si eres estudiante/visitante).
+- No eres guía ni participante en ella (si eres guía).
 
 ### ¿Cómo sé si soy guía o estudiante?
-Pregunta a un administrador o revisa tu rol en el badge que aparece en la esquina superior derecha del Lobby.
+Revisa tu rol en el badge que aparece en la esquina superior derecha del Lobby. Si no estás seguro, consulta a un administrador.
 
 ### ¿Puedo cambiar mi contraseña?
 Sí, desde la sección **"Modificar mi cuenta"** (haz clic en tu nombre en el badge superior). Deja el campo de contraseña en blanco si no deseas cambiarla.
@@ -203,7 +201,7 @@ Sí, desde la sección **"Modificar mi cuenta"** (haz clic en tu nombre en el ba
 Verifica que tu RUT esté bien escrito (con guión). Si el problema persiste, contacta a un administrador.
 
 ### ¿Cómo se almacenan los datos?
-Todos los datos (usuarios, salidas, publicaciones de la galería, imágenes) se guardan en un repositorio de GitHub mediante un Worker de Cloudflare. Las contraseñas se almacenan con hash SHA-256.
+Todos los datos (usuarios, salidas, publicaciones de la galería, imágenes) se guardan en un repositorio de GitHub mediante un Worker de Cloudflare. Las contraseñas se almacenan con hash SHA-256 (aunque por compatibilidad también se aceptan en texto plano hasta que todas las cuentas sean migradas).
 
 ---
 
@@ -219,7 +217,7 @@ Todos los datos (usuarios, salidas, publicaciones de la galería, imágenes) se 
 - `index.html` – Lobby principal.
 - `login.html` – Autenticación y registro.
 - `Planificar_Salida_Pedagogica.html` – Creación de salidas.
-- `mis_salidas.html` – Lista y detalles de salidas del usuario.
+- `mis_salidas.html` – Lista y detalles de salidas del usuario (con edición/eliminación).
 - `calendario_interactivo_personal.html` – Calendario personal.
 - `galeria.html` – Galería de viajes.
 - `modificar_cuenta.html` – Edición de perfil.
