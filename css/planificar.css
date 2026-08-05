@@ -281,11 +281,11 @@
     background: linear-gradient(135deg, #3b473c, #272120);
 }
 
-/* ===== CORRECCIÓN: transporte sin borde izquierdo destacado ===== */
+/* ===== CORRECCIÓN: Transporte integrado con el diseño general ===== */
 .info-transporte {
-    background: #f2f4f7;
-    border: 1px solid #b7c4d0;
-    /* border-left: 4px solid #8daad6;  ← esta línea fue eliminada para quitar el resalte */
+    background: #f9f8dd;               /* mismo fondo que las secciones */
+    border: 1px solid #ba9572;         /* mismo borde que las secciones */
+    /* border-left: 4px solid #8daad6;  ← eliminado por completo */
     padding: 0.9rem 1.1rem;
     margin-top: 0.5rem;
     border-radius: 6px;
