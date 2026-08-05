@@ -1,277 +1,325 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistema de Gestión de Salidas</title>
-    <link rel="stylesheet" href="css/login.css">
-</head>
-<body>
+/* ============================================================
+   ESTILOS MEJORADOS – LOGIN Y FORMULARIOS GENÉRICOS
+   (Misma estética que el resto de la aplicación)
+   MEJORAS PARA ANDROID / MÓVILES
+   ============================================================ */
 
-<div class="login-box">
-    <h1>🔐 Sistema de Gestión</h1>
-    <p>Salidas y Excursiones</p>
+/* ----- Reset y box-sizing global ----- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-    <div class="tab-btns">
-        <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">Iniciar sesión</button>
-        <button class="tab-btn" id="tabRegistro" onclick="switchTab('registro')">Registrarse</button>
-    </div>
+/* ----- Contenedores y estructura ----- */
+.container {
+    max-width: 100%; /* Cambiado de 800px a 100% para adaptarse */
+    width: 100%;
+    margin: 0 auto;
+    padding: 1.5rem; /* Reducido de 2rem */
+    background: #f9f8dd;
+    border: 1px solid #ba9572;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(39, 33, 32, 0.08);
+}
 
-    <!-- PANEL LOGIN -->
-    <div id="panelLogin">
-        <div class="field">
-            <label>RUT (con guión)</label>
-            <input type="text" id="loginRut" placeholder="Ej: 12345678-9">
-        </div>
-        <div class="field">
-            <label>Contraseña</label>
-            <input type="password" id="loginPass" placeholder="********">
-        </div>
-        <button class="btn-submit" id="btnLogin" onclick="login()">Iniciar sesión</button>
-        <div class="msg" id="loginMsg"></div>
-    </div>
+.login-box {
+    max-width: 480px; /* Un poco más estrecho para móviles */
+    width: 100%;
+    margin: 0 auto;
+    padding: 1.5rem;
+    background: #f9f8dd;
+    border: 1px solid #ba9572;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(39, 33, 32, 0.1);
+}
 
-    <!-- PANEL REGISTRO -->
-    <div id="panelRegistro" style="display:none;">
-        <div class="form-row">
-            <div class="field">
-                <label>Nombre</label>
-                <input type="text" id="regNombre" placeholder="Tu nombre">
-            </div>
-            <div class="field">
-                <label>Apellido</label>
-                <input type="text" id="regApellido" placeholder="Tu apellido">
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="field">
-                <label>Edad</label>
-                <input type="number" id="regEdad" placeholder="18">
-            </div>
-            <div class="field">
-                <label>RUT (con guión)</label>
-                <input type="text" id="regRut" placeholder="Ej: 12345678-9">
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="field">
-                <label>Teléfono</label>
-                <input type="text" id="regTelefono" placeholder="912345678">
-            </div>
-            <div class="field">
-                <label>Gmail</label>
-                <input type="email" id="regGmail" placeholder="ejemplo@gmail.com">
-            </div>
-        </div>
-        <div class="field">
-            <label>Historial médico</label>
-            <input type="text" id="regHistorial" placeholder="Alergias, condiciones, etc.">
-        </div>
-        <div class="field">
-            <label>Contraseña</label>
-            <input type="password" id="regPass" placeholder="********">
-        </div>
-        <div class="field">
-            <label>Confirmar contraseña</label>
-            <input type="password" id="regPass2" placeholder="********">
-        </div>
-        <div class="rol-info">⚠️ Si tu RUT está autorizado, obtendrás ese rol. Si no, serás Visitante.</div>
-        <button class="btn-submit" id="btnRegistro" onclick="registro()">Crear cuenta</button>
-        <div class="msg" id="registroMsg"></div>
-    </div>
-</div>
+/* ----- Títulos y encabezados ----- */
+h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #3b473c;
+    border-bottom: 3px solid #5c8d58;
+    padding-bottom: 0.6rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    word-break: break-word; /* Evita desbordes por títulos largos */
+}
 
-<!-- ===== SCRIPTS ===== -->
-<script src="js/github.js"></script>
-<script src="js/auth.js"></script>
+/* ----- Grupos de formulario ----- */
+.form-group,
+.field {
+    margin-bottom: 1.2rem;
+    display: flex;
+    flex-direction: column;
+}
 
-<script>
-    // ============================================================
-    // CÓDIGO DE LOGIN Y REGISTRO
-    // ============================================================
+.form-group label,
+.field label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem; /* Ligeramente más grande */
+    margin-bottom: 0.3rem;
+    color: #3b473c;
+}
 
-    if (typeof Auth === 'undefined') {
-        document.body.innerHTML = '<h1>Error: Auth no está definido</h1><p>Revisa que auth.js se haya cargado correctamente.</p>';
-        console.error('❌ Auth no está definido');
-    } else {
-        console.log('✅ Auth cargado correctamente');
+.form-group input,
+.field input {
+    width: 100%;
+    padding: 0.7rem 0.8rem; /* Más padding para táctil */
+    border: 1px solid #8b8893;
+    background: #f9f8dd;
+    font-size: 1rem; /* Mínimo 16px para evitar zoom en iOS/Android */
+    color: #272120;
+    border-radius: 6px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    min-height: 44px; /* Altura mínima táctil */
+    -webkit-appearance: none; /* Elimina estilos por defecto en móviles */
+    appearance: none;
+}
+
+.form-group input:focus,
+.field input:focus {
+    border-color: #5c8d58;
+    box-shadow: 0 0 0 3px rgba(92, 141, 88, 0.15);
+    outline: none;
+}
+
+/* ----- Filas de formulario (dos columnas) ----- */
+.form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.form-row .form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* ----- Botones generales ----- */
+.btn {
+    background: #f9f8dd;
+    border: 1px solid #876661;
+    padding: 0.7rem 1.5rem; /* Más padding */
+    font-size: 1rem; /* Tamaño legible */
+    font-weight: 600;
+    color: #3b473c;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    display: inline-block;
+    min-height: 44px; /* Altura táctil */
+    touch-action: manipulation; /* Mejora respuesta táctil */
+    -webkit-tap-highlight-color: transparent; /* Elimina destello en Android */
+}
+
+.btn:hover {
+    background: #d2e291;
+    box-shadow: 0 2px 6px rgba(39, 33, 32, 0.12);
+    transform: translateY(-1px);
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 0.8rem;
+    background: linear-gradient(135deg, #5c8d58, #3b473c);
+    color: #f9f8dd;
+    border: none;
+    font-weight: 700;
+    font-size: 1.1rem; /* Más grande */
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.2s ease, transform 0.15s ease;
+    min-height: 50px; /* Mayor altura para botón principal */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-submit:hover:not(:disabled) {
+    background: linear-gradient(135deg, #3b473c, #272120);
+    transform: translateY(-1px);
+}
+
+.btn-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.botones {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+}
+
+.botones .btn {
+    flex: 1; /* Ocupan espacio equitativo */
+    min-width: 120px;
+    text-align: center;
+}
+
+/* ----- Pestañas (tabs) ----- */
+.tab-btns {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap; /* Permite que bajen si no caben */
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 0.7rem 0.5rem; /* Más padding vertical */
+    border: 1px solid #ba9572;
+    background: #f9f8dd;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #3b473c;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    text-align: center;
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    word-break: break-word;
+}
+
+.tab-btn:hover {
+    background: #d2e291;
+}
+
+.tab-btn.active {
+    background: #5c8d58;
+    color: #f9f8dd;
+    border-color: #3b473c;
+    box-shadow: 0 2px 8px rgba(92, 141, 88, 0.3);
+}
+
+/* ----- Mensajes de estado ----- */
+.mensaje,
+.msg {
+    padding: 0.8rem 1.2rem;
+    margin: 0.5rem 0 1rem 0;
+    border: 1px solid #ba9572;
+    background: #f9f8dd;
+    border-radius: 6px;
+    color: #272120;
+    font-size: 0.95rem;
+}
+
+.mensaje-exito,
+.msg.success {
+    background: #d2e291;
+    border-color: #5c8d58;
+    color: #3b473c;
+}
+
+.mensaje-error,
+.msg.error {
+    background: #e0bf7a;
+    border-color: #876661;
+    color: #272120;
+}
+
+/* ----- Información de rol (texto auxiliar) ----- */
+.rol-info {
+    font-size: 0.8rem;
+    color: #54555c;
+    margin-top: 4px;
+}
+
+/* ----- Utilidades de visibilidad ----- */
+.hidden,
+.panel-hidden {
+    display: none !important;
+}
+
+/* ============================================================
+   RESPONSIVE PARA MÓVILES (ANDROID / PEQUEÑAS PANTALLAS)
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .container,
+    .login-box {
+        padding: 1rem; /* Padding más ajustado */
+        margin: 0 0.5rem;
+        border-radius: 8px;
     }
-
-    function switchTab(tab) {
-        const esLogin = tab === 'login';
-        document.getElementById('panelLogin').style.display = esLogin ? 'block' : 'none';
-        document.getElementById('panelRegistro').style.display = esLogin ? 'none' : 'block';
-        document.querySelectorAll('.tab-btn').forEach((b, i) => {
-            b.classList.toggle('active', esLogin ? i === 0 : i === 1);
-        });
-        document.getElementById('loginMsg').className = 'msg';
-        document.getElementById('loginMsg').style.display = 'none';
-        document.getElementById('registroMsg').className = 'msg';
-        document.getElementById('registroMsg').style.display = 'none';
+    h1 {
+        font-size: 1.5rem;
     }
-
-    function mostrarMsg(id, texto, tipo) {
-        const el = document.getElementById(id);
-        el.textContent = texto;
-        el.className = `msg ${tipo}`;
-        el.style.display = 'block';
+    .form-row {
+        flex-direction: column; /* Apila los campos en móviles */
+        gap: 0.5rem;
     }
-
-    function setLoading(btnId, loading) {
-        const btn = document.getElementById(btnId);
-        btn.disabled = loading;
-        btn.textContent = loading ? 'Cargando...' : btnId === 'btnLogin' ? 'Iniciar sesión' : 'Crear cuenta';
+    .form-row .form-group {
+        min-width: auto;
     }
-
-    // ===== LOGIN =====
-    async function login() {
-        const rut = document.getElementById('loginRut').value.trim();
-        const pass = document.getElementById('loginPass').value;
-        
-        if (!rut || !pass) {
-            return mostrarMsg('loginMsg', 'Completá todos los campos', 'error');
-        }
-
-        if (typeof Auth === 'undefined') {
-            return mostrarMsg('loginMsg', 'Error: Auth no está definido', 'error');
-        }
-
-        setLoading('btnLogin', true);
-        try {
-            const res = await Auth.login(rut, pass);
-            setLoading('btnLogin', false);
-            if (!res.ok) {
-                return mostrarMsg('loginMsg', res.error, 'error');
-            }
-        } catch (error) {
-            setLoading('btnLogin', false);
-            mostrarMsg('loginMsg', 'Error: ' + error.message, 'error');
-        }
+    .tab-btns {
+        flex-direction: row; /* Mantiene horizontal pero wrap */
+        gap: 0.4rem;
     }
-
-    // ===== REGISTRO CON VALIDACIONES MEJORADAS =====
-    async function registro() {
-        // Obtener valores y limpiar espacios
-        let nombre = document.getElementById('regNombre').value.trim();
-        let apellido = document.getElementById('regApellido').value.trim();
-        let edad = document.getElementById('regEdad').value.trim();
-        let rut = document.getElementById('regRut').value.trim();
-        let telefono = document.getElementById('regTelefono').value.trim();
-        let gmail = document.getElementById('regGmail').value.trim();
-        let historial = document.getElementById('regHistorial').value.trim();
-        let pass = document.getElementById('regPass').value;
-        let pass2 = document.getElementById('regPass2').value;
-
-        // --- VALIDACIONES ---
-
-        // 1. Nombre y apellido (solo letras y espacios, no vacíos)
-        if (!nombre) return mostrarMsg('registroMsg', 'El nombre es obligatorio.', 'error');
-        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(nombre)) {
-            return mostrarMsg('registroMsg', 'El nombre solo puede contener letras y espacios.', 'error');
-        }
-        if (!apellido) return mostrarMsg('registroMsg', 'El apellido es obligatorio.', 'error');
-        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(apellido)) {
-            return mostrarMsg('registroMsg', 'El apellido solo puede contener letras y espacios.', 'error');
-        }
-
-        // 2. Edad (número entero positivo)
-        if (!edad) return mostrarMsg('registroMsg', 'La edad es obligatoria.', 'error');
-        const edadNum = parseInt(edad);
-        if (isNaN(edadNum) || edadNum < 1 || edadNum > 120) {
-            return mostrarMsg('registroMsg', 'Ingresa una edad válida (1-120).', 'error');
-        }
-
-        // 3. RUT (formato chileno: 12345678-9 o 12345678-k)
-        // Limpiar puntos y espacios, dejar solo dígitos y guión
-        rut = rut.replace(/\./g, '').replace(/\s/g, '');
-        if (!rut) return mostrarMsg('registroMsg', 'El RUT es obligatorio.', 'error');
-        if (!/^\d{7,8}-[\dkK]$/.test(rut)) {
-            return mostrarMsg('registroMsg', 'RUT inválido. Debe tener el formato 12345678-9 (con guión).', 'error');
-        }
-        // Guardamos el RUT ya formateado en el campo (para que el usuario vea la corrección)
-        document.getElementById('regRut').value = rut;
-
-        // 4. Teléfono (solo dígitos, mínimo 9 dígitos)
-        let telefonoLimpio = telefono.replace(/[\s\-\(\)\+]/g, '');
-        if (!telefonoLimpio) return mostrarMsg('registroMsg', 'El teléfono es obligatorio.', 'error');
-        if (!/^\d{9,15}$/.test(telefonoLimpio)) {
-            return mostrarMsg('registroMsg', 'Teléfono inválido. Debe tener al menos 9 dígitos (ej: 912345678).', 'error');
-        }
-        // Si tiene 11 dígitos y empieza con 56, quitar el 56 inicial
-        if (telefonoLimpio.length === 11 && telefonoLimpio.startsWith('56')) {
-            telefonoLimpio = telefonoLimpio.substring(2);
-        }
-        document.getElementById('regTelefono').value = telefonoLimpio;
-
-        // 5. Correo electrónico (formato básico)
-        if (!gmail) return mostrarMsg('registroMsg', 'El correo electrónico es obligatorio.', 'error');
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(gmail)) {
-            return mostrarMsg('registroMsg', 'Correo electrónico inválido (ej: usuario@dominio.com).', 'error');
-        }
-
-        // 6. Historial (puede estar vacío, pero si tiene texto, solo letras y espacios)
-        if (historial && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s,.;:()\-]+$/.test(historial)) {
-            return mostrarMsg('registroMsg', 'El historial médico contiene caracteres no permitidos.', 'error');
-        }
-
-        // 7. Contraseña
-        if (!pass) return mostrarMsg('registroMsg', 'La contraseña es obligatoria.', 'error');
-        if (pass.length < 6) {
-            return mostrarMsg('registroMsg', 'La contraseña debe tener al menos 6 caracteres.', 'error');
-        }
-        if (pass !== pass2) {
-            return mostrarMsg('registroMsg', 'Las contraseñas no coinciden.', 'error');
-        }
-
-        // --- Si todo está bien, llamar a Auth.registro ---
-        if (typeof Auth === 'undefined') {
-            return mostrarMsg('registroMsg', 'Error: Auth no está definido', 'error');
-        }
-
-        setLoading('btnRegistro', true);
-        try {
-            const res = await Auth.registro(
-                rut,                      // RUT ya formateado
-                nombre,
-                apellido,
-                edadNum,                  // Edad como número
-                telefonoLimpio,           // Teléfono formateado
-                gmail,
-                historial,
-                pass
-            );
-            setLoading('btnRegistro', false);
-            if (!res.ok) {
-                return mostrarMsg('registroMsg', res.error, 'error');
-            }
-
-            const mensajeRol = res.rol === 'visitante' 
-                ? '✅ Cuenta creada como Visitante. Un administrador puede cambiar tu rol.' 
-                : `✅ Cuenta creada como ${res.rol.toUpperCase()}`;
-            
-            mostrarMsg('registroMsg', mensajeRol, 'success');
-            // Limpiar campos
-            document.querySelectorAll('#panelRegistro input').forEach(input => input.value = '');
-            
-            setTimeout(() => {
-                switchTab('login');
-                mostrarMsg('loginMsg', '✅ Registro exitoso. Inicia sesión.', 'success');
-            }, 2000);
-        } catch (error) {
-            setLoading('btnRegistro', false);
-            mostrarMsg('registroMsg', 'Error: ' + error.message, 'error');
-        }
+    .tab-btn {
+        font-size: 0.85rem;
+        padding: 0.6rem 0.3rem;
+        flex: 1 1 auto;
+        min-width: 60px; /* Para que no se encojan demasiado */
     }
+    .btn,
+    .btn-submit {
+        font-size: 1rem;
+        padding: 0.7rem 1rem;
+    }
+    .botones .btn {
+        flex: 1 1 100%; /* En móviles, botones ocupan todo el ancho */
+        min-width: unset;
+    }
+    .botones {
+        flex-direction: column;
+        gap: 0.7rem;
+    }
+}
 
-    // Eventos de teclado para enviar con Enter
-    document.getElementById('loginPass').addEventListener('keydown', e => {
-        if (e.key === 'Enter') login();
-    });
-    document.getElementById('regPass2').addEventListener('keydown', e => {
-        if (e.key === 'Enter') registro();
-    });
-
-    console.log('✅ login.html cargado correctamente');
-</script>
-</body>
-</html>
+@media (max-width: 480px) {
+    .container,
+    .login-box {
+        padding: 0.8rem;
+        margin: 0 0.2rem;
+        border-radius: 6px;
+    }
+    h1 {
+        font-size: 1.3rem;
+    }
+    .tab-btns {
+        flex-direction: column; /* Pestañas apiladas en pantallas muy pequeñas */
+        gap: 0.3rem;
+    }
+    .tab-btn {
+        width: 100%;
+        flex: none;
+        min-height: 48px;
+    }
+    .form-group input,
+    .field input {
+        padding: 0.6rem 0.7rem;
+        font-size: 1rem;
+        min-height: 48px;
+    }
+    .btn {
+        min-height: 48px;
+        font-size: 1rem;
+    }
+    .btn-submit {
+        min-height: 52px;
+        font-size: 1.1rem;
+    }
+    .mensaje,
+    .msg {
+        font-size: 0.9rem;
+        padding: 0.6rem 1rem;
+    }
+}
