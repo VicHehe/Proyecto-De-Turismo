@@ -175,5 +175,5 @@ Al **Liceo Eduardo Charme** por brindar el espacio y los recursos.
 
 ---
 
-**¡Disfruta del sistema y que tengas excelentes salidas!**  
+**¡SUMATE AL CHARME!**  
 *San Fernando, Agosto 2026*
