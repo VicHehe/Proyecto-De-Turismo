@@ -8,7 +8,7 @@ Bienvenido a la plataforma de gestión de salidas turísticas del Liceo Eduardo 
 
 - **Ingresa aquí:** [https://vichehe.github.io/Proyecto-De-Turismo/index.html](https://vichehe.github.io/Proyecto-De-Turismo/index.html)
 - **Repositorio del proyecto:** [https://github.com/vichehe/Proyecto-De-Turismo](https://github.com/vichehe/Proyecto-De-Turismo)
-- *DocumentacionExtendida:** [https://github.com/vichehe/Proyecto-De-Turismo]([https://github.com/vichehe/Proyecto-De-Turismo](https://github.com/VicHehe/Proyecto-De-Turismo/blob/main/DOCUMENTATION.md))
+- **DocumentacionExtendida:** [https://github.com/vichehe/Proyecto-De-Turismo](https://github.com/VicHehe/Proyecto-De-Turismo/blob/main/DOCUMENTATION.md)
 
 
 
