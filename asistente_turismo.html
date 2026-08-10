@@ -95,7 +95,7 @@
         const buscar = document.getElementById('inputBuscar');
         const contenedor = document.getElementById('contenedorPrincipal');
 
-        // Aplicar/remover clase modo-salidas
+        // Aplicar o quitar clase para modo salidas (igual a mis_salidas)
         if (tab === 'salidas') {
             contenedor.classList.add('modo-salidas');
         } else {
@@ -231,7 +231,7 @@
             </div>`;
     }
 
-    // ===== RENDER LISTA SALIDAS (con clase item-salida) =====
+    // ===== RENDER LISTA SALIDAS (igual a mis_salidas) =====
     function renderListaSalidas(lista) {
         const panel = document.getElementById('panelLista');
         if (!lista.length) {
@@ -447,13 +447,12 @@
     });
 
     // ============================================================
-    // NUEVA EXPORTACIÓN PDF con estilo unificado (igual que mis_salidas)
+    // EXPORTACIÓN PDF (igual que mis_salidas)
     // ============================================================
     window.exportarSalidaPDF = async function (id) {
         const s = todasSalidas.find(x => x.id === id);
         if (!s) { alert('Salida no encontrada'); return; }
 
-        // Deshabilitar botón temporalmente
         const btn = document.querySelector(`button[onclick="exportarSalidaPDF('${id}')"]`);
         if (btn) {
             btn.textContent = '⏳ Generando...';
@@ -461,7 +460,6 @@
         }
 
         try {
-            // 1. Enriquecer participantes con datos de usuarios
             const datosUsuarios = await GitHub.leer('datos/usuarios.json');
             const usuarios = datosUsuarios ? datosUsuarios.usuarios : [];
             const participantesConInfo = (s.participantes || []).map(p => {
@@ -474,7 +472,6 @@
                 };
             });
 
-            // 2. Enriquecer ruta con información de lugares
             const lugaresInfo = typeof lugares !== 'undefined' ? lugares : [];
             const rutaEnriquecida = (s.ruta || []).map(act => {
                 if (act.tipo === 'Lugar') {
@@ -484,10 +481,8 @@
                 return act;
             });
 
-            // 3. Generar HTML con el mismo estilo que mis_salidas
             const contenidoHTML = generarContenidoHTML(s, participantesConInfo, rutaEnriquecida);
 
-            // 4. Crear contenedor temporal para renderizar
             const container = document.createElement('div');
             container.style.position = 'absolute';
             container.style.left = '-9999px';
@@ -499,8 +494,7 @@
             container.innerHTML = contenidoHTML;
             document.body.appendChild(container);
 
-            // 5. Capturar con html2canvas y generar PDF
-            await new Promise((resolve) => setTimeout(resolve, 300)); // esperar renderizado
+            await new Promise((resolve) => setTimeout(resolve, 300));
             const canvas = await html2canvas(container, {
                 scale: 2,
                 useCORS: true,
@@ -530,7 +524,6 @@
 
             pdf.save(`Salida_${s.titulo || 'sin_titulo'}_${s.fecha || 'sin_fecha'}.pdf`);
 
-            // Limpiar
             document.body.removeChild(container);
         } catch (error) {
             console.error('Error al generar PDF:', error);
@@ -543,7 +536,6 @@
         }
     };
 
-    // Función auxiliar para generar el HTML del PDF (copiada y adaptada de mis_salidas)
     function generarContenidoHTML(salida, participantesConInfo, rutaEnriquecida) {
         const p = participantesConInfo || [];
         const r = rutaEnriquecida || [];
