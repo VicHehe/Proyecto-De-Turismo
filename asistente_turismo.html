@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🧭 Asistente de Turismo</title>
     <link rel="stylesheet" href="css/asistente_turismo.css">
+    <!-- Librerías para PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -436,95 +438,176 @@
         XLSX.writeFile(wb, `salidas_resumen_${new Date().toISOString().split('T')[0]}.xlsx`);
     });
 
-    // PDF salida individual
-    window.exportarSalidaPDF = function (id) {
+    // ============================================================
+    // NUEVA EXPORTACIÓN PDF con estilo unificado (igual que mis_salidas)
+    // ============================================================
+    window.exportarSalidaPDF = async function (id) {
         const s = todasSalidas.find(x => x.id === id);
-        if (!s) return;
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-        const margen = 15;
-        const ancho = 180;
-        let y = 22;
+        if (!s) { alert('Salida no encontrada'); return; }
 
-        const addTxt = (txt, x = margen, fs = 10, bold = false, color = [39, 33, 32]) => {
-            doc.setFontSize(fs); doc.setFont('helvetica', bold ? 'bold' : 'normal');
-            doc.setTextColor(...color);
-            const lineas = doc.splitTextToSize(String(txt || '—'), ancho - (x - margen));
-            doc.text(lineas, x, y);
-            y += lineas.length * (fs * 0.38 + 1.2);
-        };
+        // Deshabilitar botón temporalmente
+        const btn = document.querySelector(`button[onclick="exportarSalidaPDF('${id}')"]`);
+        if (btn) {
+            btn.textContent = '⏳ Generando...';
+            btn.disabled = true;
+        }
 
-        const sep = (color = [210, 226, 145]) => {
-            doc.setDrawColor(...color); doc.line(margen, y, margen + ancho, y); y += 5;
-        };
-
-        const checkPage = (esp = 20) => { if (y + esp > 275) { doc.addPage(); y = 20; } };
-
-        // Cabecera
-        doc.setFillColor(59, 71, 60);
-        doc.rect(0, 0, 210, 16, 'F');
-        doc.setFontSize(13); doc.setFont('helvetica', 'bold');
-        doc.setTextColor(249, 248, 221);
-        doc.text(`SALIDA: ${s.titulo || 'Sin título'}`, margen, 11);
-        y = 24;
-
-        addTxt('INFORMACIÓN GENERAL', margen, 12, true, [92, 141, 88]); sep();
-        addTxt(`Fecha: ${s.fecha || '—'}   ·   Duración: ${s.duracion || '—'}   ·   Curso: ${s.curso || '—'}`);
-        checkPage(8);
-        addTxt(`Precio/persona: ${s.precio ? '$' + Number(s.precio).toLocaleString('es-CL') + ' CLP' : '—'}   ·   Menú: ${s.menu || '—'}`);
-        y += 3;
-
-        checkPage(15);
-        addTxt('DESCRIPCIÓN', margen, 12, true, [92, 141, 88]); sep();
-        addTxt(s.descripcion || 'Sin descripción.');
-        y += 3;
-
-        checkPage(20);
-        addTxt('TRANSPORTE', margen, 12, true, [92, 141, 88]); sep();
-        addTxt(`Conductor: ${s.transporte?.conductor || '—'}`);
-        checkPage(8); addTxt(`Horarios: ${s.transporte?.horarios || '—'}`);
-        checkPage(8); addTxt(`Precio: ${s.transporte?.precio || '—'}`);
-        checkPage(8); addTxt(`Vehículo: ${s.transporte?.descripcion || '—'}`);
-        y += 3;
-
-        if (s.ruta && s.ruta.length) {
-            checkPage(20);
-            addTxt('RUTA DE ACTIVIDADES', margen, 12, true, [92, 141, 88]); sep();
-            s.ruta.forEach((r, i) => {
-                checkPage(10);
-                addTxt(`${i + 1}. [${r.tipo}] ${r.descripcion}${r.inicio ? ' · ' + r.inicio + (r.fin ? ' – ' + r.fin : '') : ''}`, margen + 4);
+        try {
+            // 1. Enriquecer participantes con datos de usuarios
+            const datosUsuarios = await GitHub.leer('datos/usuarios.json');
+            const usuarios = datosUsuarios ? datosUsuarios.usuarios : [];
+            const participantesConInfo = (s.participantes || []).map(p => {
+                const user = usuarios.find(u => u.rut === p.rut);
+                return {
+                    ...p,
+                    edad: user ? user.edad : '—',
+                    telefono: user ? user.telefono : '—',
+                    historial: user ? user.historial : 'Sin información'
+                };
             });
-            y += 3;
-        }
 
-        if (s.guias && s.guias.length) {
-            checkPage(20);
-            addTxt('GUÍAS', margen, 12, true, [92, 141, 88]); sep();
-            s.guias.forEach(g => { checkPage(8); addTxt(`• ${g.nombre || '—'} (RUT: ${g.rut || '—'})`, margen + 4); });
-            y += 3;
-        }
-
-        if (s.participantes && s.participantes.length) {
-            checkPage(20);
-            addTxt(`PARTICIPANTES (${s.participantes.length})`, margen, 12, true, [92, 141, 88]); sep();
-            s.participantes.forEach(p => {
-                checkPage(8);
-                addTxt(`• ${p.nombre || '—'} · RUT: ${p.rut || '—'} · ${p.rol || '—'}`, margen + 4);
+            // 2. Enriquecer ruta con información de lugares
+            const lugaresInfo = typeof lugares !== 'undefined' ? lugares : [];
+            const rutaEnriquecida = (s.ruta || []).map(act => {
+                if (act.tipo === 'Lugar') {
+                    const lugar = lugaresInfo.find(l => l.nombre.toLowerCase() === act.descripcion.toLowerCase());
+                    if (lugar) return { ...act, lugarInfo: lugar };
+                }
+                return act;
             });
-        }
 
-        const total = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= total; i++) {
-            doc.setPage(i);
-            doc.setFontSize(8); doc.setTextColor(135, 102, 97);
-            doc.text(
-                `Asistente de Turismo · Liceo Eduardo Charme · ${new Date().toLocaleDateString('es-CL')} · Pág. ${i}/${total}`,
-                margen, 290
-            );
-        }
+            // 3. Generar HTML con el mismo estilo que mis_salidas
+            const contenidoHTML = generarContenidoHTML(s, participantesConInfo, rutaEnriquecida);
 
-        doc.save(`salida_${(s.titulo || 'sin_titulo').replace(/\s+/g, '_')}_${s.fecha || 'sin_fecha'}.pdf`);
+            // 4. Crear contenedor temporal para renderizar
+            const container = document.createElement('div');
+            container.style.position = 'absolute';
+            container.style.left = '-9999px';
+            container.style.top = '0';
+            container.style.width = '800px';
+            container.style.background = 'white';
+            container.style.padding = '20px';
+            container.style.zIndex = '9999';
+            container.innerHTML = contenidoHTML;
+            document.body.appendChild(container);
+
+            // 5. Capturar con html2canvas y generar PDF
+            await new Promise((resolve) => setTimeout(resolve, 300)); // esperar renderizado
+            const canvas = await html2canvas(container, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                width: 800,
+                height: container.scrollHeight
+            });
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgData = canvas.toDataURL('image/jpeg', 0.95);
+            const imgWidth = 210;
+            const pageHeight = 297;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            pdf.save(`Salida_${s.titulo || 'sin_titulo'}_${s.fecha || 'sin_fecha'}.pdf`);
+
+            // Limpiar
+            document.body.removeChild(container);
+        } catch (error) {
+            console.error('Error al generar PDF:', error);
+            alert('Error al generar el PDF. Inténtalo de nuevo.');
+        } finally {
+            if (btn) {
+                btn.textContent = '📄 PDF completo';
+                btn.disabled = false;
+            }
+        }
     };
+
+    // Función auxiliar para generar el HTML del PDF (copiada y adaptada de mis_salidas)
+    function generarContenidoHTML(salida, participantesConInfo, rutaEnriquecida) {
+        const p = participantesConInfo || [];
+        const r = rutaEnriquecida || [];
+
+        const participantesHTML = p.length > 0
+            ? `<table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:4px;">
+                    <thead>
+                        <tr><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left;">Nombre</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left;">RUT</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left;">Rol</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left;">Edad</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left;">Teléfono</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left;">Historial Médico</th></tr>
+                    </thead>
+                    <tbody>
+                        ${p.map(pt => `<tr>
+                            <td style="border:1px solid #bbb; padding:4px 6px;">${pt.nombre || ''}</td>
+                            <td style="border:1px solid #bbb; padding:4px 6px;">${pt.rut || ''}</td>
+                            <td style="border:1px solid #bbb; padding:4px 6px;">${pt.rol || ''}</td>
+                            <td style="border:1px solid #bbb; padding:4px 6px;">${pt.edad || '—'}</td>
+                            <td style="border:1px solid #bbb; padding:4px 6px;">${pt.telefono || '—'}</td>
+                            <td style="border:1px solid #bbb; padding:4px 6px;">${pt.historial || 'Sin información'}</td>
+                        </tr>`).join('')}
+                    </tbody>
+                   </table>`
+            : '<p>No hay participantes registrados.</p>';
+
+        const rutaHTML = r.length > 0
+            ? `<ul style="list-style:none; padding:0;">${r.map(act => `
+                    <li style="padding:5px 0; border-bottom:1px solid #ddd; font-size:12px;">
+                        <strong>${act.tipo}:</strong> ${act.descripcion}
+                        <span style="color:#776; margin-left:8px; font-size:11px;">(${act.inicio || '—'} – ${act.fin || '—'})</span>
+                        ${act.lugarInfo ? `
+                            <div style="background:#f5f5e8; border:1px solid #dde; padding:4px 8px; margin-top:4px; border-radius:4px; font-size:11px;">
+                                <div><b>Ubicación:</b> ${act.lugarInfo.ubicacion || '—'}</div>
+                                <div><b>Horario lugar:</b> ${act.lugarInfo.apertura || '—'} – ${act.lugarInfo.cierre || '—'}</div>
+                                ${act.lugarInfo.descripcion ? `<div><b>Descripción:</b> ${act.lugarInfo.descripcion}</div>` : ''}
+                            </div>` : ''}
+                    </li>`).join('')}</ul>`
+            : '<p>Sin ruta definida.</p>';
+
+        const transporteHTML = salida.transporte
+            ? `<p><b>Conductor:</b> ${salida.transporte.conductor || '—'}</p>
+                   <p><b>Horarios:</b> ${salida.transporte.horarios || '—'}</p>
+                   <p><b>Precio servicio:</b> ${salida.transporte.precio || '—'}</p>
+                   <p><b>Descripción vehículo:</b> ${salida.transporte.descripcion || '—'}</p>`
+            : '<p>Sin información de transporte.</p>';
+
+        const fechaGenerado = new Date().toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        return `
+                <div style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #222; padding: 20px; background: white; max-width: 100%;">
+                    <div style="border-bottom: 3px solid #3b473c; margin-bottom: 14px; padding-bottom: 10px;">
+                        <h1 style="font-size: 20px; color: #3b473c; margin-bottom: 6px;">📋 ${salida.titulo || 'Sin título'}</h1>
+                        <div style="font-size: 11px; color: #555; margin-top: 3px;"><b>Fecha:</b> ${salida.fecha || '—'} &nbsp;|&nbsp; <b>Duración:</b> ${salida.duracion || '—'} &nbsp;|&nbsp; <b>Curso:</b> ${salida.curso || '—'}</div>
+                        <div style="font-size: 11px; color: #555; margin-top: 3px;"><b>Precio/persona:</b> ${salida.precio ? '$' + salida.precio : '—'} &nbsp;|&nbsp; <b>Menú:</b> ${salida.menu || '—'}</div>
+                        ${salida.descripcion ? `<div style="font-size:11px; color:#555; margin-top:6px;"><b>Descripción:</b> ${salida.descripcion}</div>` : ''}
+                    </div>
+
+                    <h2 style="font-size: 14px; background: #3b473c; color: #f9f8dd; padding: 4px 10px; margin: 14px 0 8px 0; border-radius: 4px;">📍 Ruta</h2>
+                    ${rutaHTML}
+
+                    <h2 style="font-size: 14px; background: #3b473c; color: #f9f8dd; padding: 4px 10px; margin: 14px 0 8px 0; border-radius: 4px;">👥 Participantes (${p.length})</h2>
+                    ${participantesHTML}
+
+                    <h2 style="font-size: 14px; background: #3b473c; color: #f9f8dd; padding: 4px 10px; margin: 14px 0 8px 0; border-radius: 4px;">🚌 Transporte</h2>
+                    ${transporteHTML}
+
+                    <h2 style="font-size: 14px; background: #3b473c; color: #f9f8dd; padding: 4px 10px; margin: 14px 0 8px 0; border-radius: 4px;">📋 Datos complementarios</h2>
+                    <p><b>Curso:</b> ${salida.curso || 'Sin curso'}</p>
+                    <p><b>Precio por persona:</b> ${salida.precio ? '$' + salida.precio : 'No especificado'}</p>
+                    <p><b>Menú:</b> ${salida.menu || 'Sin menú'}</p>
+
+                    <div style="margin-top: 22px; border-top: 1px solid #bbb; padding-top: 8px; font-size: 10px; color: #888; text-align: right;">Generado el ${fechaGenerado}</div>
+                </div>
+            `;
+    }
 
     // ===== CARGA INICIAL =====
     async function cargarDatos() {
