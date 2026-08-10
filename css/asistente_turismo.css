@@ -188,7 +188,7 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
     overflow-y: auto;
 }
 
-/* ===== ITEMS LISTA (genéricos) ===== */
+/* ===== ITEMS LISTA (comunes) ===== */
 .item-lista {
     padding: 10px 12px;
     border: 1px solid #ba9572;
@@ -219,7 +219,7 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
     font-size: 13px;
 }
 
-/* ===== DETALLE ===== */
+/* ===== DETALLE (común) ===== */
 .mensaje-inicial { text-align: center; color: #876661; font-style: italic; padding: 40px 0; }
 
 .detalle-header {
@@ -519,8 +519,28 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
     background: #f3efc9;
 }
 
-/* Responsive para que coincida con mis_salidas */
+/* ===== TABLET / DESKTOP ===== */
 @media (min-width: 768px) {
+    body { padding: 20px; }
+
+    header { flex-direction: row; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; }
+    header h1 { font-size: 20px; text-align: left; }
+    .header-right { justify-content: flex-end; }
+
+    .tab-btn { font-size: 15px; padding: 13px 20px; }
+
+    .contenedor-principal { flex-direction: row; align-items: flex-start; }
+
+    .panel-lista { flex: 1; min-width: 220px; max-width: 300px; max-height: 640px; }
+    .panel-detalle { flex: 2; min-width: 320px; max-height: 640px; }
+
+    .detalle-header h2 { font-size: 18px; }
+
+    .tabla-mini { display: table; overflow-x: visible; white-space: normal; }
+
+    .info-grid { grid-template-columns: repeat(3, 1fr); }
+
+    /* Modo salidas en escritorio */
     .modo-salidas .panel-lista {
         flex: 1;
         min-width: 220px;
@@ -552,28 +572,6 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
         padding: 5px 7px;
         min-width: auto;
     }
-}
-
-/* ===== TABLET / DESKTOP (general) ===== */
-@media (min-width: 768px) {
-    body { padding: 20px; }
-
-    header { flex-direction: row; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; }
-    header h1 { font-size: 20px; text-align: left; }
-    .header-right { justify-content: flex-end; }
-
-    .tab-btn { font-size: 15px; padding: 13px 20px; }
-
-    .contenedor-principal { flex-direction: row; align-items: flex-start; }
-
-    .panel-lista { flex: 1; min-width: 220px; max-width: 300px; max-height: 640px; }
-    .panel-detalle { flex: 2; min-width: 320px; max-height: 640px; }
-
-    .detalle-header h2 { font-size: 18px; }
-
-    .tabla-mini { display: table; overflow-x: visible; white-space: normal; }
-
-    .info-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (min-width: 1024px) {
