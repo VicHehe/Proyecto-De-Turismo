@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧭 Asistente de Turismo</title>
+    <link rel="stylesheet" href="css/asistente_turismo.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>🧭 Asistente de Turismo</h1>
+    <div class="header-right">
+        <span class="user-badge" id="userBadge">Cargando...</span>
+        <a href="index.html" class="volver">← Volver al Lobby</a>
+    </div>
+</header>
+
+<div class="tabs-bar">
+    <button class="tab-btn activo" data-tab="usuarios">👤 Usuarios</button>
+    <button class="tab-btn" data-tab="salidas">🗺️ Salidas</button>
+    <button class="tab-btn" data-tab="lugares">📍 Lugares</button>
+</div>
+
+<div class="buscador-bar">
+    <span class="lupa">🔍</span>
+    <input type="text" id="inputBuscar" placeholder="Buscar por nombre, RUT, email, rol...">
+    <input type="date" id="inputFecha" class="hidden" title="Filtrar por fecha">
+    <button id="btnBuscar">Buscar</button>
+    <div class="export-global" id="exportGlobalUsuarios">
+        <button class="btn-excel" id="btnExportTodosExcel">📊 Exportar todos (Excel)</button>
+    </div>
+    <div class="export-global hidden" id="exportGlobalSalidas">
+        <button class="btn-excel" id="btnExportSalidasExcel">📊 Resumen salidas (Excel)</button>
+    </div>
+</div>
+
+<div class="contenedor-principal">
+    <aside class="panel-lista" id="panelLista">
+        <p class="cargando">Cargando datos...</p>
+    </aside>
+    <main class="panel-detalle" id="panelDetalle">
+        <div class="mensaje-inicial">
+            <p>👈 Selecciona un elemento de la lista para ver sus detalles.</p>
+        </div>
+    </main>
+</div>
+
+<script src="js/github.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/planificacion.js"></script>
+<script src="js/lugares.js"></script>
+<script>
+(function () {
+
+    // ===== AUTH =====
+    const usuario = Auth.getSesion();
+    if (!usuario) { window.location.href = 'login.html'; return; }
+    if (usuario.rol !== 'admin') {
+        alert('Solo los administradores pueden acceder al Asistente de Turismo.');
+        window.location.href = 'index.html';
+        return;
+    }
+    document.getElementById('userBadge').textContent =
+        `${usuario.nombre} ${usuario.apellido || ''} (${usuario.rol})`;
+
+    // ===== STATE =====
+    let tabActual = 'usuarios';
+    let todosUsuarios = [];
+    let todasSalidas = [];
+    let rutuSeleccionada = null;
+    let idSalidaSeleccionada = null;
+    let idxLugarSeleccionado = null;
+
+    // ===== TABS =====
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('activo'));
+            this.classList.add('activo');
+            tabActual = this.dataset.tab;
+            document.getElementById('inputBuscar').value = '';
+            document.getElementById('inputFecha').value = '';
+            cambiarTab(tabActual);
+        });
+    });
+
+    function cambiarTab(tab) {
+        const inputFecha = document.getElementById('inputFecha');
+        const expU = document.getElementById('exportGlobalUsuarios');
+        const expS = document.getElementById('exportGlobalSalidas');
+        const buscar = document.getElementById('inputBuscar');
+
+        inputFecha.classList.add('hidden');
+        expU.classList.add('hidden');
+        expS.classList.add('hidden');
+
+        document.getElementById('panelDetalle').innerHTML =
+            '<div class="mensaje-inicial"><p>👈 Selecciona un elemento de la lista para ver sus detalles.</p></div>';
+
+        if (tab === 'usuarios') {
+            buscar.placeholder = 'Buscar por nombre, RUT, email, rol...';
+            expU.classList.remove('hidden');
+            renderListaUsuarios(todosUsuarios);
+        } else if (tab === 'salidas') {
+            buscar.placeholder = 'Buscar por título, descripción, participante, lugar, curso...';
+            inputFecha.classList.remove('hidden');
+            expS.classList.remove('hidden');
+            renderListaSalidas(todasSalidas);
+        } else if (tab === 'lugares') {
+            buscar.placeholder = 'Buscar por nombre, descripción, ubicación...';
+            renderListaLugares(lugares);
+        }
+    }
+
+    // ===== BÚSQUEDA =====
+    function filtrar() {
+        const q = document.getElementById('inputBuscar').value.toLowerCase().trim();
+        const fecha = document.getElementById('inputFecha').value;
+
+        if (tabActual === 'usuarios') {
+            renderListaUsuarios(todosUsuarios.filter(u =>
+                (u.nombre || '').toLowerCase().includes(q) ||
+                (u.apellido || '').toLowerCase().includes(q) ||
+                (u.rut || '').toLowerCase().includes(q) ||
+                (u.gmail || u.email || '').toLowerCase().includes(q) ||
+                (u.rol || '').toLowerCase().includes(q) ||
+                (u.estado || '').toLowerCase().includes(q)
+            ));
+        } else if (tabActual === 'salidas') {
+            let res = todasSalidas.filter(s =>
+                q === '' ||
+                (s.titulo || '').toLowerCase().includes(q) ||
+                (s.descripcion || '').toLowerCase().includes(q) ||
+                (s.curso || '').toLowerCase().includes(q) ||
+                (s.participantes || []).some(p =>
+                    (p.nombre || '').toLowerCase().includes(q) ||
+                    (p.rut || '').toLowerCase().includes(q)
+                ) ||
+                (s.guias || []).some(g => (g.nombre || '').toLowerCase().includes(q)) ||
+                (s.ruta || []).some(r => (r.descripcion || '').toLowerCase().includes(q))
+            );
+            if (fecha) res = res.filter(s => s.fecha === fecha);
+            renderListaSalidas(res);
+        } else if (tabActual === 'lugares') {
+            renderListaLugares(lugares.filter(l =>
+                (l.nombre || '').toLowerCase().includes(q) ||
+                (l.descripcion || '').toLowerCase().includes(q) ||
+                (l.ubicacion || '').toLowerCase().includes(q)
+            ));
+        }
+    }
+
+    document.getElementById('btnBuscar').addEventListener('click', filtrar);
+    document.getElementById('inputBuscar').addEventListener('input', filtrar);
+    document.getElementById('inputFecha').addEventListener('change', filtrar);
+
+    // ===== RENDER LISTA USUARIOS =====
+    function renderListaUsuarios(lista) {
+        const panel = document.getElementById('panelLista');
+        if (!lista.length) {
+            panel.innerHTML = '<p class="vacio">No se encontraron usuarios.</p>';
+            return;
+        }
+        panel.innerHTML = lista.map(u => `
+            <div class="item-lista ${rutuSeleccionada === u.rut ? 'activo' : ''}"
+                 data-rut="${u.rut}" onclick="seleccionarUsuario('${u.rut}')">
+                <strong>${u.nombre || ''} ${u.apellido || ''}</strong>
+                <span>${u.rut} · ${u.rol || 'sin rol'}</span>
+            </div>
+        `).join('');
+    }
+
+    window.seleccionarUsuario = function (rut) {
+        rutuSeleccionada = rut;
+        const u = todosUsuarios.find(x => x.rut === rut);
+        if (!u) return;
+        document.querySelectorAll('#panelLista .item-lista').forEach(el =>
+            el.classList.toggle('activo', el.dataset.rut === rut));
+        renderDetalleUsuario(u);
+    };
+
+    function renderDetalleUsuario(u) {
+        const salidaParticipa = todasSalidas.filter(s =>
+            (s.participantes || []).some(p => p.rut === u.rut) ||
+            (s.guias || []).some(g => g.rut === u.rut)
+        );
+        document.getElementById('panelDetalle').innerHTML = `
+            <div class="detalle-header">
+                <h2>👤 ${u.nombre || ''} ${u.apellido || ''}</h2>
+                <div class="detalle-acciones">
+                    <button class="btn-excel" onclick="exportarUsuarioExcel('${u.rut}')">📊 Excel individual</button>
+                </div>
+            </div>
+            <div class="detalle-body">
+                <div class="info-grid">
+                    <div class="info-item"><label>RUT</label><span>${u.rut || '—'}</span></div>
+                    <div class="info-item"><label>Rol</label><span class="badge-rol">${u.rol || '—'}</span></div>
+                    <div class="info-item"><label>Estado</label><span>${u.estado || '—'}</span></div>
+                    <div class="info-item"><label>Edad</label><span>${u.edad || '—'}</span></div>
+                    <div class="info-item"><label>Email</label><span>${u.gmail || u.email || '—'}</span></div>
+                    <div class="info-item"><label>Teléfono</label><span>${u.telefono || '—'}</span></div>
+                </div>
+                ${u.historialMedico ? `<h3>🩺 Historial Médico</h3><p class="historial">${u.historialMedico}</p>` : ''}
+                <h3>🗺️ Salidas en las que participa (${salidaParticipa.length})</h3>
+                ${salidaParticipa.length ? `
+                    <table class="tabla-mini">
+                        <thead><tr><th>Título</th><th>Fecha</th><th>Rol</th><th>Curso</th></tr></thead>
+                        <tbody>${salidaParticipa.map(s => {
+                            const esGuia = (s.guias || []).some(g => g.rut === u.rut);
+                            const p = (s.participantes || []).find(p => p.rut === u.rut);
+                            return `<tr>
+                                <td>${s.titulo || '—'}</td>
+                                <td>${s.fecha || '—'}</td>
+                                <td>${esGuia ? 'Guía' : (p ? p.rol : '—')}</td>
+                                <td>${s.curso || '—'}</td>
+                            </tr>`;
+                        }).join('')}</tbody>
+                    </table>` : '<p class="muted">No participa en ninguna salida registrada.</p>'}
+            </div>`;
+    }
+
+    // ===== RENDER LISTA SALIDAS =====
+    function renderListaSalidas(lista) {
+        const panel = document.getElementById('panelLista');
+        if (!lista.length) {
+            panel.innerHTML = '<p class="vacio">No se encontraron salidas.</p>';
+            return;
+        }
+        const hoy = new Date().toISOString().split('T')[0];
+        const ordenadas = [...lista].sort((a, b) => b.fecha > a.fecha ? 1 : -1);
+        panel.innerHTML = ordenadas.map(s => `
+            <div class="item-lista ${idSalidaSeleccionada === s.id ? 'activo' : ''}"
+                 data-id="${s.id}" onclick="seleccionarSalida('${s.id}')">
+                <strong>${s.titulo || 'Sin título'}</strong>
+                <span>${s.fecha || 'Sin fecha'} · ${s.fecha < hoy ? 'Pasada' : 'Próxima'}</span>
+            </div>
+        `).join('');
+    }
+
+    window.seleccionarSalida = function (id) {
+        idSalidaSeleccionada = id;
+        const s = todasSalidas.find(x => x.id === id);
+        if (!s) return;
+        document.querySelectorAll('#panelLista .item-lista').forEach(el =>
+            el.classList.toggle('activo', el.dataset.id === id));
+        renderDetalleSalida(s);
+    };
+
+    function renderDetalleSalida(s) {
+        const hoy = new Date().toISOString().split('T')[0];
+        const pasada = s.fecha < hoy;
+        document.getElementById('panelDetalle').innerHTML = `
+            <div class="detalle-header">
+                <h2>🗺️ ${s.titulo || 'Sin título'}
+                    <span class="${pasada ? 'badge-pasada' : 'badge-futura'}">${pasada ? 'Pasada' : 'Próxima'}</span>
+                </h2>
+                <div class="detalle-acciones">
+                    <button class="btn-pdf" onclick="exportarSalidaPDF('${s.id}')">📄 PDF completo</button>
+                </div>
+            </div>
+            <div class="detalle-body">
+                <div class="info-grid">
+                    <div class="info-item"><label>Fecha</label><span>${s.fecha || '—'}</span></div>
+                    <div class="info-item"><label>Duración</label><span>${s.duracion || '—'}</span></div>
+                    <div class="info-item"><label>Curso</label><span>${s.curso || '—'}</span></div>
+                    <div class="info-item"><label>Precio/persona</label><span>${s.precio ? '$' + Number(s.precio).toLocaleString('es-CL') + ' CLP' : '—'}</span></div>
+                    <div class="info-item"><label>Menú</label><span>${s.menu || '—'}</span></div>
+                    <div class="info-item"><label>Participantes</label><span>${(s.participantes || []).length}</span></div>
+                </div>
+
+                <h3>📝 Descripción</h3>
+                <p>${s.descripcion || 'Sin descripción.'}</p>
+
+                <h3>🚌 Transporte</h3>
+                <div class="info-grid">
+                    <div class="info-item"><label>Conductor</label><span>${s.transporte?.conductor || '—'}</span></div>
+                    <div class="info-item"><label>Horarios ida/vuelta</label><span>${s.transporte?.horarios || '—'}</span></div>
+                    <div class="info-item"><label>Precio transporte</label><span>${s.transporte?.precio || '—'}</span></div>
+                    <div class="info-item"><label>Vehículo</label><span>${s.transporte?.descripcion || '—'}</span></div>
+                </div>
+
+                <h3>📍 Ruta de actividades (${(s.ruta || []).length})</h3>
+                ${s.ruta && s.ruta.length ? `
+                <ul class="ruta-lista">
+                    ${s.ruta.map(r => `
+                        <li>
+                            <strong>${r.tipo === 'Traslado' ? '🚌' : r.tipo === 'Pausa' ? '☕' : '📍'} ${r.tipo}</strong>:
+                            ${r.descripcion || '—'}
+                            ${r.inicio ? `<span class="horario">${r.inicio}${r.fin ? ' – ' + r.fin : ''}</span>` : ''}
+                        </li>`).join('')}
+                </ul>` : '<p class="muted">Sin actividades registradas.</p>'}
+
+                <h3>🧭 Guías (${(s.guias || []).length})</h3>
+                ${s.guias && s.guias.length ? `
+                <table class="tabla-mini">
+                    <thead><tr><th>Nombre</th><th>RUT</th></tr></thead>
+                    <tbody>${s.guias.map(g => `<tr><td>${g.nombre || '—'}</td><td>${g.rut || '—'}</td></tr>`).join('')}</tbody>
+                </table>` : '<p class="muted">Sin guías registrados.</p>'}
+
+                <h3>👥 Participantes (${(s.participantes || []).length})</h3>
+                ${s.participantes && s.participantes.length ? `
+                <table class="tabla-mini">
+                    <thead><tr><th>Nombre</th><th>RUT</th><th>Rol</th></tr></thead>
+                    <tbody>${s.participantes.map(p => `
+                        <tr><td>${p.nombre || '—'}</td><td>${p.rut || '—'}</td><td>${p.rol || '—'}</td></tr>
+                    `).join('')}</tbody>
+                </table>` : '<p class="muted">Sin participantes registrados.</p>'}
+            </div>`;
+    }
+
+    // ===== RENDER LISTA LUGARES =====
+    function renderListaLugares(lista) {
+        const panel = document.getElementById('panelLista');
+        if (!lista.length) {
+            panel.innerHTML = '<p class="vacio">No se encontraron lugares.</p>';
+            return;
+        }
+        panel.innerHTML = lista.map((l, i) => {
+            const idxReal = lugares.indexOf(l);
+            return `
+            <div class="item-lista ${idxLugarSeleccionado === idxReal ? 'activo' : ''}"
+                 data-idx="${idxReal}" onclick="seleccionarLugar(${idxReal})">
+                <strong>${l.nombre}</strong>
+                <span>🕐 ${l.apertura}</span>
+            </div>`;
+        }).join('');
+    }
+
+    window.seleccionarLugar = function (idx) {
+        idxLugarSeleccionado = idx;
+        const l = lugares[idx];
+        if (!l) return;
+        document.querySelectorAll('#panelLista .item-lista').forEach(el =>
+            el.classList.toggle('activo', parseInt(el.dataset.idx) === idx));
+        renderDetalleLugar(l);
+    };
+
+    function renderDetalleLugar(l) {
+        const nombreL = l.nombre.toLowerCase();
+        const salidasConLugar = todasSalidas.filter(s =>
+            (s.ruta || []).some(r => (r.descripcion || '').toLowerCase().includes(nombreL))
+        );
+        document.getElementById('panelDetalle').innerHTML = `
+            <div class="detalle-header">
+                <h2>📍 ${l.nombre}</h2>
+            </div>
+            <div class="detalle-body">
+                <div class="info-grid">
+                    <div class="info-item"><label>🕐 Apertura</label><span>${l.apertura || '—'}</span></div>
+                    <div class="info-item"><label>🕕 Cierre</label><span>${l.cierre || '—'}</span></div>
+                </div>
+                <h3>📌 Ubicación</h3>
+                <p>${l.ubicacion || '—'}</p>
+                <h3>📝 Descripción</h3>
+                <p>${l.descripcion || '—'}</p>
+                <h3>🗺️ Salidas que visitan este lugar (${salidasConLugar.length})</h3>
+                ${salidasConLugar.length ? `
+                <table class="tabla-mini">
+                    <thead><tr><th>Título</th><th>Fecha</th><th>Participantes</th><th>Curso</th></tr></thead>
+                    <tbody>${salidasConLugar.map(s => `
+                        <tr>
+                            <td>${s.titulo || '—'}</td>
+                            <td>${s.fecha || '—'}</td>
+                            <td>${(s.participantes || []).length}</td>
+                            <td>${s.curso || '—'}</td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>` : '<p class="muted">Ninguna salida registrada visita este lugar.</p>'}
+            </div>`;
+    }
+
+    // ===== EXPORTACIONES =====
+
+    // Excel usuario individual
+    window.exportarUsuarioExcel = function (rut) {
+        const u = todosUsuarios.find(x => x.rut === rut);
+        if (!u) return;
+        const wb = XLSX.utils.book_new();
+
+        const datosPersonales = [
+            ['RUT', 'Nombre', 'Apellido', 'Edad', 'Email', 'Teléfono', 'Rol', 'Estado', 'Historial Médico'],
+            [u.rut, u.nombre || '', u.apellido || '', u.edad || '', u.gmail || u.email || '',
+             u.telefono || '', u.rol || '', u.estado || '', u.historialMedico || '']
+        ];
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datosPersonales), 'Datos Personales');
+
+        const salidas = todasSalidas.filter(s =>
+            (s.participantes || []).some(p => p.rut === u.rut) ||
+            (s.guias || []).some(g => g.rut === u.rut)
+        );
+        const datosSalidas = [['Título', 'Fecha', 'Duración', 'Rol en salida', 'Curso', 'Precio/persona', 'Menú']];
+        salidas.forEach(s => {
+            const esGuia = (s.guias || []).some(g => g.rut === u.rut);
+            const p = (s.participantes || []).find(p => p.rut === u.rut);
+            datosSalidas.push([s.titulo || '', s.fecha || '', s.duracion || '',
+                esGuia ? 'Guía' : (p ? p.rol : '—'), s.curso || '', s.precio || '', s.menu || '']);
+        });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datosSalidas), 'Salidas');
+
+        XLSX.writeFile(wb, `usuario_${u.rut.replace(/\./g, '').replace('-', '_')}.xlsx`);
+    };
+
+    // Excel todos los usuarios
+    document.getElementById('btnExportTodosExcel').addEventListener('click', function () {
+        if (!todosUsuarios.length) { alert('No hay usuarios cargados.'); return; }
+        const wb = XLSX.utils.book_new();
+        const datos = [['RUT', 'Nombre', 'Apellido', 'Edad', 'Email', 'Teléfono', 'Rol', 'Estado', 'Historial Médico', 'N° Salidas']];
+        todosUsuarios.forEach(u => {
+            const n = todasSalidas.filter(s =>
+                (s.participantes || []).some(p => p.rut === u.rut) ||
+                (s.guias || []).some(g => g.rut === u.rut)
+            ).length;
+            datos.push([u.rut, u.nombre || '', u.apellido || '', u.edad || '',
+                u.gmail || u.email || '', u.telefono || '', u.rol || '', u.estado || '',
+                u.historialMedico || '', n]);
+        });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datos), 'Usuarios');
+        XLSX.writeFile(wb, `usuarios_todos_${new Date().toISOString().split('T')[0]}.xlsx`);
+    });
+
+    // Excel resumen de todas las salidas
+    document.getElementById('btnExportSalidasExcel').addEventListener('click', function () {
+        if (!todasSalidas.length) { alert('No hay salidas cargadas.'); return; }
+        const wb = XLSX.utils.book_new();
+        const datos = [['Título', 'Fecha', 'Duración', 'Curso', 'Precio/persona', 'Menú',
+            'N° Participantes', 'N° Guías', 'Conductor', 'Horarios transporte', 'Precio transporte', 'Vehículo']];
+        todasSalidas.forEach(s => {
+            datos.push([s.titulo || '', s.fecha || '', s.duracion || '', s.curso || '',
+                s.precio || '', s.menu || '', (s.participantes || []).length, (s.guias || []).length,
+                s.transporte?.conductor || '', s.transporte?.horarios || '',
+                s.transporte?.precio || '', s.transporte?.descripcion || '']);
+        });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datos), 'Resumen Salidas');
+        XLSX.writeFile(wb, `salidas_resumen_${new Date().toISOString().split('T')[0]}.xlsx`);
+    });
+
+    // PDF salida individual
+    window.exportarSalidaPDF = function (id) {
+        const s = todasSalidas.find(x => x.id === id);
+        if (!s) return;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+        const margen = 15;
+        const ancho = 180;
+        let y = 22;
+
+        const addTxt = (txt, x = margen, fs = 10, bold = false, color = [39, 33, 32]) => {
+            doc.setFontSize(fs); doc.setFont('helvetica', bold ? 'bold' : 'normal');
+            doc.setTextColor(...color);
+            const lineas = doc.splitTextToSize(String(txt || '—'), ancho - (x - margen));
+            doc.text(lineas, x, y);
+            y += lineas.length * (fs * 0.38 + 1.2);
+        };
+
+        const sep = (color = [210, 226, 145]) => {
+            doc.setDrawColor(...color); doc.line(margen, y, margen + ancho, y); y += 5;
+        };
+
+        const checkPage = (esp = 20) => { if (y + esp > 275) { doc.addPage(); y = 20; } };
+
+        // Cabecera
+        doc.setFillColor(59, 71, 60);
+        doc.rect(0, 0, 210, 16, 'F');
+        doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+        doc.setTextColor(249, 248, 221);
+        doc.text(`SALIDA: ${s.titulo || 'Sin título'}`, margen, 11);
+        y = 24;
+
+        addTxt('INFORMACIÓN GENERAL', margen, 12, true, [92, 141, 88]); sep();
+        addTxt(`Fecha: ${s.fecha || '—'}   ·   Duración: ${s.duracion || '—'}   ·   Curso: ${s.curso || '—'}`);
+        checkPage(8);
+        addTxt(`Precio/persona: ${s.precio ? '$' + Number(s.precio).toLocaleString('es-CL') + ' CLP' : '—'}   ·   Menú: ${s.menu || '—'}`);
+        y += 3;
+
+        checkPage(15);
+        addTxt('DESCRIPCIÓN', margen, 12, true, [92, 141, 88]); sep();
+        addTxt(s.descripcion || 'Sin descripción.');
+        y += 3;
+
+        checkPage(20);
+        addTxt('TRANSPORTE', margen, 12, true, [92, 141, 88]); sep();
+        addTxt(`Conductor: ${s.transporte?.conductor || '—'}`);
+        checkPage(8); addTxt(`Horarios: ${s.transporte?.horarios || '—'}`);
+        checkPage(8); addTxt(`Precio: ${s.transporte?.precio || '—'}`);
+        checkPage(8); addTxt(`Vehículo: ${s.transporte?.descripcion || '—'}`);
+        y += 3;
+
+        if (s.ruta && s.ruta.length) {
+            checkPage(20);
+            addTxt('RUTA DE ACTIVIDADES', margen, 12, true, [92, 141, 88]); sep();
+            s.ruta.forEach((r, i) => {
+                checkPage(10);
+                addTxt(`${i + 1}. [${r.tipo}] ${r.descripcion}${r.inicio ? ' · ' + r.inicio + (r.fin ? ' – ' + r.fin : '') : ''}`, margen + 4);
+            });
+            y += 3;
+        }
+
+        if (s.guias && s.guias.length) {
+            checkPage(20);
+            addTxt('GUÍAS', margen, 12, true, [92, 141, 88]); sep();
+            s.guias.forEach(g => { checkPage(8); addTxt(`• ${g.nombre || '—'} (RUT: ${g.rut || '—'})`, margen + 4); });
+            y += 3;
+        }
+
+        if (s.participantes && s.participantes.length) {
+            checkPage(20);
+            addTxt(`PARTICIPANTES (${s.participantes.length})`, margen, 12, true, [92, 141, 88]); sep();
+            s.participantes.forEach(p => {
+                checkPage(8);
+                addTxt(`• ${p.nombre || '—'} · RUT: ${p.rut || '—'} · ${p.rol || '—'}`, margen + 4);
+            });
+        }
+
+        const total = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= total; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8); doc.setTextColor(135, 102, 97);
+            doc.text(
+                `Asistente de Turismo · Liceo Eduardo Charme · ${new Date().toLocaleDateString('es-CL')} · Pág. ${i}/${total}`,
+                margen, 290
+            );
+        }
+
+        doc.save(`salida_${(s.titulo || 'sin_titulo').replace(/\s+/g, '_')}_${s.fecha || 'sin_fecha'}.pdf`);
+    };
+
+    // ===== CARGA INICIAL =====
+    async function cargarDatos() {
+        try {
+            const datosU = await GitHub.leer('datos/usuarios.json');
+            todosUsuarios = datosU?.usuarios || [];
+            todasSalidas = await Planificacion.cargarSalidas();
+            todasSalidas.forEach(s => {
+                if (!s.guias) s.guias = [];
+                if (!s.participantes) s.participantes = [];
+            });
+            cambiarTab('usuarios');
+        } catch (e) {
+            console.error('Error al cargar datos:', e);
+            document.getElementById('panelLista').innerHTML =
+                '<p class="error">⚠️ Error al cargar los datos. Recarga la página.</p>';
+        }
+    }
+
+    cargarDatos();
+
+})();
+</script>
+</body>
+</html>
