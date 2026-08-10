@@ -1,255 +1,604 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧭 Asistente de Turismo</title>
+    <link rel="stylesheet" href="css/asistente_turismo.css">
+    <!-- Librerías para PDF y Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
 
-body {
-    background: #f9f8dd;
-    color: #272120;
-    font-family: Arial, Helvetica, sans-serif;
-    padding: 10px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
+<header>
+    <h1>🧭 Asistente de Turismo</h1>
+    <div class="header-right">
+        <span class="user-badge" id="userBadge">Cargando...</span>
+        <a href="index.html" class="volver">← Volver al Lobby</a>
+    </div>
+</header>
 
-/* ===== HEADER ===== */
-header {
-    border-radius: 8px 8px 0 0;
-    padding: 14px 18px;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    background: linear-gradient(135deg, #3b473c, #272120);
-    color: #f9f8dd;
-    box-shadow: 0 3px 10px rgba(39,33,32,0.15);
-    flex-shrink: 0;
-}
+<!-- BARRA DE ACCIONES RÁPIDAS (EXPORTAR TODO) -->
+<div class="acciones-rapidas">
+    <button class="btn-excel" id="btnExportSalidasExcel">📊 Todas las Salidas (Excel)</button>
+    <button class="btn-excel" id="btnExportUsuariosExcel">📊 Todos los Usuarios (Excel)</button>
+    <button class="btn-excel" id="btnRecargarDatos">🔄 Recargar datos</button>
+</div>
 
-header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: center; }
+<!-- PANEL PRINCIPAL: LISTA DE SALIDAS + LISTA DE USUARIOS -->
+<div class="panel-principal">
+    <!-- Columna izquierda: Salidas -->
+    <div class="panel-lista" id="panelSalidas">
+        <h2>🗺️ Salidas</h2>
+        <div id="listaSalidasContainer">
+            <p class="cargando">Cargando salidas...</p>
+        </div>
+    </div>
 
-.header-right {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-}
+    <!-- Columna derecha: Usuarios -->
+    <div class="panel-lista" id="panelUsuarios">
+        <h2>👤 Usuarios</h2>
+        <div id="listaUsuariosContainer">
+            <p class="cargando">Cargando usuarios...</p>
+        </div>
+    </div>
+</div>
 
-.user-badge {
-    border: 1px solid #f9f8dd;
-    padding: 4px 12px;
-    font-size: 13px;
-    color: #f9f8dd;
-    border-radius: 14px;
-}
+<!-- PANEL DE DETALLE (se muestra al hacer clic en una salida o usuario) -->
+<div class="panel-detalle" id="panelDetalle">
+    <div class="mensaje-inicial">
+        <p>👈 Haz clic en una <strong>Salida</strong> o <strong>Usuario</strong> para ver sus detalles y gestionarlo.</p>
+    </div>
+</div>
 
-.volver {
-    border: 1px solid #f9f8dd;
-    padding: 8px 14px;
-    background: transparent;
-    text-decoration: none;
-    color: #f9f8dd;
-    font-size: 14px;
-    border-radius: 20px;
-    transition: 0.2s ease;
-    text-align: center;
-}
-.volver:hover { background: #f9f8dd; color: #272120; }
+<script src="js/github.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/planificacion.js"></script>
+<script src="js/lugares.js"></script>
 
-/* ===== CHAT CONTAINER ===== */
-.chat-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: #f9f8dd;
-    border: 1px solid #ba9572;
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-    overflow: hidden;
-    min-height: 0;
-}
+<script>
+    (function() {
+        // ============================================================
+        // VERIFICACIÓN DE SESIÓN (SOLO ADMIN)
+        // ============================================================
+        const usuario = Auth.getSesion();
+        if (!usuario) { window.location.href = 'login.html'; return; }
+        if (usuario.rol !== 'admin') {
+            alert('Solo los administradores pueden acceder al Asistente de Turismo.');
+            window.location.href = 'index.html';
+            return;
+        }
+        document.getElementById('userBadge').textContent = `${usuario.nombre} ${usuario.apellido || ''} (${usuario.rol})`;
 
-/* ===== CHAT AREA ===== */
-.chat-area {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    background: #f9f8dd;
-}
+        // ============================================================
+        // STATE
+        // ============================================================
+        let todosUsuarios = [];
+        let todasSalidas = [];
+        let todosLugares = (typeof lugares !== 'undefined') ? lugares : [];
+        let elementoSeleccionado = null; // { tipo: 'salida'|'usuario', data: objeto }
 
-.mensaje-chat {
-    display: flex;
-    width: 100%;
-}
+        // ============================================================
+        // REFERENCIAS DOM
+        // ============================================================
+        const containerSalidas = document.getElementById('listaSalidasContainer');
+        const containerUsuarios = document.getElementById('listaUsuariosContainer');
+        const panelDetalle = document.getElementById('panelDetalle');
 
-.mensaje-chat.usuario {
-    justify-content: flex-end;
-}
+        // ============================================================
+        // CARGAR DATOS
+        // ============================================================
+        async function cargarDatos() {
+            try {
+                containerSalidas.innerHTML = '<p class="cargando">Cargando salidas...</p>';
+                containerUsuarios.innerHTML = '<p class="cargando">Cargando usuarios...</p>';
+                panelDetalle.innerHTML = `<div class="mensaje-inicial"><p>⏳ Cargando datos...</p></div>`;
 
-.mensaje-chat.asistente {
-    justify-content: flex-start;
-}
+                const datosU = await GitHub.leer('datos/usuarios.json');
+                todosUsuarios = datosU?.usuarios || [];
+                todasSalidas = await Planificacion.cargarSalidas();
+                todasSalidas.forEach(s => {
+                    if (!s.guias) s.guias = [];
+                    if (!s.participantes) s.participantes = [];
+                });
 
-.burbuja {
-    max-width: 80%;
-    padding: 10px 14px;
-    border-radius: 16px;
-    font-size: 14px;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-break: break-word;
-    box-shadow: 0 2px 6px rgba(39,33,32,0.08);
-}
+                renderizarListaSalidas();
+                renderizarListaUsuarios();
+                panelDetalle.innerHTML = `<div class="mensaje-inicial"><p>👈 Haz clic en una <strong>Salida</strong> o <strong>Usuario</strong> para ver sus detalles y gestionarlo.</p></div>`;
+                elementoSeleccionado = null;
+            } catch (e) {
+                console.error('Error al cargar datos:', e);
+                containerSalidas.innerHTML = '<p class="error">⚠️ Error al cargar salidas.</p>';
+                containerUsuarios.innerHTML = '<p class="error">⚠️ Error al cargar usuarios.</p>';
+            }
+        }
 
-.mensaje-chat.usuario .burbuja {
-    background: #d2e291;
-    color: #272120;
-    border-bottom-right-radius: 4px;
-}
+        // ============================================================
+        // RENDERIZAR LISTA DE SALIDAS
+        // ============================================================
+        function renderizarListaSalidas() {
+            if (!todasSalidas.length) {
+                containerSalidas.innerHTML = '<p class="vacio">No hay salidas registradas.</p>';
+                return;
+            }
+            // Ordenar por fecha (más reciente primero)
+            const ordenadas = [...todasSalidas].sort((a, b) => (a.fecha > b.fecha ? -1 : 1));
+            let html = '';
+            ordenadas.forEach(s => {
+                const activa = (elementoSeleccionado?.tipo === 'salida' && elementoSeleccionado.data.id === s.id) ? 'activo' : '';
+                html += `
+                    <div class="item-lista ${activa}" data-id="${s.id}" data-tipo="salida">
+                        <strong>${s.titulo || 'Sin título'}</strong>
+                        <span>📅 ${s.fecha || 'Sin fecha'} · 👥 ${s.participantes.length}</span>
+                    </div>
+                `;
+            });
+            containerSalidas.innerHTML = html;
 
-.mensaje-chat.asistente .burbuja {
-    background: #ffffff;
-    color: #272120;
-    border: 1px solid #ba9572;
-    border-bottom-left-radius: 4px;
-}
+            // Eventos clic
+            containerSalidas.querySelectorAll('.item-lista').forEach(el => {
+                el.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const salida = todasSalidas.find(s => s.id === id);
+                    if (salida) {
+                        elementoSeleccionado = { tipo: 'salida', data: salida };
+                        renderizarDetalleSalida(salida);
+                        // Resaltar
+                        document.querySelectorAll('.item-lista').forEach(i => i.classList.remove('activo'));
+                        this.classList.add('activo');
+                    }
+                });
+            });
+        }
 
-.burbuja small {
-    font-size: 12px;
-    color: #54555c;
-    display: block;
-    margin-top: 6px;
-}
+        // ============================================================
+        // RENDERIZAR LISTA DE USUARIOS
+        // ============================================================
+        function renderizarListaUsuarios() {
+            if (!todosUsuarios.length) {
+                containerUsuarios.innerHTML = '<p class="vacio">No hay usuarios registrados.</p>';
+                return;
+            }
+            let html = '';
+            todosUsuarios.forEach(u => {
+                const activa = (elementoSeleccionado?.tipo === 'usuario' && elementoSeleccionado.data.rut === u.rut) ? 'activo' : '';
+                html += `
+                    <div class="item-lista ${activa}" data-rut="${u.rut}" data-tipo="usuario">
+                        <strong>${u.nombre || ''} ${u.apellido || ''}</strong>
+                        <span>${u.rut} · ${u.rol || 'sin rol'}</span>
+                    </div>
+                `;
+            });
+            containerUsuarios.innerHTML = html;
 
-.btn-pdf-chat {
-    margin-top: 10px;
-    padding: 6px 14px;
-    background: #f9f8dd;
-    border: 1px solid #5c8d58;
-    color: #5c8d58;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-.btn-pdf-chat:hover {
-    background: #5c8d58;
-    color: #f9f8dd;
-}
+            containerUsuarios.querySelectorAll('.item-lista').forEach(el => {
+                el.addEventListener('click', function() {
+                    const rut = this.dataset.rut;
+                    const user = todosUsuarios.find(u => u.rut === rut);
+                    if (user) {
+                        elementoSeleccionado = { tipo: 'usuario', data: user };
+                        renderizarDetalleUsuario(user);
+                        document.querySelectorAll('.item-lista').forEach(i => i.classList.remove('activo'));
+                        this.classList.add('activo');
+                    }
+                });
+            });
+        }
 
-.mensaje-bienvenida {
-    display: flex;
-    justify-content: flex-start;
-}
-.mensaje-bienvenida .burbuja {
-    background: #ffffff;
-    border: 1px solid #ba9572;
-    border-bottom-left-radius: 4px;
-}
+        // ============================================================
+        // RENDERIZAR DETALLE DE SALIDA
+        // ============================================================
+        function renderizarDetalleSalida(s) {
+            const hoy = new Date().toISOString().split('T')[0];
+            const pasada = s.fecha < hoy;
 
-/* ===== PREGUNTAS RÁPIDAS ===== */
-.preguntas-rapidas {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 10px 12px;
-    background: #eef3dc;
-    border-top: 1px solid #ba9572;
-    border-bottom: 1px solid #ba9572;
-    flex-shrink: 0;
-}
+            // Enriquecer participantes con datos de usuarios
+            const participantesConInfo = (s.participantes || []).map(p => {
+                const user = todosUsuarios.find(u => u.rut === p.rut);
+                return { ...p, edad: user?.edad || '—', telefono: user?.telefono || '—', historial: user?.historial || 'Sin info' };
+            });
 
-.btn-pregunta {
-    padding: 6px 14px;
-    background: #f9f8dd;
-    border: 1px solid #9cab6c;
-    color: #3b473c;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s ease;
-    white-space: nowrap;
-}
-.btn-pregunta:hover {
-    background: #d2e291;
-    transform: scale(0.98);
-}
+            // Enriquecer ruta con info de lugares
+            const rutaEnriquecida = (s.ruta || []).map(act => {
+                if (act.tipo === 'Lugar') {
+                    const lugar = todosLugares.find(l => l.nombre.toLowerCase() === act.descripcion.toLowerCase());
+                    if (lugar) return { ...act, lugarInfo: lugar };
+                }
+                return act;
+            });
 
-/* ===== INPUT CHAT ===== */
-.chat-input {
-    display: flex;
-    gap: 8px;
-    padding: 10px 12px;
-    background: #f9f8dd;
-    border-top: 1px solid #ba9572;
-    flex-shrink: 0;
-}
+            const puedeEditar = true; // Es admin
 
-.chat-input input {
-    flex: 1;
-    padding: 10px 14px;
-    border: 1px solid #8b8893;
-    border-radius: 24px;
-    font-size: 15px;
-    background: #f9f8dd;
-    color: #272120;
-    outline: none;
-}
-.chat-input input:focus {
-    border-color: #5c8d58;
-    box-shadow: 0 0 0 3px rgba(92,141,88,0.15);
-}
+            let html = `
+                <div class="detalle-header">
+                    <h2>🗺️ ${s.titulo || 'Sin título'}
+                        <span class="${pasada ? 'badge-pasada' : 'badge-futura'}">${pasada ? 'Pasada' : 'Próxima'}</span>
+                    </h2>
+                    <div class="detalle-acciones">
+                        <button class="btn-pdf" onclick="exportarSalidaPDF('${s.id}')">📄 Exportar PDF</button>
+                        ${puedeEditar ? `
+                            <button class="btn-editar" onclick="editarSalida('${s.id}')">✏️ Editar</button>
+                            <button class="btn-eliminar" onclick="eliminarSalida('${s.id}')">🗑️ Eliminar</button>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="detalle-body">
+                    <div class="info-grid">
+                        <div class="info-item"><label>Fecha</label><span>${s.fecha || '—'}</span></div>
+                        <div class="info-item"><label>Duración</label><span>${s.duracion || '—'}</span></div>
+                        <div class="info-item"><label>Curso</label><span>${s.curso || '—'}</span></div>
+                        <div class="info-item"><label>Precio/persona</label><span>${s.precio ? '$' + Number(s.precio).toLocaleString('es-CL') + ' CLP' : '—'}</span></div>
+                        <div class="info-item"><label>Menú</label><span>${s.menu || '—'}</span></div>
+                        <div class="info-item"><label>Participantes</label><span>${(s.participantes || []).length}</span></div>
+                    </div>
+                    <h3>📝 Descripción</h3>
+                    <p>${s.descripcion || 'Sin descripción.'}</p>
+                    <h3>🚌 Transporte</h3>
+                    <div class="info-grid">
+                        <div class="info-item"><label>Conductor</label><span>${s.transporte?.conductor || '—'}</span></div>
+                        <div class="info-item"><label>Horarios ida/vuelta</label><span>${s.transporte?.horarios || '—'}</span></div>
+                        <div class="info-item"><label>Precio transporte</label><span>${s.transporte?.precio || '—'}</span></div>
+                        <div class="info-item"><label>Vehículo</label><span>${s.transporte?.descripcion || '—'}</span></div>
+                    </div>
+                    <h3>📍 Ruta (${rutaEnriquecida.length})</h3>
+                    ${rutaEnriquecida.length ? `
+                        <ul class="ruta-lista">
+                            ${rutaEnriquecida.map(r => `
+                                <li>
+                                    <strong>${r.tipo === 'Traslado' ? '🚌' : r.tipo === 'Pausa' ? '☕' : '📍'} ${r.tipo}</strong>:
+                                    ${r.descripcion || '—'}
+                                    ${r.inicio ? `<span class="horario">${r.inicio}${r.fin ? ' – ' + r.fin : ''}</span>` : ''}
+                                    ${r.lugarInfo ? `
+                                        <div class="lugar-info">
+                                            <div><strong>Ubicación:</strong> ${r.lugarInfo.ubicacion || 'N/A'}</div>
+                                            <div><strong>Horario:</strong> ${r.lugarInfo.apertura || 'N/A'} - ${r.lugarInfo.cierre || 'N/A'}</div>
+                                        </div>
+                                    ` : ''}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : '<p class="muted">Sin actividades registradas.</p>'}
+                    <h3>👥 Participantes (${participantesConInfo.length})</h3>
+                    ${participantesConInfo.length ? `
+                        <table class="tabla-mini">
+                            <thead><tr><th>Nombre</th><th>RUT</th><th>Rol</th><th>Edad</th><th>Teléfono</th><th>Historial</th></tr></thead>
+                            <tbody>${participantesConInfo.map(p => `
+                                <tr><td>${p.nombre || '—'}</td><td>${p.rut || '—'}</td><td>${p.rol || '—'}</td><td>${p.edad}</td><td>${p.telefono}</td><td>${p.historial}</td></tr>
+                            `).join('')}</tbody>
+                        </table>
+                    ` : '<p class="muted">Sin participantes.</p>'}
+                </div>
+            `;
+            panelDetalle.innerHTML = html;
+        }
 
-.chat-input button {
-    padding: 10px 18px;
-    background: #3b473c;
-    color: #f9f8dd;
-    border: none;
-    border-radius: 24px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-.chat-input button:hover {
-    background: #5c8d58;
-}
+        // ============================================================
+        // RENDERIZAR DETALLE DE USUARIO
+        // ============================================================
+        function renderizarDetalleUsuario(u) {
+            const salidasParticipa = todasSalidas.filter(s =>
+                (s.participantes || []).some(p => p.rut === u.rut) ||
+                (s.guias || []).some(g => g.rut === u.rut)
+            );
 
-/* ===== RESPONSIVE ===== */
-@media (min-width: 768px) {
-    body { padding: 20px; }
-    header { flex-direction: row; justify-content: space-between; align-items: center; }
-    header h1 { font-size: 20px; text-align: left; }
-    .header-right { justify-content: flex-end; }
-    .chat-container { border-radius: 8px; }
-    .burbuja { max-width: 70%; }
-}
+            let html = `
+                <div class="detalle-header">
+                    <h2>👤 ${u.nombre || ''} ${u.apellido || ''}</h2>
+                    <div class="detalle-acciones">
+                        <button class="btn-pdf" onclick="exportarUsuarioPDF('${u.rut}')">📄 Exportar PDF</button>
+                        <button class="btn-excel" onclick="exportarUsuarioExcel('${u.rut}')">📊 Excel individual</button>
+                        <button class="btn-editar" onclick="editarUsuario('${u.rut}')">✏️ Editar</button>
+                        ${u.rut !== '22785939-3' ? `<button class="btn-eliminar" onclick="eliminarUsuario('${u.rut}')">🗑️ Eliminar</button>` : '<span class="admin-badge">🔒 Admin Principal</span>'}
+                    </div>
+                </div>
+                <div class="detalle-body">
+                    <div class="info-grid">
+                        <div class="info-item"><label>RUT</label><span>${u.rut || '—'}</span></div>
+                        <div class="info-item"><label>Rol</label><span class="badge-rol">${u.rol || '—'}</span></div>
+                        <div class="info-item"><label>Estado</label><span>${u.estado || '—'}</span></div>
+                        <div class="info-item"><label>Edad</label><span>${u.edad || '—'}</span></div>
+                        <div class="info-item"><label>Email</label><span>${u.gmail || u.email || '—'}</span></div>
+                        <div class="info-item"><label>Teléfono</label><span>${u.telefono || '—'}</span></div>
+                    </div>
+                    ${u.historial ? `<h3>🩺 Historial Médico</h3><p class="historial">${u.historial}</p>` : ''}
+                    <h3>🗺️ Salidas en las que participa (${salidasParticipa.length})</h3>
+                    ${salidasParticipa.length ? `
+                        <table class="tabla-mini">
+                            <thead><tr><th>Título</th><th>Fecha</th><th>Rol</th><th>Curso</th></tr></thead>
+                            <tbody>${salidasParticipa.map(s => {
+                                const esGuia = (s.guias || []).some(g => g.rut === u.rut);
+                                const p = (s.participantes || []).find(p => p.rut === u.rut);
+                                return `<tr>
+                                    <td>${s.titulo || '—'}</td>
+                                    <td>${s.fecha || '—'}</td>
+                                    <td>${esGuia ? 'Guía' : (p ? p.rol : '—')}</td>
+                                    <td>${s.curso || '—'}</td>
+                                </tr>`;
+                            }).join('')}</tbody>
+                        </table>
+                    ` : '<p class="muted">No participa en ninguna salida.</p>'}
+                </div>
+            `;
+            panelDetalle.innerHTML = html;
+        }
 
-@media (max-width: 600px) {
-    .preguntas-rapidas {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding: 8px 10px;
-        gap: 6px;
-    }
-    .btn-pregunta {
-        font-size: 12px;
-        padding: 5px 10px;
-        white-space: nowrap;
-    }
-    .burbuja {
-        max-width: 90%;
-        font-size: 13px;
-    }
-    .chat-input input {
-        font-size: 14px;
-        padding: 8px 12px;
-    }
-    .chat-input button {
-        padding: 8px 14px;
-        font-size: 16px;
-    }
-}
+        // ============================================================
+        // ACCIONES SOBRE SALIDAS
+        // ============================================================
+        window.editarSalida = function(id) {
+            window.location.href = `mis_salidas.html?id=${id}`;
+        };
+
+        window.eliminarSalida = async function(id) {
+            const salida = todasSalidas.find(s => s.id === id);
+            if (!salida) return alert('Salida no encontrada.');
+            if (!confirm(`¿Eliminar la salida "${salida.titulo}"?`)) return;
+            const ok = await Planificacion.eliminarSalida(id);
+            if (ok) {
+                alert('✅ Salida eliminada.');
+                await cargarDatos();
+            } else {
+                alert('❌ Error al eliminar.');
+            }
+        };
+
+        // ============================================================
+        // ACCIONES SOBRE USUARIOS
+        // ============================================================
+        window.editarUsuario = function(rut) {
+            window.location.href = `pages/dashboard.html?edit=${rut}`;
+        };
+
+        window.eliminarUsuario = async function(rut) {
+            if (rut === '22785939-3') return alert('No se puede eliminar al admin principal.');
+            if (!confirm(`¿Eliminar al usuario ${rut}?`)) return;
+            const index = todosUsuarios.findIndex(u => u.rut === rut);
+            if (index === -1) return alert('Usuario no encontrado.');
+            todosUsuarios.splice(index, 1);
+            const datos = await GitHub.leer('datos/usuarios.json');
+            if (!datos) return alert('Error al leer datos.');
+            datos.usuarios = todosUsuarios;
+            const sha = await GitHub.sha('datos/usuarios.json');
+            const ok = await GitHub.escribir('datos/usuarios.json', datos, sha);
+            if (ok) {
+                alert('✅ Usuario eliminado.');
+                await cargarDatos();
+            } else {
+                alert('❌ Error al eliminar.');
+            }
+        };
+
+        // ============================================================
+        // EXPORTAR SALIDA A PDF (con estilo unificado)
+        // ============================================================
+        window.exportarSalidaPDF = async function(id) {
+            const s = todasSalidas.find(x => x.id === id);
+            if (!s) return alert('Salida no encontrada');
+            const btn = document.querySelector(`button[onclick*="exportarSalidaPDF('${id}')"]`);
+            if (btn) { btn.textContent = '⏳...'; btn.disabled = true; }
+
+            try {
+                const participantesConInfo = (s.participantes || []).map(p => {
+                    const user = todosUsuarios.find(u => u.rut === p.rut);
+                    return { ...p, edad: user?.edad || '—', telefono: user?.telefono || '—', historial: user?.historial || 'Sin info' };
+                });
+                const rutaEnriquecida = (s.ruta || []).map(act => {
+                    if (act.tipo === 'Lugar') {
+                        const lugar = todosLugares.find(l => l.nombre.toLowerCase() === act.descripcion.toLowerCase());
+                        if (lugar) return { ...act, lugarInfo: lugar };
+                    }
+                    return act;
+                });
+
+                const html = generarHTMLPDF(s, participantesConInfo, rutaEnriquecida);
+                const container = document.createElement('div');
+                container.style.position = 'absolute';
+                container.style.left = '-9999px';
+                container.style.top = '0';
+                container.style.width = '800px';
+                container.style.background = 'white';
+                container.style.padding = '20px';
+                container.innerHTML = html;
+                document.body.appendChild(container);
+
+                await new Promise(r => setTimeout(r, 300));
+                const canvas = await html2canvas(container, { scale: 2, useCORS: true, logging: false, width: 800 });
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                const imgWidth = 210;
+                const pageHeight = 297;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                pdf.save(`Salida_${s.titulo || 'sin_titulo'}.pdf`);
+                document.body.removeChild(container);
+            } catch (e) {
+                console.error(e);
+                alert('Error al generar PDF');
+            }
+            if (btn) { btn.textContent = '📄 Exportar PDF'; btn.disabled = false; }
+        };
+
+        // ============================================================
+        // EXPORTAR USUARIO A PDF
+        // ============================================================
+        window.exportarUsuarioPDF = async function(rut) {
+            const u = todosUsuarios.find(x => x.rut === rut);
+            if (!u) return alert('Usuario no encontrado');
+            const salidas = todasSalidas.filter(s =>
+                (s.participantes || []).some(p => p.rut === u.rut) ||
+                (s.guias || []).some(g => g.rut === u.rut)
+            );
+            let texto = `FICHA DE USUARIO\n\n`;
+            texto += `Nombre: ${u.nombre} ${u.apellido}\nRUT: ${u.rut}\nRol: ${u.rol}\nEstado: ${u.estado}\nEdad: ${u.edad}\nEmail: ${u.gmail}\nTeléfono: ${u.telefono}\nHistorial: ${u.historial || 'N/A'}\n\n`;
+            texto += `Salidas en las que participa (${salidas.length}):\n`;
+            salidas.forEach(s => {
+                const esGuia = (s.guias || []).some(g => g.rut === u.rut);
+                texto += `- ${s.titulo} (${s.fecha}) - ${esGuia ? 'Guía' : 'Participante'}\n`;
+            });
+
+            const html = `
+                <div style="font-family: Arial; padding: 20px; white-space: pre-wrap; font-size: 13px; line-height: 1.6;">
+                    <h1 style="color: #3b473c;">${texto}</h1>
+                    <p style="margin-top: 20px; color: #888; font-size: 10px;">Generado por Asistente de Turismo - ${new Date().toLocaleDateString('es-CL')}</p>
+                </div>
+            `;
+            const container = document.createElement('div');
+            container.style.position = 'absolute';
+            container.style.left = '-9999px';
+            container.style.top = '0';
+            container.style.width = '800px';
+            container.style.background = 'white';
+            container.innerHTML = html;
+            document.body.appendChild(container);
+
+            await new Promise(r => setTimeout(r, 300));
+            const canvas = await html2canvas(container, { scale: 2, useCORS: true, logging: false, width: 800 });
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgData = canvas.toDataURL('image/jpeg', 0.95);
+            const imgWidth = 210;
+            const pageHeight = 297;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            pdf.save(`Usuario_${u.rut}.pdf`);
+            document.body.removeChild(container);
+        };
+
+        // ============================================================
+        // EXPORTAR USUARIO A EXCEL (individual)
+        // ============================================================
+        window.exportarUsuarioExcel = function(rut) {
+            const u = todosUsuarios.find(x => x.rut === rut);
+            if (!u) return;
+            const wb = XLSX.utils.book_new();
+            const datosPersonales = [
+                ['RUT', 'Nombre', 'Apellido', 'Edad', 'Email', 'Teléfono', 'Rol', 'Estado', 'Historial Médico'],
+                [u.rut, u.nombre || '', u.apellido || '', u.edad || '', u.gmail || '', u.telefono || '', u.rol || '', u.estado || '', u.historial || '']
+            ];
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datosPersonales), 'Datos');
+            const salidas = todasSalidas.filter(s =>
+                (s.participantes || []).some(p => p.rut === u.rut) ||
+                (s.guias || []).some(g => g.rut === u.rut)
+            );
+            const datosSalidas = [['Título', 'Fecha', 'Rol']];
+            salidas.forEach(s => {
+                const esGuia = (s.guias || []).some(g => g.rut === u.rut);
+                datosSalidas.push([s.titulo || '', s.fecha || '', esGuia ? 'Guía' : 'Participante']);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datosSalidas), 'Salidas');
+            XLSX.writeFile(wb, `usuario_${u.rut.replace(/\./g, '').replace('-', '_')}.xlsx`);
+        };
+
+        // ============================================================
+        // FUNCIONES AUXILIARES PARA PDF (estilo unificado)
+        // ============================================================
+        function generarHTMLPDF(salida, participantes, ruta) {
+            const p = participantes || [];
+            const r = ruta || [];
+            const participantesHTML = p.length ? `
+                <table style="width:100%; border-collapse:collapse; font-size:11px;">
+                    <thead><tr><th style="background:#3b473c;color:#f9f8dd;padding:5px;">Nombre</th><th style="background:#3b473c;color:#f9f8dd;padding:5px;">RUT</th><th style="background:#3b473c;color:#f9f8dd;padding:5px;">Rol</th><th style="background:#3b473c;color:#f9f8dd;padding:5px;">Edad</th><th style="background:#3b473c;color:#f9f8dd;padding:5px;">Teléfono</th><th style="background:#3b473c;color:#f9f8dd;padding:5px;">Historial</th></tr></thead>
+                    <tbody>${p.map(pt => `<tr><td style="border:1px solid #bbb;padding:4px;">${pt.nombre}</td><td style="border:1px solid #bbb;padding:4px;">${pt.rut}</td><td style="border:1px solid #bbb;padding:4px;">${pt.rol}</td><td style="border:1px solid #bbb;padding:4px;">${pt.edad}</td><td style="border:1px solid #bbb;padding:4px;">${pt.telefono}</td><td style="border:1px solid #bbb;padding:4px;">${pt.historial}</td></tr>`).join('')}</tbody>
+                </table>` : '<p>Sin participantes.</p>';
+
+            const rutaHTML = r.length ? `<ul style="list-style:none;padding:0;">${r.map(act => `
+                <li style="padding:5px 0;border-bottom:1px solid #ddd;font-size:12px;">
+                    <strong>${act.tipo}:</strong> ${act.descripcion}
+                    <span style="color:#776;margin-left:8px;">(${act.inicio||'—'} – ${act.fin||'—'})</span>
+                    ${act.lugarInfo ? `<div style="background:#f5f5e8;border:1px solid #dde;padding:4px 8px;margin-top:4px;font-size:11px;"><b>Ubicación:</b> ${act.lugarInfo.ubicacion||'—'} | <b>Horario:</b> ${act.lugarInfo.apertura||'—'} – ${act.lugarInfo.cierre||'—'}</div>` : ''}
+                </li>`).join('')}</ul>` : '<p>Sin ruta.</p>';
+
+            return `
+                <div style="font-family:Arial;font-size:12px;color:#222;padding:20px;background:white;">
+                    <h1 style="font-size:20px;color:#3b473c;border-bottom:3px solid #3b473c;padding-bottom:10px;">📋 ${salida.titulo||'Sin título'}</h1>
+                    <div style="font-size:11px;color:#555;margin:6px 0;"><b>Fecha:</b> ${salida.fecha||'—'} | <b>Duración:</b> ${salida.duracion||'—'} | <b>Curso:</b> ${salida.curso||'—'}</div>
+                    <div style="font-size:11px;color:#555;margin:6px 0;"><b>Precio:</b> ${salida.precio?'$'+salida.precio:'—'} | <b>Menú:</b> ${salida.menu||'—'}</div>
+                    ${salida.descripcion ? `<div style="font-size:11px;color:#555;margin:6px 0;"><b>Descripción:</b> ${salida.descripcion}</div>` : ''}
+                    <h2 style="font-size:14px;background:#3b473c;color:#f9f8dd;padding:4px 10px;margin:14px 0 8px 0;">📍 Ruta</h2>
+                    ${rutaHTML}
+                    <h2 style="font-size:14px;background:#3b473c;color:#f9f8dd;padding:4px 10px;margin:14px 0 8px 0;">👥 Participantes (${p.length})</h2>
+                    ${participantesHTML}
+                    <h2 style="font-size:14px;background:#3b473c;color:#f9f8dd;padding:4px 10px;margin:14px 0 8px 0;">🚌 Transporte</h2>
+                    <p><b>Conductor:</b> ${salida.transporte?.conductor||'—'}</p>
+                    <p><b>Horarios:</b> ${salida.transporte?.horarios||'—'}</p>
+                    <p><b>Vehículo:</b> ${salida.transporte?.descripcion||'—'}</p>
+                    <div style="margin-top:22px;border-top:1px solid #bbb;padding-top:8px;font-size:10px;color:#888;text-align:right;">Generado el ${new Date().toLocaleDateString('es-CL')}</div>
+                </div>`;
+        }
+
+        // ============================================================
+        // EXPORTAR TODAS LAS SALIDAS A EXCEL
+        // ============================================================
+        document.getElementById('btnExportSalidasExcel').addEventListener('click', function() {
+            if (!todasSalidas.length) { alert('No hay salidas cargadas.'); return; }
+            const wb = XLSX.utils.book_new();
+            const datos = [['Título', 'Fecha', 'Duración', 'Curso', 'Precio', 'Menú', 'Participantes', 'Guías', 'Conductor', 'Horarios']];
+            todasSalidas.forEach(s => {
+                datos.push([
+                    s.titulo || '', s.fecha || '', s.duracion || '', s.curso || '',
+                    s.precio || '', s.menu || '', (s.participantes || []).length,
+                    (s.guias || []).map(g => g.nombre).join(', '),
+                    s.transporte?.conductor || '', s.transporte?.horarios || ''
+                ]);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datos), 'Resumen Salidas');
+            XLSX.writeFile(wb, `salidas_resumen_${new Date().toISOString().split('T')[0]}.xlsx`);
+            alert('✅ Exportado');
+        });
+
+        // ============================================================
+        // EXPORTAR TODOS LOS USUARIOS A EXCEL
+        // ============================================================
+        document.getElementById('btnExportUsuariosExcel').addEventListener('click', function() {
+            if (!todosUsuarios.length) { alert('No hay usuarios cargados.'); return; }
+            const wb = XLSX.utils.book_new();
+            const datos = [['RUT', 'Nombre', 'Apellido', 'Edad', 'Email', 'Teléfono', 'Rol', 'Estado', 'Historial', 'N° Salidas']];
+            todosUsuarios.forEach(u => {
+                const n = todasSalidas.filter(s =>
+                    (s.participantes || []).some(p => p.rut === u.rut) ||
+                    (s.guias || []).some(g => g.rut === u.rut)
+                ).length;
+                datos.push([u.rut, u.nombre || '', u.apellido || '', u.edad || '', u.gmail || '', u.telefono || '', u.rol || '', u.estado || '', u.historial || '', n]);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datos), 'Usuarios');
+            XLSX.writeFile(wb, `usuarios_todos_${new Date().toISOString().split('T')[0]}.xlsx`);
+            alert('✅ Exportado');
+        });
+
+        // ============================================================
+        // RECARGAR DATOS
+        // ============================================================
+        document.getElementById('btnRecargarDatos').addEventListener('click', function() {
+            cargarDatos();
+        });
+
+        // ============================================================
+        // INICIALIZAR
+        // ============================================================
+        cargarDatos();
+
+    })();
+</script>
+</body>
+</html>
