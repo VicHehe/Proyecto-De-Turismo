@@ -5,9 +5,6 @@ body {
     color: #272120;
     font-family: Arial, Helvetica, sans-serif;
     padding: 10px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
 }
 
 /* ===== HEADER ===== */
@@ -21,7 +18,7 @@ header {
     background: linear-gradient(135deg, #3b473c, #272120);
     color: #f9f8dd;
     box-shadow: 0 3px 10px rgba(39,33,32,0.15);
-    flex-shrink: 0;
+    margin-bottom: 0;
 }
 
 header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: center; }
@@ -55,21 +52,85 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
 }
 .volver:hover { background: #f9f8dd; color: #272120; }
 
-/* ===== ACCIONES RÁPIDAS ===== */
-.acciones-rapidas {
+/* ===== TABS ===== */
+.tabs-bar {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 12px 14px;
-    background: #eef3dc;
-    border: 1px solid #ba9572;
-    border-top: none;
-    border-bottom: none;
-    align-items: center;
+    background: #3b473c;
+    overflow-x: auto;
 }
 
-.btn-excel {
+.tab-btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 12px 10px;
+    border: none;
+    background: transparent;
+    color: #d2e291;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: 0.2s ease;
+    white-space: nowrap;
+}
+.tab-btn:hover { background: rgba(249,248,221,0.1); }
+.tab-btn.activo { color: #f9f8dd; background: rgba(249,248,221,0.12); border-bottom: 3px solid #a8d455; }
+
+/* ===== BUSCADOR ===== */
+.buscador-bar {
+    background: #f9f8dd;
+    border: 1px solid #ba9572;
+    border-top: none;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.lupa { font-size: 16px; }
+
+.buscador-bar input[type="text"] {
+    flex: 1;
+    min-width: 160px;
+    padding: 8px 10px;
+    border: 1px solid #8b8893;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #f9f8dd;
+    color: #272120;
+}
+.buscador-bar input[type="text"]:focus { border-color: #8daad6; outline: none; box-shadow: 0 0 0 3px rgba(141,170,214,0.2); }
+
+.buscador-bar input[type="date"] {
+    padding: 8px 10px;
+    border: 1px solid #8b8893;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #f9f8dd;
+    color: #272120;
+}
+
+#btnBuscar {
     padding: 8px 16px;
+    background: #3b473c;
+    color: #f9f8dd;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+#btnBuscar:hover { background: #5c8d58; }
+
+.export-global { display: flex; gap: 8px; flex-wrap: wrap; }
+.hidden { display: none !important; }
+
+/* ===== BOTONES ===== */
+.btn-excel {
+    padding: 8px 14px;
     background: #f9f8dd;
     border: 1px solid #5c8d58;
     color: #5c8d58;
@@ -78,11 +139,12 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
     font-weight: bold;
     cursor: pointer;
     transition: 0.2s ease;
+    white-space: nowrap;
 }
 .btn-excel:hover { background: #5c8d58; color: #f9f8dd; }
 
 .btn-pdf {
-    padding: 8px 16px;
+    padding: 8px 14px;
     background: #f9f8dd;
     border: 1px solid #9197b6;
     color: #9197b6;
@@ -91,64 +153,42 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
     font-weight: bold;
     cursor: pointer;
     transition: 0.2s ease;
+    white-space: nowrap;
 }
 .btn-pdf:hover { background: #9197b6; color: #f9f8dd; }
 
-.btn-editar {
-    padding: 8px 16px;
-    background: #f9f8dd;
-    border: 1px solid #8daad6;
-    color: #3b473c;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-.btn-editar:hover { background: #8daad6; color: #f9f8dd; }
-
-.btn-eliminar {
-    padding: 8px 16px;
-    background: #f9f8dd;
-    border: 1px solid #876661;
-    color: #876661;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-.btn-eliminar:hover { background: #876661; color: #f9f8dd; }
-
-/* ===== PANEL PRINCIPAL (dos columnas) ===== */
-.panel-principal {
+/* ===== LAYOUT ===== */
+.contenedor-principal {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding: 12px 0;
-    flex: 1;
-    min-height: 0;
 }
 
 .panel-lista {
+    width: 100%;
     border: 1px solid #ba9572;
     border-radius: 8px;
     padding: 10px;
-    background: #f9f8dd;
     max-height: 260px;
     overflow-y: auto;
-    flex: 1;
+    background: #f9f8dd;
+    box-shadow: 0 3px 10px rgba(39,33,32,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
-.panel-lista h2 {
-    font-size: 15px;
-    border-bottom: 2px solid #5c8d58;
-    padding-bottom: 6px;
-    margin-bottom: 8px;
-    color: #5c8d58;
+.panel-detalle {
+    width: 100%;
+    border: 1px solid #ba9572;
+    border-radius: 8px;
+    padding: 14px;
+    background: #f9f8dd;
+    box-shadow: 0 3px 10px rgba(39,33,32,0.06);
+    overflow-y: auto;
 }
 
-/* ===== ITEMS DE LISTA ===== */
+/* ===== ITEMS LISTA ===== */
 .item-lista {
     padding: 10px 12px;
     border: 1px solid #ba9572;
@@ -159,7 +199,6 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
     display: flex;
     flex-direction: column;
     gap: 2px;
-    margin-bottom: 4px;
 }
 .item-lista:hover { background: #eef3dc; border-color: #9cab6c; }
 .item-lista.activo {
@@ -172,24 +211,16 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
 .item-lista span { font-size: 12px; opacity: 0.7; }
 .item-lista.activo span { opacity: 0.9; color: #d2e291; }
 
-/* ===== PANEL DETALLE ===== */
-.panel-detalle {
-    border: 1px solid #ba9572;
-    border-radius: 8px;
-    padding: 14px;
-    background: #f9f8dd;
-    flex: 1;
-    max-height: 400px;
-    overflow-y: auto;
-    margin-top: 4px;
-}
-
-.mensaje-inicial {
+.cargando, .vacio, .error, .muted {
+    padding: 12px;
     text-align: center;
     color: #876661;
     font-style: italic;
-    padding: 30px 0;
+    font-size: 13px;
 }
+
+/* ===== DETALLE ===== */
+.mensaje-inicial { text-align: center; color: #876661; font-style: italic; padding: 40px 0; }
 
 .detalle-header {
     display: flex;
@@ -223,6 +254,7 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
 
 .detalle-body p { font-size: 13px; color: #54555c; line-height: 1.5; margin: 4px 0; }
 
+/* ===== INFO GRID ===== */
 .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -247,6 +279,7 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
 }
 .info-item span { font-size: 13px; color: #272120; font-weight: 500; }
 
+/* ===== BADGES ===== */
 .badge-rol {
     background: #9197b6;
     color: #f9f8dd;
@@ -274,16 +307,8 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
     font-weight: bold;
     display: inline-block;
 }
-.admin-badge {
-    background: #e0bf7a;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-    color: #3b473c;
-    border: 1px solid #272120;
-}
 
+/* ===== HISTORIAL ===== */
 .historial {
     background: #eef3dc;
     border: 1px solid #d2e291;
@@ -293,19 +318,12 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
     color: #272120;
 }
 
+/* ===== RUTA ===== */
 .ruta-lista { list-style: none; padding: 0; }
 .ruta-lista li { padding: 7px 0; border-bottom: 1px solid #d2e291; font-size: 13px; color: #272120; }
 .horario { font-size: 12px; color: #876661; margin-left: 8px; }
 
-.lugar-info {
-    background: #eef3dc;
-    border: 1px solid #d2e291;
-    padding: 7px 10px;
-    margin-top: 4px;
-    font-size: 12px;
-    border-radius: 6px;
-}
-
+/* ===== TABLA MINI ===== */
 .tabla-mini {
     width: 100%;
     border-collapse: collapse;
@@ -324,39 +342,29 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
 .tabla-mini th { background: #9197b6; color: #f9f8dd; font-weight: 700; }
 .tabla-mini tr:hover td { background: #f3efc9; }
 
-.cargando, .vacio, .error, .muted {
-    padding: 12px;
-    text-align: center;
-    color: #876661;
-    font-style: italic;
-    font-size: 13px;
-}
-.error { color: #c0392b; font-style: normal; }
-
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
+/* ===== TABLET / DESKTOP ===== */
 @media (min-width: 768px) {
     body { padding: 20px; }
-    header { flex-direction: row; justify-content: space-between; align-items: center; }
+
+    header { flex-direction: row; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; }
     header h1 { font-size: 20px; text-align: left; }
     .header-right { justify-content: flex-end; }
 
-    .panel-principal {
-        flex-direction: row;
-        align-items: stretch;
-    }
-    .panel-lista {
-        max-height: 500px;
-        flex: 1;
-    }
-    .panel-lista:first-child { flex: 1.2; }
-    .panel-detalle { max-height: 500px; }
-    .info-grid { grid-template-columns: repeat(3, 1fr); }
+    .tab-btn { font-size: 15px; padding: 13px 20px; }
+
+    .contenedor-principal { flex-direction: row; align-items: flex-start; }
+
+    .panel-lista { flex: 1; min-width: 220px; max-width: 300px; max-height: 640px; }
+    .panel-detalle { flex: 2; min-width: 320px; max-height: 640px; }
+
+    .detalle-header h2 { font-size: 18px; }
+
     .tabla-mini { display: table; overflow-x: visible; white-space: normal; }
+
+    .info-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (min-width: 1024px) {
+    .panel-lista { max-width: 320px; }
     .info-grid { grid-template-columns: repeat(4, 1fr); }
-    .panel-detalle { max-height: 600px; }
 }
