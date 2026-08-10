@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧭 Asistente de Turismo</title>
+    <title>🧭 Asistente IA de Turismo</title>
     <link rel="stylesheet" href="css/asistente_turismo.css">
     <!-- Librerías para PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -20,466 +19,354 @@
     </div>
 </header>
 
-<div class="tabs-bar">
-    <button class="tab-btn activo" data-tab="usuarios">👤 Usuarios</button>
-    <button class="tab-btn" data-tab="salidas">🗺️ Salidas</button>
-    <button class="tab-btn" data-tab="lugares">📍 Lugares</button>
-</div>
-
-<div class="buscador-bar">
-    <span class="lupa">🔍</span>
-    <input type="text" id="inputBuscar" placeholder="Buscar por nombre, RUT, email, rol...">
-    <input type="date" id="inputFecha" class="hidden" title="Filtrar por fecha">
-    <button id="btnBuscar">Buscar</button>
-    <div class="export-global" id="exportGlobalUsuarios">
-        <button class="btn-excel" id="btnExportTodosExcel">📊 Exportar todos (Excel)</button>
-    </div>
-    <div class="export-global hidden" id="exportGlobalSalidas">
-        <button class="btn-excel" id="btnExportSalidasExcel">📊 Resumen salidas (Excel)</button>
-    </div>
-</div>
-
-<div class="contenedor-principal">
-    <aside class="panel-lista" id="panelLista">
-        <p class="cargando">Cargando datos...</p>
-    </aside>
-    <main class="panel-detalle" id="panelDetalle">
-        <div class="mensaje-inicial">
-            <p>👈 Selecciona un elemento de la lista para ver sus detalles.</p>
+<div class="chat-container">
+    <!-- Área del chat -->
+    <div id="chatArea" class="chat-area">
+        <div class="mensaje-bienvenida">
+            <div class="burbuja asistente">
+                👋 ¡Hola! Soy tu asistente de turismo. Pregúntame sobre salidas, lugares o participantes.
+                <br><small>Usa los botones de abajo o escribe tu pregunta.</small>
+            </div>
         </div>
-    </main>
+    </div>
+
+    <!-- Botones de preguntas rápidas -->
+    <div class="preguntas-rapidas">
+        <button class="btn-pregunta" data-pregunta="salidas_hoy">📅 Salidas de hoy</button>
+        <button class="btn-pregunta" data-pregunta="salidas_manana">📅 Salidas de mañana</button>
+        <button class="btn-pregunta" data-pregunta="salidas_mes">📅 Salidas de este mes</button>
+        <button class="btn-pregunta" data-pregunta="lugares">📍 Lugares turísticos</button>
+        <button class="btn-pregunta" data-pregunta="participantes">👥 Participantes de una salida</button>
+        <button class="btn-pregunta" data-pregunta="detalle_salida">📋 Detalle de una salida</button>
+        <button class="btn-pregunta" data-pregunta="ayuda">❓ Ayuda</button>
+    </div>
+
+    <!-- Input del chat -->
+    <div class="chat-input">
+        <input type="text" id="inputMensaje" placeholder="Escribe tu pregunta...">
+        <button id="btnEnviar">➤</button>
+    </div>
 </div>
 
 <script src="js/github.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/planificacion.js"></script>
 <script src="js/lugares.js"></script>
+
 <script>
-(function () {
-
-    // ===== AUTH =====
-    const usuario = Auth.getSesion();
-    if (!usuario) { window.location.href = 'login.html'; return; }
-    if (usuario.rol !== 'admin') {
-        alert('Solo los administradores pueden acceder al Asistente de Turismo.');
-        window.location.href = 'index.html';
-        return;
-    }
-    document.getElementById('userBadge').textContent =
-        `${usuario.nombre} ${usuario.apellido || ''} (${usuario.rol})`;
-
-    // ===== STATE =====
-    let tabActual = 'usuarios';
-    let todosUsuarios = [];
-    let todasSalidas = [];
-    let rutuSeleccionada = null;
-    let idSalidaSeleccionada = null;
-    let idxLugarSeleccionado = null;
-
-    // ===== TABS =====
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('activo'));
-            this.classList.add('activo');
-            tabActual = this.dataset.tab;
-            document.getElementById('inputBuscar').value = '';
-            document.getElementById('inputFecha').value = '';
-            cambiarTab(tabActual);
-        });
-    });
-
-    function cambiarTab(tab) {
-        const inputFecha = document.getElementById('inputFecha');
-        const expU = document.getElementById('exportGlobalUsuarios');
-        const expS = document.getElementById('exportGlobalSalidas');
-        const buscar = document.getElementById('inputBuscar');
-
-        inputFecha.classList.add('hidden');
-        expU.classList.add('hidden');
-        expS.classList.add('hidden');
-
-        document.getElementById('panelDetalle').innerHTML =
-            '<div class="mensaje-inicial"><p>👈 Selecciona un elemento de la lista para ver sus detalles.</p></div>';
-
-        if (tab === 'usuarios') {
-            buscar.placeholder = 'Buscar por nombre, RUT, email, rol...';
-            expU.classList.remove('hidden');
-            renderListaUsuarios(todosUsuarios);
-        } else if (tab === 'salidas') {
-            buscar.placeholder = 'Buscar por título, descripción, participante, lugar, curso...';
-            inputFecha.classList.remove('hidden');
-            expS.classList.remove('hidden');
-            renderListaSalidas(todasSalidas);
-        } else if (tab === 'lugares') {
-            buscar.placeholder = 'Buscar por nombre, descripción, ubicación...';
-            renderListaLugares(lugares);
+    (function() {
+        // ===== AUTH =====
+        const usuario = Auth.getSesion();
+        if (!usuario) { window.location.href = 'login.html'; return; }
+        if (usuario.rol !== 'admin') {
+            alert('Solo administradores pueden usar el asistente.');
+            window.location.href = 'index.html';
+            return;
         }
-    }
+        document.getElementById('userBadge').textContent = `${usuario.nombre} ${usuario.apellido || ''} (${usuario.rol})`;
 
-    // ===== BÚSQUEDA =====
-    function filtrar() {
-        const q = document.getElementById('inputBuscar').value.toLowerCase().trim();
-        const fecha = document.getElementById('inputFecha').value;
+        // ===== STATE =====
+        let todosUsuarios = [];
+        let todasSalidas = [];
+        let todosLugares = typeof lugares !== 'undefined' ? lugares : [];
+        let chatMensajes = [];
 
-        if (tabActual === 'usuarios') {
-            renderListaUsuarios(todosUsuarios.filter(u =>
-                (u.nombre || '').toLowerCase().includes(q) ||
-                (u.apellido || '').toLowerCase().includes(q) ||
-                (u.rut || '').toLowerCase().includes(q) ||
-                (u.gmail || u.email || '').toLowerCase().includes(q) ||
-                (u.rol || '').toLowerCase().includes(q) ||
-                (u.estado || '').toLowerCase().includes(q)
-            ));
-        } else if (tabActual === 'salidas') {
-            let res = todasSalidas.filter(s =>
-                q === '' ||
-                (s.titulo || '').toLowerCase().includes(q) ||
-                (s.descripcion || '').toLowerCase().includes(q) ||
-                (s.curso || '').toLowerCase().includes(q) ||
-                (s.participantes || []).some(p =>
-                    (p.nombre || '').toLowerCase().includes(q) ||
-                    (p.rut || '').toLowerCase().includes(q)
-                ) ||
-                (s.guias || []).some(g => (g.nombre || '').toLowerCase().includes(q)) ||
-                (s.ruta || []).some(r => (r.descripcion || '').toLowerCase().includes(q))
+        // ===== CARGAR DATOS =====
+        async function cargarDatos() {
+            try {
+                const datosU = await GitHub.leer('datos/usuarios.json');
+                todosUsuarios = datosU?.usuarios || [];
+                todasSalidas = await Planificacion.cargarSalidas();
+                todasSalidas.forEach(s => {
+                    if (!s.guias) s.guias = [];
+                    if (!s.participantes) s.participantes = [];
+                });
+                console.log('✅ Datos cargados correctamente.');
+            } catch (e) {
+                console.error('Error al cargar datos:', e);
+                agregarMensaje('asistente', '⚠️ Error al cargar los datos. Recarga la página.');
+            }
+        }
+
+        // ===== FUNCIONES DEL CHAT =====
+        function agregarMensaje(tipo, contenido, extra = '') {
+            const area = document.getElementById('chatArea');
+            const div = document.createElement('div');
+            div.className = `mensaje-chat ${tipo}`;
+            const burbuja = document.createElement('div');
+            burbuja.className = 'burbuja';
+            if (tipo === 'asistente') {
+                burbuja.innerHTML = contenido + extra;
+            } else {
+                burbuja.textContent = contenido;
+            }
+            div.appendChild(burbuja);
+            area.appendChild(div);
+            area.scrollTop = area.scrollHeight;
+            chatMensajes.push({ tipo, contenido, extra });
+        }
+
+        function agregarMensajeAsistente(texto, extra = '') {
+            agregarMensaje('asistente', texto, extra);
+        }
+
+        function agregarMensajeUsuario(texto) {
+            agregarMensaje('usuario', texto);
+        }
+
+        // ===== PROCESAR PREGUNTAS =====
+        function procesarPregunta(pregunta) {
+            const q = pregunta.toLowerCase().trim();
+            agregarMensajeUsuario(pregunta);
+
+            // Manejar comandos predefinidos
+            if (q.includes('salidas de hoy') || q === 'salidas_hoy') {
+                responderSalidasHoy();
+            } else if (q.includes('salidas de mañana') || q === 'salidas_manana') {
+                responderSalidasManana();
+            } else if (q.includes('salidas de este mes') || q === 'salidas_mes') {
+                responderSalidasMes();
+            } else if (q.includes('lugares') || q === 'lugares') {
+                responderLugares();
+            } else if (q.includes('participantes') || q === 'participantes') {
+                responderParticipantes();
+            } else if (q.includes('detalle') || q === 'detalle_salida') {
+                responderDetalleSalida();
+            } else if (q.includes('ayuda') || q === 'ayuda') {
+                mostrarAyuda();
+            } else {
+                // Búsqueda general por palabras clave
+                buscarGeneral(q);
+            }
+        }
+
+        // ===== RESPONDER SALIDAS DE HOY =====
+        function responderSalidasHoy() {
+            const hoy = new Date().toISOString().split('T')[0];
+            const salidas = todasSalidas.filter(s => s.fecha === hoy);
+            if (salidas.length === 0) {
+                agregarMensajeAsistente('📭 No hay salidas programadas para hoy.');
+                return;
+            }
+            let texto = `📅 **Salidas de hoy (${hoy}):**\n\n`;
+            salidas.forEach((s, i) => {
+                texto += `${i+1}. **${s.titulo}** (${s.fecha}) - ${s.guias.length > 0 ? 'Guía: ' + s.guias.map(g => g.nombre).join(', ') : 'Sin guía'}\n`;
+                texto += `   Participantes: ${s.participantes.length}\n`;
+            });
+            agregarMensajeAsistente(texto, generarBotonPDF(texto, 'Salidas de hoy'));
+        }
+
+        // ===== RESPONDER SALIDAS DE MAÑANA =====
+        function responderSalidasManana() {
+            const hoy = new Date();
+            hoy.setDate(hoy.getDate() + 1);
+            const manana = hoy.toISOString().split('T')[0];
+            const salidas = todasSalidas.filter(s => s.fecha === manana);
+            if (salidas.length === 0) {
+                agregarMensajeAsistente(`📭 No hay salidas programadas para mañana (${manana}).`);
+                return;
+            }
+            let texto = `📅 **Salidas de mañana (${manana}):**\n\n`;
+            salidas.forEach((s, i) => {
+                texto += `${i+1}. **${s.titulo}** (${s.fecha}) - ${s.guias.length > 0 ? 'Guía: ' + s.guias.map(g => g.nombre).join(', ') : 'Sin guía'}\n`;
+                texto += `   Participantes: ${s.participantes.length}\n`;
+            });
+            agregarMensajeAsistente(texto, generarBotonPDF(texto, 'Salidas de mañana'));
+        }
+
+        // ===== RESPONDER SALIDAS DEL MES =====
+        function responderSalidasMes() {
+            const hoy = new Date();
+            const mes = hoy.getMonth();
+            const año = hoy.getFullYear();
+            const salidas = todasSalidas.filter(s => {
+                const fecha = new Date(s.fecha);
+                return fecha.getMonth() === mes && fecha.getFullYear() === año;
+            });
+            if (salidas.length === 0) {
+                agregarMensajeAsistente(`📭 No hay salidas programadas para este mes (${hoy.toLocaleString('es', { month: 'long' })}).`);
+                return;
+            }
+            let texto = `📅 **Salidas de ${hoy.toLocaleString('es', { month: 'long' })} ${año}:**\n\n`;
+            salidas.sort((a,b) => a.fecha.localeCompare(b.fecha));
+            salidas.forEach((s, i) => {
+                texto += `${i+1}. **${s.titulo}** (${s.fecha}) - Guía: ${s.guias.length > 0 ? s.guias.map(g => g.nombre).join(', ') : 'N/A'}\n`;
+                texto += `   Participantes: ${s.participantes.length}\n`;
+            });
+            agregarMensajeAsistente(texto, generarBotonPDF(texto, 'Salidas del mes'));
+        }
+
+        // ===== RESPONDER LUGARES =====
+        function responderLugares() {
+            if (todosLugares.length === 0) {
+                agregarMensajeAsistente('📍 No hay lugares turísticos registrados.');
+                return;
+            }
+            let texto = '📍 **Lugares turísticos disponibles:**\n\n';
+            todosLugares.forEach((l, i) => {
+                texto += `${i+1}. **${l.nombre}** - ${l.ubicacion || 'Sin ubicación'}\n`;
+                texto += `   Horario: ${l.apertura || 'N/A'} - ${l.cierre || 'N/A'}\n`;
+                if (l.descripcion) texto += `   ${l.descripcion}\n`;
+            });
+            agregarMensajeAsistente(texto, generarBotonPDF(texto, 'Lista de lugares'));
+        }
+
+        // ===== RESPONDER PARTICIPANTES =====
+        function responderParticipantes() {
+            // Preguntar al usuario qué salida
+            const salidas = todasSalidas;
+            if (salidas.length === 0) {
+                agregarMensajeAsistente('No hay salidas registradas.');
+                return;
+            }
+            // Mostrar lista de salidas para que el usuario elija
+            let texto = '👥 **Participantes:**\n\nEscribe el **nombre o ID** de la salida para ver sus participantes.\n\nSalidas disponibles:\n';
+            salidas.forEach((s, i) => {
+                texto += `${i+1}. ${s.titulo} (${s.fecha})\n`;
+            });
+            texto += '\nEjemplo: escribe "participantes de Termas del Flaco" o "participantes de salida_123"';
+            agregarMensajeAsistente(texto);
+            // Guardar contexto para la próxima respuesta
+            window.contextoPregunta = 'participantes';
+        }
+
+        // ===== RESPONDER DETALLE DE SALIDA =====
+        function responderDetalleSalida() {
+            const salidas = todasSalidas;
+            if (salidas.length === 0) {
+                agregarMensajeAsistente('No hay salidas registradas.');
+                return;
+            }
+            let texto = '📋 **Detalle de una salida:**\n\nEscribe el **nombre o ID** de la salida para ver sus detalles.\n\nSalidas disponibles:\n';
+            salidas.forEach((s, i) => {
+                texto += `${i+1}. ${s.titulo} (${s.fecha})\n`;
+            });
+            texto += '\nEjemplo: escribe "detalle de Termas del Flaco"';
+            agregarMensajeAsistente(texto);
+            window.contextoPregunta = 'detalle';
+        }
+
+        // ===== MOSTRAR AYUDA =====
+        function mostrarAyuda() {
+            let texto = `❓ **Comandos disponibles:**\n\n`;
+            texto += `• "salidas de hoy" - Muestra las salidas de hoy.\n`;
+            texto += `• "salidas de mañana" - Muestra las salidas de mañana.\n`;
+            texto += `• "salidas de este mes" - Muestra las salidas del mes actual.\n`;
+            texto += `• "lugares" - Lista todos los lugares turísticos.\n`;
+            texto += `• "participantes" - Te guía para ver participantes de una salida.\n`;
+            texto += `• "detalle de [nombre]" - Muestra detalles completos de una salida.\n`;
+            texto += `• "ayuda" - Muestra este mensaje.\n`;
+            texto += `\nTambién puedes escribir el nombre de una salida o lugar para buscar información.`;
+            agregarMensajeAsistente(texto);
+        }
+
+        // ===== BÚSQUEDA GENERAL =====
+        function buscarGeneral(q) {
+            // Buscar en títulos de salidas
+            const salidasEncontradas = todasSalidas.filter(s =>
+                s.titulo.toLowerCase().includes(q) ||
+                (s.descripcion && s.descripcion.toLowerCase().includes(q))
             );
-            if (fecha) res = res.filter(s => s.fecha === fecha);
-            renderListaSalidas(res);
-        } else if (tabActual === 'lugares') {
-            renderListaLugares(lugares.filter(l =>
-                (l.nombre || '').toLowerCase().includes(q) ||
-                (l.descripcion || '').toLowerCase().includes(q) ||
-                (l.ubicacion || '').toLowerCase().includes(q)
-            ));
-        }
-    }
+            if (salidasEncontradas.length > 0) {
+                let texto = `🔍 **Encontré ${salidasEncontradas.length} salida(s) relacionada(s):**\n\n`;
+                salidasEncontradas.forEach((s, i) => {
+                    texto += `${i+1}. **${s.titulo}** (${s.fecha})\n`;
+                    texto += `   Guía: ${s.guias.length > 0 ? s.guias.map(g => g.nombre).join(', ') : 'N/A'}\n`;
+                    texto += `   Participantes: ${s.participantes.length}\n`;
+                    if (s.descripcion) texto += `   ${s.descripcion}\n`;
+                });
+                agregarMensajeAsistente(texto, generarBotonPDF(texto, 'Resultados de búsqueda'));
+                return;
+            }
 
-    document.getElementById('btnBuscar').addEventListener('click', filtrar);
-    document.getElementById('inputBuscar').addEventListener('input', filtrar);
-    document.getElementById('inputFecha').addEventListener('change', filtrar);
+            // Buscar en lugares
+            const lugaresEncontrados = todosLugares.filter(l =>
+                l.nombre.toLowerCase().includes(q) ||
+                (l.descripcion && l.descripcion.toLowerCase().includes(q))
+            );
+            if (lugaresEncontrados.length > 0) {
+                let texto = `📍 **Encontré ${lugaresEncontrados.length} lugar(es) relacionado(s):**\n\n`;
+                lugaresEncontrados.forEach((l, i) => {
+                    texto += `${i+1}. **${l.nombre}** - ${l.ubicacion || 'Sin ubicación'}\n`;
+                    texto += `   Horario: ${l.apertura || 'N/A'} - ${l.cierre || 'N/A'}\n`;
+                    if (l.descripcion) texto += `   ${l.descripcion}\n`;
+                });
+                agregarMensajeAsistente(texto, generarBotonPDF(texto, 'Lugares encontrados'));
+                return;
+            }
 
-    // ===== RENDER LISTA USUARIOS =====
-    function renderListaUsuarios(lista) {
-        const panel = document.getElementById('panelLista');
-        if (!lista.length) {
-            panel.innerHTML = '<p class="vacio">No se encontraron usuarios.</p>';
-            return;
-        }
-        panel.innerHTML = lista.map(u => `
-            <div class="item-lista ${rutuSeleccionada === u.rut ? 'activo' : ''}"
-                 data-rut="${u.rut}" onclick="seleccionarUsuario('${u.rut}')">
-                <strong>${u.nombre || ''} ${u.apellido || ''}</strong>
-                <span>${u.rut} · ${u.rol || 'sin rol'}</span>
-            </div>
-        `).join('');
-    }
-
-    window.seleccionarUsuario = function (rut) {
-        rutuSeleccionada = rut;
-        const u = todosUsuarios.find(x => x.rut === rut);
-        if (!u) return;
-        document.querySelectorAll('#panelLista .item-lista').forEach(el =>
-            el.classList.toggle('activo', el.dataset.rut === rut));
-        renderDetalleUsuario(u);
-    };
-
-    function renderDetalleUsuario(u) {
-        const salidaParticipa = todasSalidas.filter(s =>
-            (s.participantes || []).some(p => p.rut === u.rut) ||
-            (s.guias || []).some(g => g.rut === u.rut)
-        );
-        document.getElementById('panelDetalle').innerHTML = `
-            <div class="detalle-header">
-                <h2>👤 ${u.nombre || ''} ${u.apellido || ''}</h2>
-                <div class="detalle-acciones">
-                    <button class="btn-excel" onclick="exportarUsuarioExcel('${u.rut}')">📊 Excel individual</button>
-                </div>
-            </div>
-            <div class="detalle-body">
-                <div class="info-grid">
-                    <div class="info-item"><label>RUT</label><span>${u.rut || '—'}</span></div>
-                    <div class="info-item"><label>Rol</label><span class="badge-rol">${u.rol || '—'}</span></div>
-                    <div class="info-item"><label>Estado</label><span>${u.estado || '—'}</span></div>
-                    <div class="info-item"><label>Edad</label><span>${u.edad || '—'}</span></div>
-                    <div class="info-item"><label>Email</label><span>${u.gmail || u.email || '—'}</span></div>
-                    <div class="info-item"><label>Teléfono</label><span>${u.telefono || '—'}</span></div>
-                </div>
-                ${u.historialMedico ? `<h3>🩺 Historial Médico</h3><p class="historial">${u.historialMedico}</p>` : ''}
-                <h3>🗺️ Salidas en las que participa (${salidaParticipa.length})</h3>
-                ${salidaParticipa.length ? `
-                    <table class="tabla-mini">
-                        <thead><tr><th>Título</th><th>Fecha</th><th>Rol</th><th>Curso</th></tr></thead>
-                        <tbody>${salidaParticipa.map(s => {
-                            const esGuia = (s.guias || []).some(g => g.rut === u.rut);
-                            const p = (s.participantes || []).find(p => p.rut === u.rut);
-                            return `<tr>
-                                <td>${s.titulo || '—'}</td>
-                                <td>${s.fecha || '—'}</td>
-                                <td>${esGuia ? 'Guía' : (p ? p.rol : '—')}</td>
-                                <td>${s.curso || '—'}</td>
-                            </tr>`;
-                        }).join('')}</tbody>
-                    </table>` : '<p class="muted">No participa en ninguna salida registrada.</p>'}
-            </div>`;
-    }
-
-    // ===== RENDER LISTA SALIDAS =====
-    function renderListaSalidas(lista) {
-        const panel = document.getElementById('panelLista');
-        if (!lista.length) {
-            panel.innerHTML = '<p class="vacio">No se encontraron salidas.</p>';
-            return;
-        }
-        const hoy = new Date().toISOString().split('T')[0];
-        const ordenadas = [...lista].sort((a, b) => b.fecha > a.fecha ? 1 : -1);
-        panel.innerHTML = ordenadas.map(s => `
-            <div class="item-lista ${idSalidaSeleccionada === s.id ? 'activo' : ''}"
-                 data-id="${s.id}" onclick="seleccionarSalida('${s.id}')">
-                <strong>${s.titulo || 'Sin título'}</strong>
-                <span>${s.fecha || 'Sin fecha'} · ${s.fecha < hoy ? 'Pasada' : 'Próxima'}</span>
-            </div>
-        `).join('');
-    }
-
-    window.seleccionarSalida = function (id) {
-        idSalidaSeleccionada = id;
-        const s = todasSalidas.find(x => x.id === id);
-        if (!s) return;
-        document.querySelectorAll('#panelLista .item-lista').forEach(el =>
-            el.classList.toggle('activo', el.dataset.id === id));
-        renderDetalleSalida(s);
-    };
-
-    function renderDetalleSalida(s) {
-        const hoy = new Date().toISOString().split('T')[0];
-        const pasada = s.fecha < hoy;
-        document.getElementById('panelDetalle').innerHTML = `
-            <div class="detalle-header">
-                <h2>🗺️ ${s.titulo || 'Sin título'}
-                    <span class="${pasada ? 'badge-pasada' : 'badge-futura'}">${pasada ? 'Pasada' : 'Próxima'}</span>
-                </h2>
-                <div class="detalle-acciones">
-                    <button class="btn-pdf" onclick="exportarSalidaPDF('${s.id}')">📄 PDF completo</button>
-                </div>
-            </div>
-            <div class="detalle-body">
-                <div class="info-grid">
-                    <div class="info-item"><label>Fecha</label><span>${s.fecha || '—'}</span></div>
-                    <div class="info-item"><label>Duración</label><span>${s.duracion || '—'}</span></div>
-                    <div class="info-item"><label>Curso</label><span>${s.curso || '—'}</span></div>
-                    <div class="info-item"><label>Precio/persona</label><span>${s.precio ? '$' + Number(s.precio).toLocaleString('es-CL') + ' CLP' : '—'}</span></div>
-                    <div class="info-item"><label>Menú</label><span>${s.menu || '—'}</span></div>
-                    <div class="info-item"><label>Participantes</label><span>${(s.participantes || []).length}</span></div>
-                </div>
-
-                <h3>📝 Descripción</h3>
-                <p>${s.descripcion || 'Sin descripción.'}</p>
-
-                <h3>🚌 Transporte</h3>
-                <div class="info-grid">
-                    <div class="info-item"><label>Conductor</label><span>${s.transporte?.conductor || '—'}</span></div>
-                    <div class="info-item"><label>Horarios ida/vuelta</label><span>${s.transporte?.horarios || '—'}</span></div>
-                    <div class="info-item"><label>Precio transporte</label><span>${s.transporte?.precio || '—'}</span></div>
-                    <div class="info-item"><label>Vehículo</label><span>${s.transporte?.descripcion || '—'}</span></div>
-                </div>
-
-                <h3>📍 Ruta de actividades (${(s.ruta || []).length})</h3>
-                ${s.ruta && s.ruta.length ? `
-                <ul class="ruta-lista">
-                    ${s.ruta.map(r => `
-                        <li>
-                            <strong>${r.tipo === 'Traslado' ? '🚌' : r.tipo === 'Pausa' ? '☕' : '📍'} ${r.tipo}</strong>:
-                            ${r.descripcion || '—'}
-                            ${r.inicio ? `<span class="horario">${r.inicio}${r.fin ? ' – ' + r.fin : ''}</span>` : ''}
-                        </li>`).join('')}
-                </ul>` : '<p class="muted">Sin actividades registradas.</p>'}
-
-                <h3>🧭 Guías (${(s.guias || []).length})</h3>
-                ${s.guias && s.guias.length ? `
-                <table class="tabla-mini">
-                    <thead><tr><th>Nombre</th><th>RUT</th></tr></thead>
-                    <tbody>${s.guias.map(g => `<tr><td>${g.nombre || '—'}</td><td>${g.rut || '—'}</td></tr>`).join('')}</tbody>
-                </table>` : '<p class="muted">Sin guías registrados.</p>'}
-
-                <h3>👥 Participantes (${(s.participantes || []).length})</h3>
-                ${s.participantes && s.participantes.length ? `
-                <table class="tabla-mini">
-                    <thead><tr><th>Nombre</th><th>RUT</th><th>Rol</th></tr></thead>
-                    <tbody>${s.participantes.map(p => `
-                        <tr><td>${p.nombre || '—'}</td><td>${p.rut || '—'}</td><td>${p.rol || '—'}</td></tr>
-                    `).join('')}</tbody>
-                </table>` : '<p class="muted">Sin participantes registrados.</p>'}
-            </div>`;
-    }
-
-    // ===== RENDER LISTA LUGARES =====
-    function renderListaLugares(lista) {
-        const panel = document.getElementById('panelLista');
-        if (!lista.length) {
-            panel.innerHTML = '<p class="vacio">No se encontraron lugares.</p>';
-            return;
-        }
-        panel.innerHTML = lista.map((l, i) => {
-            const idxReal = lugares.indexOf(l);
-            return `
-            <div class="item-lista ${idxLugarSeleccionado === idxReal ? 'activo' : ''}"
-                 data-idx="${idxReal}" onclick="seleccionarLugar(${idxReal})">
-                <strong>${l.nombre}</strong>
-                <span>🕐 ${l.apertura}</span>
-            </div>`;
-        }).join('');
-    }
-
-    window.seleccionarLugar = function (idx) {
-        idxLugarSeleccionado = idx;
-        const l = lugares[idx];
-        if (!l) return;
-        document.querySelectorAll('#panelLista .item-lista').forEach(el =>
-            el.classList.toggle('activo', parseInt(el.dataset.idx) === idx));
-        renderDetalleLugar(l);
-    };
-
-    function renderDetalleLugar(l) {
-        const nombreL = l.nombre.toLowerCase();
-        const salidasConLugar = todasSalidas.filter(s =>
-            (s.ruta || []).some(r => (r.descripcion || '').toLowerCase().includes(nombreL))
-        );
-        document.getElementById('panelDetalle').innerHTML = `
-            <div class="detalle-header">
-                <h2>📍 ${l.nombre}</h2>
-            </div>
-            <div class="detalle-body">
-                <div class="info-grid">
-                    <div class="info-item"><label>🕐 Apertura</label><span>${l.apertura || '—'}</span></div>
-                    <div class="info-item"><label>🕕 Cierre</label><span>${l.cierre || '—'}</span></div>
-                </div>
-                <h3>📌 Ubicación</h3>
-                <p>${l.ubicacion || '—'}</p>
-                <h3>📝 Descripción</h3>
-                <p>${l.descripcion || '—'}</p>
-                <h3>🗺️ Salidas que visitan este lugar (${salidasConLugar.length})</h3>
-                ${salidasConLugar.length ? `
-                <table class="tabla-mini">
-                    <thead><tr><th>Título</th><th>Fecha</th><th>Participantes</th><th>Curso</th></tr></thead>
-                    <tbody>${salidasConLugar.map(s => `
-                        <tr>
-                            <td>${s.titulo || '—'}</td>
-                            <td>${s.fecha || '—'}</td>
-                            <td>${(s.participantes || []).length}</td>
-                            <td>${s.curso || '—'}</td>
-                        </tr>`).join('')}
-                    </tbody>
-                </table>` : '<p class="muted">Ninguna salida registrada visita este lugar.</p>'}
-            </div>`;
-    }
-
-    // ===== EXPORTACIONES =====
-
-    // Excel usuario individual
-    window.exportarUsuarioExcel = function (rut) {
-        const u = todosUsuarios.find(x => x.rut === rut);
-        if (!u) return;
-        const wb = XLSX.utils.book_new();
-
-        const datosPersonales = [
-            ['RUT', 'Nombre', 'Apellido', 'Edad', 'Email', 'Teléfono', 'Rol', 'Estado', 'Historial Médico'],
-            [u.rut, u.nombre || '', u.apellido || '', u.edad || '', u.gmail || u.email || '',
-             u.telefono || '', u.rol || '', u.estado || '', u.historialMedico || '']
-        ];
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datosPersonales), 'Datos Personales');
-
-        const salidas = todasSalidas.filter(s =>
-            (s.participantes || []).some(p => p.rut === u.rut) ||
-            (s.guias || []).some(g => g.rut === u.rut)
-        );
-        const datosSalidas = [['Título', 'Fecha', 'Duración', 'Rol en salida', 'Curso', 'Precio/persona', 'Menú']];
-        salidas.forEach(s => {
-            const esGuia = (s.guias || []).some(g => g.rut === u.rut);
-            const p = (s.participantes || []).find(p => p.rut === u.rut);
-            datosSalidas.push([s.titulo || '', s.fecha || '', s.duracion || '',
-                esGuia ? 'Guía' : (p ? p.rol : '—'), s.curso || '', s.precio || '', s.menu || '']);
-        });
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datosSalidas), 'Salidas');
-
-        XLSX.writeFile(wb, `usuario_${u.rut.replace(/\./g, '').replace('-', '_')}.xlsx`);
-    };
-
-    // Excel todos los usuarios
-    document.getElementById('btnExportTodosExcel').addEventListener('click', function () {
-        if (!todosUsuarios.length) { alert('No hay usuarios cargados.'); return; }
-        const wb = XLSX.utils.book_new();
-        const datos = [['RUT', 'Nombre', 'Apellido', 'Edad', 'Email', 'Teléfono', 'Rol', 'Estado', 'Historial Médico', 'N° Salidas']];
-        todosUsuarios.forEach(u => {
-            const n = todasSalidas.filter(s =>
-                (s.participantes || []).some(p => p.rut === u.rut) ||
-                (s.guias || []).some(g => g.rut === u.rut)
-            ).length;
-            datos.push([u.rut, u.nombre || '', u.apellido || '', u.edad || '',
-                u.gmail || u.email || '', u.telefono || '', u.rol || '', u.estado || '',
-                u.historialMedico || '', n]);
-        });
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datos), 'Usuarios');
-        XLSX.writeFile(wb, `usuarios_todos_${new Date().toISOString().split('T')[0]}.xlsx`);
-    });
-
-    // Excel resumen de todas las salidas
-    document.getElementById('btnExportSalidasExcel').addEventListener('click', function () {
-        if (!todasSalidas.length) { alert('No hay salidas cargadas.'); return; }
-        const wb = XLSX.utils.book_new();
-        const datos = [['Título', 'Fecha', 'Duración', 'Curso', 'Precio/persona', 'Menú',
-            'N° Participantes', 'N° Guías', 'Conductor', 'Horarios transporte', 'Precio transporte', 'Vehículo']];
-        todasSalidas.forEach(s => {
-            datos.push([s.titulo || '', s.fecha || '', s.duracion || '', s.curso || '',
-                s.precio || '', s.menu || '', (s.participantes || []).length, (s.guias || []).length,
-                s.transporte?.conductor || '', s.transporte?.horarios || '',
-                s.transporte?.precio || '', s.transporte?.descripcion || '']);
-        });
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datos), 'Resumen Salidas');
-        XLSX.writeFile(wb, `salidas_resumen_${new Date().toISOString().split('T')[0]}.xlsx`);
-    });
-
-    // ============================================================
-    // NUEVA EXPORTACIÓN PDF con estilo unificado (igual que mis_salidas)
-    // ============================================================
-    window.exportarSalidaPDF = async function (id) {
-        const s = todasSalidas.find(x => x.id === id);
-        if (!s) { alert('Salida no encontrada'); return; }
-
-        // Deshabilitar botón temporalmente
-        const btn = document.querySelector(`button[onclick="exportarSalidaPDF('${id}')"]`);
-        if (btn) {
-            btn.textContent = '⏳ Generando...';
-            btn.disabled = true;
+            // Si no hay nada
+            agregarMensajeAsistente(`❌ No encontré información sobre "${q}".\nPrueba con "ayuda" para ver los comandos disponibles.`);
         }
 
-        try {
-            // 1. Enriquecer participantes con datos de usuarios
-            const datosUsuarios = await GitHub.leer('datos/usuarios.json');
-            const usuarios = datosUsuarios ? datosUsuarios.usuarios : [];
-            const participantesConInfo = (s.participantes || []).map(p => {
-                const user = usuarios.find(u => u.rut === p.rut);
-                return {
-                    ...p,
-                    edad: user ? user.edad : '—',
-                    telefono: user ? user.telefono : '—',
-                    historial: user ? user.historial : 'Sin información'
-                };
-            });
-
-            // 2. Enriquecer ruta con información de lugares
-            const lugaresInfo = typeof lugares !== 'undefined' ? lugares : [];
-            const rutaEnriquecida = (s.ruta || []).map(act => {
-                if (act.tipo === 'Lugar') {
-                    const lugar = lugaresInfo.find(l => l.nombre.toLowerCase() === act.descripcion.toLowerCase());
-                    if (lugar) return { ...act, lugarInfo: lugar };
+        // ===== PROCESAR PREGUNTA DETALLE O PARTICIPANTES (contexto) =====
+        function procesarContexto(q) {
+            const ctx = window.contextoPregunta;
+            if (ctx === 'participantes') {
+                // Buscar salida por nombre o ID
+                const salida = todasSalidas.find(s =>
+                    s.titulo.toLowerCase().includes(q) ||
+                    s.id.toLowerCase().includes(q)
+                );
+                if (!salida) {
+                    agregarMensajeAsistente(`❌ No encontré una salida con "${q}".\nIntenta con otro nombre.`);
+                    return;
                 }
-                return act;
-            });
+                const participantes = salida.participantes || [];
+                if (participantes.length === 0) {
+                    agregarMensajeAsistente(`👥 La salida "${salida.titulo}" no tiene participantes aún.`);
+                } else {
+                    let texto = `👥 **Participantes de "${salida.titulo}" (${salida.fecha}):**\n\n`;
+                    participantes.forEach((p, i) => {
+                        texto += `${i+1}. ${p.nombre || 'Sin nombre'} (${p.rut || 'Sin RUT'}) - ${p.rol || 'Visitante'}\n`;
+                    });
+                    agregarMensajeAsistente(texto, generarBotonPDF(texto, `Participantes de ${salida.titulo}`));
+                }
+                window.contextoPregunta = null;
+            } else if (ctx === 'detalle') {
+                const salida = todasSalidas.find(s =>
+                    s.titulo.toLowerCase().includes(q) ||
+                    s.id.toLowerCase().includes(q)
+                );
+                if (!salida) {
+                    agregarMensajeAsistente(`❌ No encontré una salida con "${q}".\nIntenta con otro nombre.`);
+                    return;
+                }
+                let texto = `📋 **Detalle de "${salida.titulo}"**\n\n`;
+                texto += `📅 Fecha: ${salida.fecha || 'N/A'}\n`;
+                texto += `⏳ Duración: ${salida.duracion || 'N/A'}\n`;
+                texto += `📝 Descripción: ${salida.descripcion || 'Sin descripción'}\n`;
+                texto += `👨‍🏫 Guía(s): ${salida.guias.length > 0 ? salida.guias.map(g => g.nombre).join(', ') : 'N/A'}\n`;
+                texto += `👥 Participantes: ${salida.participantes.length}\n`;
+                texto += `🚌 Transporte: Conductor: ${salida.transporte?.conductor || 'N/A'}, Horarios: ${salida.transporte?.horarios || 'N/A'}\n`;
+                if (salida.ruta && salida.ruta.length > 0) {
+                    texto += `📍 Ruta:\n`;
+                    salida.ruta.forEach((act, i) => {
+                        texto += `   ${i+1}. ${act.tipo}: ${act.descripcion} (${act.inicio || 'N/A'} - ${act.fin || 'N/A'})\n`;
+                    });
+                }
+                agregarMensajeAsistente(texto, generarBotonPDF(texto, `Detalle de ${salida.titulo}`));
+                window.contextoPregunta = null;
+            }
+        }
 
-            // 3. Generar HTML con el mismo estilo que mis_salidas
-            const contenidoHTML = generarContenidoHTML(s, participantesConInfo, rutaEnriquecida);
+        // ===== GENERAR BOTÓN PARA EXPORTAR A PDF =====
+        function generarBotonPDF(texto, titulo) {
+            return `<br><button class="btn-pdf-chat" onclick="exportarRespuestaPDF('${encodeURIComponent(texto)}', '${encodeURIComponent(titulo)}')">📄 Exportar respuesta a PDF</button>`;
+        }
 
-            // 4. Crear contenedor temporal para renderizar
+        // ===== EXPORTAR RESPUESTA A PDF =====
+        window.exportarRespuestaPDF = function(textoEncoded, tituloEncoded) {
+            const texto = decodeURIComponent(textoEncoded);
+            const titulo = decodeURIComponent(tituloEncoded) || 'Respuesta del asistente';
+            // Generar HTML con el texto formateado
+            const html = `
+                <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 100%;">
+                    <h2 style="color: #3b473c;">${titulo}</h2>
+                    <div style="white-space: pre-wrap; font-size: 12px; line-height: 1.6;">${texto}</div>
+                    <p style="margin-top: 20px; font-size: 10px; color: #888; text-align: right;">Generado por Asistente de Turismo - ${new Date().toLocaleDateString('es-CL')}</p>
+                </div>
+            `;
             const container = document.createElement('div');
             container.style.position = 'absolute';
             container.style.left = '-9999px';
@@ -487,149 +374,72 @@
             container.style.width = '800px';
             container.style.background = 'white';
             container.style.padding = '20px';
-            container.style.zIndex = '9999';
-            container.innerHTML = contenidoHTML;
+            container.innerHTML = html;
             document.body.appendChild(container);
 
-            // 5. Capturar con html2canvas y generar PDF
-            await new Promise((resolve) => setTimeout(resolve, 300)); // esperar renderizado
-            const canvas = await html2canvas(container, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                width: 800,
-                height: container.scrollHeight
-            });
+            setTimeout(() => {
+                html2canvas(container, { scale: 2, useCORS: true, logging: false, width: 800 })
+                    .then(canvas => {
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                        const imgWidth = 210;
+                        const pageHeight = 297;
+                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                        let heightLeft = imgHeight;
+                        let position = 0;
+                        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                        while (heightLeft > 0) {
+                            position = heightLeft - imgHeight;
+                            pdf.addPage();
+                            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+                            heightLeft -= pageHeight;
+                        }
+                        pdf.save(`Asistente_${titulo.replace(/\s+/g, '_')}.pdf`);
+                        document.body.removeChild(container);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Error al generar PDF');
+                        document.body.removeChild(container);
+                    });
+            }, 300);
+        };
 
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgData = canvas.toDataURL('image/jpeg', 0.95);
-            const imgWidth = 210;
-            const pageHeight = 297;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            let heightLeft = imgHeight;
-            let position = 0;
-
-            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-
-            while (heightLeft > 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
+        // ===== EVENTOS DEL CHAT =====
+        document.getElementById('btnEnviar').addEventListener('click', function() {
+            const input = document.getElementById('inputMensaje');
+            const texto = input.value.trim();
+            if (!texto) return;
+            input.value = '';
+            // Verificar si hay contexto pendiente
+            if (window.contextoPregunta) {
+                procesarContexto(texto);
+            } else {
+                procesarPregunta(texto);
             }
+        });
 
-            pdf.save(`Salida_${s.titulo || 'sin_titulo'}_${s.fecha || 'sin_fecha'}.pdf`);
-
-            // Limpiar
-            document.body.removeChild(container);
-        } catch (error) {
-            console.error('Error al generar PDF:', error);
-            alert('Error al generar el PDF. Inténtalo de nuevo.');
-        } finally {
-            if (btn) {
-                btn.textContent = '📄 PDF completo';
-                btn.disabled = false;
+        document.getElementById('inputMensaje').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btnEnviar').click();
             }
-        }
-    };
+        });
 
-    // Función auxiliar para generar el HTML del PDF (copiada y adaptada de mis_salidas)
-    function generarContenidoHTML(salida, participantesConInfo, rutaEnriquecida) {
-        const p = participantesConInfo || [];
-        const r = rutaEnriquecida || [];
-
-        const participantesHTML = p.length > 0
-            ? `<table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:4px;">
-                    <thead>
-                        <tr><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left;">Nombre</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left;">RUT</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left;">Rol</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left;">Edad</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left;">Teléfono</th><th style="background:#3b473c; color:#f9f8dd; padding:5px 6px; text-align:left;">Historial Médico</th></tr>
-                    </thead>
-                    <tbody>
-                        ${p.map(pt => `<tr>
-                            <td style="border:1px solid #bbb; padding:4px 6px;">${pt.nombre || ''}</td>
-                            <td style="border:1px solid #bbb; padding:4px 6px;">${pt.rut || ''}</td>
-                            <td style="border:1px solid #bbb; padding:4px 6px;">${pt.rol || ''}</td>
-                            <td style="border:1px solid #bbb; padding:4px 6px;">${pt.edad || '—'}</td>
-                            <td style="border:1px solid #bbb; padding:4px 6px;">${pt.telefono || '—'}</td>
-                            <td style="border:1px solid #bbb; padding:4px 6px;">${pt.historial || 'Sin información'}</td>
-                        </tr>`).join('')}
-                    </tbody>
-                   </table>`
-            : '<p>No hay participantes registrados.</p>';
-
-        const rutaHTML = r.length > 0
-            ? `<ul style="list-style:none; padding:0;">${r.map(act => `
-                    <li style="padding:5px 0; border-bottom:1px solid #ddd; font-size:12px;">
-                        <strong>${act.tipo}:</strong> ${act.descripcion}
-                        <span style="color:#776; margin-left:8px; font-size:11px;">(${act.inicio || '—'} – ${act.fin || '—'})</span>
-                        ${act.lugarInfo ? `
-                            <div style="background:#f5f5e8; border:1px solid #dde; padding:4px 8px; margin-top:4px; border-radius:4px; font-size:11px;">
-                                <div><b>Ubicación:</b> ${act.lugarInfo.ubicacion || '—'}</div>
-                                <div><b>Horario lugar:</b> ${act.lugarInfo.apertura || '—'} – ${act.lugarInfo.cierre || '—'}</div>
-                                ${act.lugarInfo.descripcion ? `<div><b>Descripción:</b> ${act.lugarInfo.descripcion}</div>` : ''}
-                            </div>` : ''}
-                    </li>`).join('')}</ul>`
-            : '<p>Sin ruta definida.</p>';
-
-        const transporteHTML = salida.transporte
-            ? `<p><b>Conductor:</b> ${salida.transporte.conductor || '—'}</p>
-                   <p><b>Horarios:</b> ${salida.transporte.horarios || '—'}</p>
-                   <p><b>Precio servicio:</b> ${salida.transporte.precio || '—'}</p>
-                   <p><b>Descripción vehículo:</b> ${salida.transporte.descripcion || '—'}</p>`
-            : '<p>Sin información de transporte.</p>';
-
-        const fechaGenerado = new Date().toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' });
-
-        return `
-                <div style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #222; padding: 20px; background: white; max-width: 100%;">
-                    <div style="border-bottom: 3px solid #3b473c; margin-bottom: 14px; padding-bottom: 10px;">
-                        <h1 style="font-size: 20px; color: #3b473c; margin-bottom: 6px;">📋 ${salida.titulo || 'Sin título'}</h1>
-                        <div style="font-size: 11px; color: #555; margin-top: 3px;"><b>Fecha:</b> ${salida.fecha || '—'} &nbsp;|&nbsp; <b>Duración:</b> ${salida.duracion || '—'} &nbsp;|&nbsp; <b>Curso:</b> ${salida.curso || '—'}</div>
-                        <div style="font-size: 11px; color: #555; margin-top: 3px;"><b>Precio/persona:</b> ${salida.precio ? '$' + salida.precio : '—'} &nbsp;|&nbsp; <b>Menú:</b> ${salida.menu || '—'}</div>
-                        ${salida.descripcion ? `<div style="font-size:11px; color:#555; margin-top:6px;"><b>Descripción:</b> ${salida.descripcion}</div>` : ''}
-                    </div>
-
-                    <h2 style="font-size: 14px; background: #3b473c; color: #f9f8dd; padding: 4px 10px; margin: 14px 0 8px 0; border-radius: 4px;">📍 Ruta</h2>
-                    ${rutaHTML}
-
-                    <h2 style="font-size: 14px; background: #3b473c; color: #f9f8dd; padding: 4px 10px; margin: 14px 0 8px 0; border-radius: 4px;">👥 Participantes (${p.length})</h2>
-                    ${participantesHTML}
-
-                    <h2 style="font-size: 14px; background: #3b473c; color: #f9f8dd; padding: 4px 10px; margin: 14px 0 8px 0; border-radius: 4px;">🚌 Transporte</h2>
-                    ${transporteHTML}
-
-                    <h2 style="font-size: 14px; background: #3b473c; color: #f9f8dd; padding: 4px 10px; margin: 14px 0 8px 0; border-radius: 4px;">📋 Datos complementarios</h2>
-                    <p><b>Curso:</b> ${salida.curso || 'Sin curso'}</p>
-                    <p><b>Precio por persona:</b> ${salida.precio ? '$' + salida.precio : 'No especificado'}</p>
-                    <p><b>Menú:</b> ${salida.menu || 'Sin menú'}</p>
-
-                    <div style="margin-top: 22px; border-top: 1px solid #bbb; padding-top: 8px; font-size: 10px; color: #888; text-align: right;">Generado el ${fechaGenerado}</div>
-                </div>
-            `;
-    }
-
-    // ===== CARGA INICIAL =====
-    async function cargarDatos() {
-        try {
-            const datosU = await GitHub.leer('datos/usuarios.json');
-            todosUsuarios = datosU?.usuarios || [];
-            todasSalidas = await Planificacion.cargarSalidas();
-            todasSalidas.forEach(s => {
-                if (!s.guias) s.guias = [];
-                if (!s.participantes) s.participantes = [];
+        // Botones de preguntas rápidas
+        document.querySelectorAll('.btn-pregunta').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const pregunta = this.dataset.pregunta;
+                procesarPregunta(pregunta);
             });
-            cambiarTab('usuarios');
-        } catch (e) {
-            console.error('Error al cargar datos:', e);
-            document.getElementById('panelLista').innerHTML =
-                '<p class="error">⚠️ Error al cargar los datos. Recarga la página.</p>';
-        }
-    }
+        });
 
-    cargarDatos();
+        // ===== INICIALIZAR =====
+        cargarDatos();
 
-})();
+    })();
 </script>
+
 </body>
 </html>
