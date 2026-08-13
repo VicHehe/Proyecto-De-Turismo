@@ -59,7 +59,7 @@
         let añoActual = new Date().getFullYear();
 
         // ============================================================
-        // FUNCIÓN DE FILTRO DE SALIDAS (igual que en index)
+        // FUNCIÓN DE FILTRO DE SALIDAS (solo futuras, incluyendo hoy)
         // ============================================================
         function getSalidasVisibles(todas, usuario) {
             const hoy = new Date().toISOString().split('T')[0];
@@ -68,11 +68,11 @@
                 if (!s.participantes) s.participantes = [];
             });
 
-            // Filtrar solo salidas futuras (>= hoy) para todos
+            // ✅ CORRECCIÓN: filtrar estrictamente salidas con fecha >= hoy
             const futuras = todas.filter(s => s.fecha >= hoy);
 
             if (usuario.rol === 'admin') {
-                return futuras;
+                return futuras; // Administradores también ven solo futuras
             } else if (usuario.rol === 'guia' || usuario.rol === 'asistente') {
                 return futuras.filter(s => {
                     const esGuia = s.guias.some(g => g.rut === usuario.rut);
