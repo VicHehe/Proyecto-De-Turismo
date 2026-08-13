@@ -40,7 +40,7 @@
 </div>
 
 <footer>
-    Nota: El calendario muestra las salidas según tu rol y participación.
+    Nota: El calendario muestra todas las salidas (pasadas y futuras) según tu rol y participación.
 </footer>
 
 <script src="js/github.js"></script>
@@ -59,28 +59,27 @@
         let añoActual = new Date().getFullYear();
 
         // ============================================================
-        // FUNCIÓN DE FILTRO DE SALIDAS (solo futuras, incluyendo hoy)
+        // FUNCIÓN DE FILTRO DE SALIDAS (SIN FILTRO DE FECHA)
         // ============================================================
         function getSalidasVisibles(todas, usuario) {
-            const hoy = new Date().toISOString().split('T')[0];
+            // Aseguramos que existan arrays para guías y participantes
             todas.forEach(s => {
                 if (!s.guias) s.guias = [];
                 if (!s.participantes) s.participantes = [];
             });
 
-            // ✅ CORRECCIÓN: filtrar estrictamente salidas con fecha >= hoy
-            const futuras = todas.filter(s => s.fecha >= hoy);
-
+            // 🔹 SIN FILTRO DE FECHA: se muestran TODAS las salidas (pasadas y futuras)
             if (usuario.rol === 'admin') {
-                return futuras; // Administradores también ven solo futuras
+                return todas; // Administradores ven todas
             } else if (usuario.rol === 'guia' || usuario.rol === 'asistente') {
-                return futuras.filter(s => {
+                return todas.filter(s => {
                     const esGuia = s.guias.some(g => g.rut === usuario.rut);
                     const esParticipante = s.participantes.some(p => p.rut === usuario.rut);
                     return (esGuia || esParticipante);
                 });
             } else {
-                return futuras.filter(s => {
+                // Estudiantes / visitantes
+                return todas.filter(s => {
                     const esParticipante = s.participantes.some(p => p.rut === usuario.rut);
                     return esParticipante;
                 });
