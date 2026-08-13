@@ -519,8 +519,199 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
     background: #f3efc9;
 }
 
+/* ============================================================
+   MEJORAS PARA MÓVILES (TELÉFONOS)
+   ============================================================ */
+@media (max-width: 768px) {
+    body {
+        padding: 8px;
+    }
+
+    header {
+        padding: 10px 12px;
+        gap: 6px;
+    }
+    header h1 {
+        font-size: 16px;
+    }
+    .user-badge {
+        font-size: 12px;
+        padding: 3px 10px;
+    }
+    .volver {
+        font-size: 13px;
+        padding: 6px 12px;
+    }
+
+    .tab-btn {
+        font-size: 13px;
+        padding: 10px 8px;
+        min-width: 80px;
+    }
+
+    .buscador-bar {
+        padding: 8px 10px;
+        gap: 6px;
+    }
+    .buscador-bar input[type="text"],
+    .buscador-bar input[type="date"] {
+        font-size: 16px; /* Evita zoom en iOS */
+        padding: 8px 8px;
+        min-height: 44px;
+    }
+    #btnBuscar {
+        font-size: 14px;
+        padding: 8px 14px;
+        min-height: 44px;
+        width: 100%;
+    }
+    .export-global {
+        width: 100%;
+        justify-content: center;
+    }
+    .btn-excel, .btn-pdf {
+        font-size: 13px;
+        padding: 8px 12px;
+        min-height: 44px;
+        flex: 1;
+        text-align: center;
+    }
+
+    .panel-lista {
+        max-height: 200px;
+        padding: 8px;
+    }
+    .panel-detalle {
+        padding: 10px;
+        max-height: none;
+    }
+
+    .item-lista {
+        padding: 10px 10px;
+        font-size: 14px;
+    }
+    .item-lista strong {
+        font-size: 14px;
+    }
+    .item-lista span {
+        font-size: 12px;
+    }
+
+    .detalle-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+    .detalle-header h2 {
+        font-size: 16px;
+    }
+    .detalle-acciones {
+        justify-content: stretch;
+        gap: 6px;
+    }
+    .detalle-acciones .btn-excel,
+    .detalle-acciones .btn-pdf {
+        flex: 1;
+        text-align: center;
+        padding: 10px 8px;
+        min-height: 44px;
+        font-size: 14px;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr; /* Una sola columna en móvil */
+        gap: 6px;
+    }
+    .info-item {
+        padding: 6px 8px;
+    }
+    .info-item label {
+        font-size: 11px;
+    }
+    .info-item span {
+        font-size: 14px;
+    }
+
+    .detalle-body h3 {
+        font-size: 15px;
+    }
+    .detalle-body p {
+        font-size: 14px;
+    }
+
+    .tabla-mini {
+        font-size: 12px;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    .tabla-mini th,
+    .tabla-mini td {
+        padding: 6px 6px;
+        min-width: 60px;
+    }
+
+    .ruta-lista li {
+        font-size: 14px;
+        padding: 8px 0;
+    }
+    .horario {
+        font-size: 13px;
+        margin-left: 4px;
+    }
+
+    .modo-salidas .panel-lista {
+        max-height: 180px;
+        padding: 10px;
+    }
+    .modo-salidas .item-salida {
+        padding: 10px 10px;
+        font-size: 14px;
+    }
+    .modo-salidas .item-salida strong {
+        font-size: 14px;
+    }
+    .modo-salidas .item-salida span {
+        font-size: 12px;
+    }
+    .modo-salidas .panel-detalle {
+        padding: 10px;
+    }
+    .modo-salidas .detalle-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .modo-salidas .detalle-header h2 {
+        font-size: 16px;
+    }
+    .modo-salidas .btn-pdf {
+        padding: 10px 12px;
+        min-height: 44px;
+        font-size: 14px;
+        width: 100%;
+        text-align: center;
+    }
+    .modo-salidas .detalle-body h3 {
+        font-size: 15px;
+    }
+    .modo-salidas .detalle-body p {
+        font-size: 14px;
+    }
+    .modo-salidas .participantes-tabla {
+        font-size: 12px;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    .modo-salidas .participantes-tabla th,
+    .modo-salidas .participantes-tabla td {
+        padding: 5px 6px;
+        min-width: 60px;
+    }
+}
+
 /* ===== TABLET / DESKTOP ===== */
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     body { padding: 20px; }
 
     header { flex-direction: row; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; }
@@ -540,7 +731,6 @@ header h1 { font-size: 18px; font-weight: bold; color: #f9f8dd; text-align: cent
 
     .info-grid { grid-template-columns: repeat(3, 1fr); }
 
-    /* Modo salidas en escritorio */
     .modo-salidas .panel-lista {
         flex: 1;
         min-width: 220px;
