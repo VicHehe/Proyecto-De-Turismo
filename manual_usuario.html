@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario · Turismo Eduardo Charme</title>
+    <link rel="stylesheet" href="css/manual.css">
+</head>
+<body>
+
+<header>
+    <h1>📖 Manual de Usuario</h1>
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <span class="user-badge" id="userBadge">Cargando...</span>
+        <a href="index.html" class="volver">← Volver al Lobby</a>
+    </div>
+</header>
+
+<!-- BARRA DE BÚSQUEDA -->
+<div class="manual-buscador">
+    <span class="lupa">🔍</span>
+    <input type="text" id="inputBuscar" placeholder="Busca: 'planificar', 'galería', 'contraseña', 'PDF'...">
+    <button id="btnLimpiar" title="Limpiar búsqueda">✕</button>
+</div>
+
+<div id="resultadoBusqueda" class="resultado-busqueda oculto"></div>
+
+<!-- LAYOUT PRINCIPAL -->
+<div class="manual-wrap">
+    <aside class="manual-sidebar">
+        <h2>📑 Secciones</h2>
+        <nav id="indiceSecciones"></nav>
+    </aside>
+
+    <main class="manual-contenido" id="manualContenido">
+        <!-- Contenido generado por JS -->
+    </main>
+</div>
+
+<footer>
+    Manual generado para la Especialidad de Turismo · Liceo Eduardo Charme
+</footer>
+
+<script src="js/github.js"></script>
+<script src="js/auth.js"></script>
+<script>
+(function() {
+    // ============================================================
+    // 1. VERIFICAR SESIÓN Y ROL
+    // ============================================================
+    const usuario = Auth.getSesion();
+    if (!usuario) {
+        window.location.href = 'login.html';
+        return;
+    }
+    document.getElementById('userBadge').textContent =
+        `${usuario.nombre} ${usuario.apellido || ''} (${usuario.rol})`;
+
+    // Normalizar rol para el manual
+    let rol = 'estudiante';
+    if (usuario.rol === 'admin') rol = 'admin';
+    else if (usuario.rol === 'guia' || usuario.rol === 'asistente') rol = 'guia';
+
+    // ============================================================
+    // 2. CONTENIDO DEL MANUAL
+    //    roles: ['all'] → todos | ['guia'] | ['admin'] | ['estudiante']
+    // ============================================================
+    const SECCIONES = [
+    // ---------- INTRODUCCIÓN ----------
+    {
+        id: 'intro',
+        titulo: '👋 Introducción',
+        roles: ['all'],
+        articulos: [
+            {
+                titulo: '¿Qué es esta plataforma?',
+                html: `
+                    <p>La plataforma <strong>Turismo Eduardo Charme</strong> es el sistema oficial de gestión de salidas pedagógicas de la Especialidad de Turismo. Aquí podrás:</p>
+                    <ul>
+                        <li>📋 Ver todas las salidas programadas (pasadas y futuras).</li>
+                        <li>📝 Inscribirte o revisar tu participación.</li>
+                        <li>📸 Compartir fotos de los viajes en la galería.</li>
+                        <li>📅 Consultar el calendario interactivo personal.</li>
+                        <li>✏️ Modificar los datos de tu cuenta cuando lo necesites.</li>
+                    </ul>
+                    <div class="nota tip">
+                        <strong>💡 Tip:</strong> Esta guía se adapta a tu rol. Como <strong>${rol === 'admin' ? 'administrador' : rol === 'guia' ? 'guía/asistente' : 'estudiante'}</strong> verás sólo las herramientas que puedes usar.
+                    </div>
+                `
+            },
+            {
+                titulo: '¿Cómo navego por el manual?',
+                html: `
+                    <p>Este manual tiene 3 herramientas pensadas para ti:</p>
+                    <ol>
+                        <li><strong>Barra de búsqueda</strong> (arriba): escribe una palabra y filtra los artículos al instante.</li>
+                        <li><strong>Índice lateral</strong> (izquierda en escritorio): salta directo a la sección que necesites.</li>
+                        <li><strong>Preguntas frecuentes</strong> (al final): haz clic en cada pregunta para desplegar la respuesta.</li>
+                    </ol>
+                `
+            }
+        ]
+    },
+
+    // ---------- PRIMEROS PASOS ----------
+    {
+        id: 'primeros-pasos',
+        titulo: '🚀 Primeros pasos',
+        roles: ['all'],
+        articulos: [
+            {
+                titulo: 'Iniciar sesión',
+                html: `
+                    <div class="paso"><div class="paso-num">1</div><div class="paso-texto">Ve a la página de <strong>Login</strong> (se abre automáticamente si no tienes sesión).</div></div>
+                    <div class="paso"><div class="paso-num">2</div><div class="paso-texto">Escribe tu <strong>RUT con guión</strong> (ej: <code>12345678-9</code>) y tu contraseña.</div></div>
+                    <div class="paso"><div class="paso-num">3</div><div class="paso-texto">Presiona <strong>Iniciar sesión</strong> o presiona Enter en el campo de contraseña.</div></div>
+                    <div class="nota">
+                        Si eres <strong>admin</strong> serás redirigido al Panel de Administración. El resto de usuarios llega al Lobby.
+                    </div>
+                `
+            },
+            {
+                titulo: 'Crear una cuenta nueva',
+                html: `
+                    <div class="paso"><div class="paso-num">1</div><div class="paso-texto">En el Login, haz clic en la pestaña <strong>Registrarse</strong>.</div></div>
+                    <div class="paso"><div class="paso-num">2</div><div class="paso-texto">Completa todos los campos: nombre, apellido, edad, RUT, teléfono, Gmail, historial médico, contraseña y confirmación.</div></div>
+                    <div class="paso"><div class="paso-num">3</div><div class="paso-texto">El sistema valida cada campo: RUT con guión, teléfono de al menos 9 dígitos, correo con formato <code>usuario@dominio.cl</code>, contraseña de mínimo 6 caracteres.</div></div>
+                    <div class="paso"><div class="paso-num">4</div><div class="paso-texto">Presiona <strong>Crear cuenta</strong>.</div></div>
+                    <div class="nota warning">
+                        <strong>⚠️ Importante:</strong> Si tu RUT está en la lista de <em>RUTs autorizados</em>, obtendrás el rol asignado (guía/admin). Si no, entrarás como <strong>Visitante/Estudiante</strong>. Un admin puede cambiarte el rol después.
+                    </div>
+                `
+            },
+            {
+                titulo: 'Cerrar sesión',
+                html: `
+                    <p>En el Lobby verás al final de la página el botón <strong>Cerrar sesión</strong>. También puedes cerrar la pestaña del navegador: la sesión se guarda en <code>sessionStorage</code> y se pierde al cerrar el navegador.</p>
+                `
+            }
+        ]
+    },
+
+    // ---------- MI CUENTA ----------
+    {
+        id: 'mi-cuenta',
+        titulo: '✏️ Modificar mi cuenta',
+        roles: ['all'],
+        articulos: [
+            {
+                titulo: 'Actualizar mis datos',
+                html: `
+                    <div class="paso"><div class="paso-num">1</div><div class="paso-texto">Desde el Lobby, haz clic sobre tu <strong>nombre</strong> (arriba a la derecha).</div></div>
+                    <div class="paso"><div class="paso-num">2</div><div class="paso-texto">Se abrirá el formulario con tus datos actuales.</div></div>
+                    <div class="paso"><div class="paso-num">3</div><div class="paso-texto">Modifica lo que necesites: nombre, apellido, edad, teléfono, correo o historial médico.</div></div>
+                    <div class="paso"><div class="paso-num">4</div><div class="paso-texto">Si quieres cambiar la contraseña, escríbela dos veces en los campos correspondientes.</div></div>
+                    <div class="paso"><div class="paso-num">5</div><div class="paso-texto">Presiona <strong>💾 Guardar cambios</strong>.</div></div>
+                    <div class="nota tip">
+                        <strong>💡 Tip:</strong> El <strong>RUT</strong> no es editable. Si te equivocaste al registrarte, contacta a un administrador.
+                    </div>
+                `
+            }
+        ]
+    },
+
+    // ---------- LOBBY ----------
+    {
+        id: 'lobby',
+        titulo: '🏠 El Lobby (Inicio)',
+        roles: ['all'],
+        articulos: [
+            {
+                titulo: '¿Qué encuentro en el Lobby?',
+                html: `
+                    <ul>
+                        <li><strong>Botones de navegación</strong> (según tu rol) para ir a Calendario, Galería, Mis Salidas, Planificar, etc.</li>
+                        <li><strong>Hero</strong> con información de la Especialidad.</li>
+                        <li><strong>Destinos destacados</strong>: las 3 publicaciones más recientes de la galería.</li>
+                        <li><strong>Salidas próximas</strong>: las 3 salidas futuras en las que participas o eres guía.</li>
+                    </ul>
+                    <p>Haz clic en <strong>Ver más</strong> de una tarjeta de salida para abrir su detalle completo en <em>Mis Salidas</em>.</p>
+                `
+            }
+        ]
+    },
+
+    // ---------- CALENDARIO ----------
+    {
+        id: 'calendario',
+        titulo: '📅 Calendario Personal',
+        roles: ['all'],
+        articulos: [
+            {
+                titulo: 'Navegar por el calendario',
+                html: `
+                    <div class="paso"><div class="paso-num">1</div><div class="paso-texto">Haz clic en <strong>📅 Calendario</strong> desde el Lobby.</div></div>
+                    <div class="paso"><div class="paso-num">2</div><div class="paso-texto">Usa las flechas <strong>◀</strong> y <strong>▶</strong> del encabezado para cambiar de mes.</div></div>
+                    <div class="paso"><div class="paso-num">3</div><div class="paso-texto">Los días con eventos muestran el título en verde. Si hay más de 2 aparece <strong>+N más</strong>.</div></div>
+                    <div class="paso"><div class="paso-num">4</div><div class="paso-texto">Haz clic en un día con eventos para ver el detalle en el panel derecho.</div></div>
+                    <div class="nota">
+                        El calendario muestra <strong>todas</strong> las salidas (pasadas y futuras) según tu rol: admin ve todas, guía/asistente ve las que participa o guía, estudiante sólo donde está inscrito.
+                    </div>
+                `
+            },
+            {
+                titulo: 'Ver fichas médicas desde el calendario',
+                html: `
+                    <p>Si eres <strong>admin, guía o asistente</strong>, dentro del detalle de un día con eventos verás el botón <strong>Ver fichas médicas</strong>. Al pulsarlo se muestran los datos médicos de cada participante de esa salida.</p>
+                    <div class="nota warning">
+                        <strong>⚠️ Privacidad:</strong> esta información es sensible. Úsala sólo para fines de seguridad durante la salida.
+                    </div>
+                `
+            }
+        ]
+    },
+
+    // ---------- GALERÍA ----------
+    {
+        id: 'galeria',
+        titulo: '📸 Galería de Viajes',
+        roles: ['all'],
+        articulos: [
+            {
+                titulo: 'Ver las publicaciones',
+                html: `
+                    <p>Cada publicación muestra: autor, fecha, descripción, hasta 4 imágenes y una calificación con <strong>piñas 🍍</strong> (1 a 5).</p>
+                    <p>En la parte inferior verás los controles de paginación: <strong>⬅ Anterior</strong> y <strong>Siguiente ➡</strong>. Se muestran 3 publicaciones por página.</p>
+                `
+            },
+            {
+                titulo: 'Subir una publicación (guías y admins)',
+                html: `
+                    <div class="paso"><div class="paso-num">1</div><div class="paso-texto">Pulsa el botón <strong>➕ Nueva publicación</strong>.</div></div>
+                    <div class="paso"><div class="paso-num">2</div><div class="paso-texto">Escribe una descripción (máx. 500 caracteres).</div></div>
+                    <div class="paso"><div class="paso-num">3</div><div class="paso-texto">Elige la calificación con piñas (1 a 5).</div></div>
+                    <div class="paso"><div class="paso-num">4</div><div class="paso-texto">Selecciona hasta <strong>4 imágenes</strong> JPG o PNG.</div></div>
+                    <div class="paso"><div class="paso-num">5</div><div class="paso-texto">Presiona <strong>📤 Publicar</strong> y espera a que termine la subida.</div></div>
+                    <div class="nota tip">
+                        Las imágenes se <strong>redimensionan automáticamente a 350 px</strong> de ancho y se comprimen (calidad 0.3) para no sobrecargar el repositorio.
+                    </div>
+                `
+            },
+            {
+                titulo: 'Eliminar una publicación',
+                html: `
+                    <p>Puedes eliminar publicaciones si eres <strong>admin</strong> (cualquiera) o si eres <strong>guía/asistente y eres el autor</strong>.</p>
+                    <div class="paso"><div class="paso-num">1</div><div class="paso-texto">Ubica el botón <strong>🗑️ Eliminar</strong> en la esquina inferior derecha de la publicación.</div></div>
+                    <div class="paso"><div class="paso-num">2</div><div class="paso-texto">Confirma el mensaje. Se eliminarán la publicación y todas sus imágenes.</div></div>
+                `
+            }
+        ]
+    },
+
+    // ---------- MIS SALIDAS (guía/admin) ----------
+    {
+        id: 'mis-salidas',
+        titulo: '📋 Mis Salidas',
+        roles: ['guia', 'admin'],
+        articulos: [
+            {
+                titulo: 'Ver el detalle de una salida',
+                html: `
+                    <div class="paso"><div class="paso-num">1</div><div class="paso-texto">Entra desde el Lobby al botón <strong>📋 Mis Salidas</strong>.</div></div>
+                    <div class="paso"><div class="paso-num">2</div><div class="paso-texto">En el panel izquierdo aparecen tus salidas ordenadas por fecha (la más próxima arriba).</div></div>
+                    <div class="paso"><div class="paso-num">3</div><div class="paso-texto">Haz clic en una salida para ver ruta, participantes, transporte, precios y menú.</div></div>
+                `
+            },
+            {
+                titulo: 'Exportar una salida a PDF',
+                html: `
+                    <div class="paso"><div class="paso-num">1</div><div class="paso-texto">Selecciona la salida en la lista.</div></div>
+                    <div class="paso"><div class="paso-num">2</div><div class="paso-texto">Presiona <strong>🖨️ Exportar PDF</strong> en la parte superior derecha del detalle.</div></div>
+                    <div class="paso"><div class="paso-num">3</div><div class="paso-texto">Espera mientras se genera el archivo. Se descargará como <code>Salida_Titulo.pdf</code>.</div></div>
+                    <div class="nota tip">
+                        El PDF incluye <strong>ruta, participantes con ficha médica, transporte y datos complementarios</strong>. Ideal para entregar a la dirección o al conductor.
+                    </div>
+                `
+            },
+            {
+                titulo: 'Editar una salida',
+                html: `
+                    <div class="paso"><div class="paso-num">1</div><div class="paso-texto">Abre el detalle y presiona <strong>✏️ Editar</strong>.</div></div>
+                    <div class="paso"><div class="paso-num">2</div><div class="paso-texto">Modifica título, fecha, duración, descripción, ruta, participantes, transporte, curso, precio o menú.</div></div>
+                    <div class="paso"><div class="paso-num">3</div><div class="paso-texto">Para agregar una actividad, pulsa <strong>➕ Agregar actividad</strong> y completa tipo, descripción y horarios.</div></div>
+                    <div class="paso"><div class="paso-num">4</div><div class="paso-texto">Para añadir un participante, escribe su <strong>RUT</strong>, selecciona el rol y pulsa <strong>➕ Añadir</strong>.</div></div>
+                    <div class="paso"><div class="paso-num">5</div><div class="paso-texto">Presiona <strong>💾 Guardar cambios</strong>.</div></div>
+                `
+            },
+            {
+                titulo: 'Eliminar una salida',
+                html: `
+                    <div class="nota warning">
+                        <strong>⚠️ Cuidado:</strong> eliminar una salida es permanente. No se puede deshacer.
+                    </div>
+                    <div class="paso"><div class="paso-num">1</div><div class="paso-texto">Con la salida abierta, presiona <strong>🗑️ Eliminar</strong>.</div></div>
+                    <div class="paso"><div class="paso-num">2</div><div class="paso-texto">Confirma el diálogo.</div></div>
+                `
+            }
+        ]
+    },
+
+    // ---------- PLANIFICAR (guía/admin) ----------
+    {
+        id: 'planificar',
+        titulo: '🧭 Planificar una Salida',
+        roles: ['guia', 'admin'],
+        articulos: [
+            {
+                titulo: 'Crear una nueva salida paso a paso',
+                html: `
+                    <div class="paso"><div class="paso-num">1</div><div class="paso-texto"><strong>Lugares:</strong> escribe el nombre de un lugar en el buscador y pulsa <strong>➕ Añadir a la ruta</strong>. El lugar se agrega automáticamente como actividad.</div></div>
+                    <div class="paso"><div class="paso-num">2</div><div class="paso-texto"><strong>Personas:</strong> busca por nombre o RUT, elige el rol (Visitante / Asistente / Guía) y pulsa <strong>➕ Añadir</strong>. Se agregan a la tabla.</div></div>
+                    <div class="paso"><div class="paso-num">3</div><div class="paso-texto"><strong>Transporte:</strong> completa conductor, horarios, precio del servicio y descripción del vehículo.</div></div>
+                    <div class="paso"><div class="paso-num">4</div><div class="paso-texto"><strong>Plan de ruta:</strong> agrega actividades manualmente (Lugar, Traslado o Pausa). Puedes reordenarlas con ⬆ y ⬇ y editar los horarios en línea.</div></div>
+                    <div class="paso"><div class="paso-num">5</div><div class="paso-texto"><strong>Datos complementarios:</strong> título, fecha, duración, curso, precio por persona y menú.</div></div>
+                    <div class="paso"><div class="paso-num">6</div><div class="paso-texto">Presiona <strong>✅ Guardar Salida</strong>. Serás redirigido al Lobby.</div></div>
+                    <div class="nota warning">
+                        <strong>⚠️ Obligatorio:</strong> título, fecha, al menos <strong>1 participante</strong> y al menos <strong>1 actividad</strong> en la ruta.
+                    </div>
+                `
+            },
+            {
+                titulo: 'Reordenar y editar actividades',
+                html: `
+                    <p>Cada actividad de la ruta tiene 3 botones:</p>
+                    <ul>
+                        <li><strong>⬆ Subir:</strong> la mueve una posición hacia arriba.</li>
+                        <li><strong>⬇ Bajar:</strong> la mueve una posición hacia abajo.</li>
+                        <li><strong>✕ Eliminar:</strong> la quita de la ruta.</li>
+                    </ul>
+                    <p>También puedes cambiar el horario de inicio y fin directamente en los campos <code>time</code> de cada actividad.</p>
+                `
+            }
+        ]
+    },
+
+    // ---------- ASISTENTE (admin) ----------
+    {
+        id: 'asistente',
+        titulo: '🧑‍🏫 Asistente de Turismo',
+        roles: ['admin'],
+        articulos: [
+            {
+                titulo: '¿Qué es el Asistente de Turismo?',
+                html: `
+                    <p>Es un panel exclusivo de administradores para <strong>explorar, buscar y exportar</strong> toda la información del sistema en 3 pestañas:</p>
+                    <ul>
+                        <li><strong>👤 Usuarios:</strong> lista todos los usuarios con filtros por nombre, RUT, email o rol.</li>
+                        <li><strong>🗺️ Salidas:</strong> explora todas las salidas con filtros por fecha y exporta la ficha completa en PDF.</li>
+                        <li><strong>📍 Lugares:</strong> catálogo de lugares turísticos con las salidas que los visitan.</li>
+                    </ul>
+                `
+            },
+            {
+                titulo: 'Exportaciones disponibles',
+                html: `
+                    <ul>
+                        <li><strong>📊 Excel todos los usuarios:</strong> descarga un .xlsx con la lista completa.</li>
+                        <li><strong>📊 Resumen salidas (Excel):</strong> un .xlsx con todas las salidas y sus datos clave.</li>
+                        <li><strong>📊 Excel individual:</strong> al abrir un usuario, botón para exportar sólo sus datos + historial de salidas.</li>
+                        <li><strong>📄 PDF completo:</strong> al abrir una salida, exporta la ficha con ruta, participantes y transporte.</li>
+                    </ul>
+                `
+            }
+        ]
+    },
+
+    // ---------- DASHBOARD (admin) ----------
+    {
+        id: 'dashboard',
+        titulo: '👑 Panel de Administración',
+        roles: ['admin'],
+        articulos: [
+            {
+                titulo: 'Gestionar usuarios',
+                html: `
+                    <div class="paso"><div class="paso-num">1</div><div class="paso-texto">Entra al <strong>Panel de Administración</strong> desde el Lobby.</div></div>
+                    <div class="paso"><div class="paso-num">2</div><div class="paso-texto">Usa el buscador para filtrar por RUT, nombre o apellido.</div></div>
+                    <div class="paso"><div class="paso-num">3</div><div class="paso-texto">Para cada usuario puedes: <strong>cambiar rol</strong> (Admin / Guía / Estudiante), <strong>cambiar estado</strong> (Activo / Kick / Ban) o <strong>editar sus datos</strong>.</div></div>
+                    <div class="paso"><div class="paso-num">4</div><div class="paso-texto">Pulsa <strong>📊 Exportar a Excel</strong> para descargar el CSV con todos los usuarios.</div></div>
+                `
+            },
+            {
+                titulo: 'Estados de usuario',
+                html: `
+                    <ul>
+                        <li><strong>✅ Activo:</strong> el usuario puede iniciar sesión normalmente.</li>
+                        <li><strong>⏰ Kick:</strong> expulsión temporal. No puede iniciar sesión mientras esté en este estado.</li>
+                        <li><strong>🚫 Ban:</strong> bloqueo permanente. No puede iniciar sesión ni registrarse de nuevo con el mismo RUT.</li>
+                    </ul>
+                    <div class="nota warning">
+                        <strong>🔒 Admin principal:</strong> el usuario con RUT <code>22785939-3</code> no puede ser editado, eliminado, ni cambiado de rol/estado.
+                    </div>
+                `
+            },
+            {
+                titulo: 'Editar un usuario',
+                html: `
+                    <div class="paso"><div class="paso-num">1</div><div class="paso-texto">Presiona el botón <strong>✏️</strong> en la fila del usuario.</div></div>
+                    <div class="paso"><div class="paso-num">2</div><div class="paso-texto">Modifica nombre, apellido, edad, teléfono, correo o historial médico.</div></div>
+                    <div class="paso"><div class="paso-num">3</div><div class="paso-texto">Pulsa <strong>💾 Guardar cambios</strong>.</div></div>
+                `
+            }
+        ]
+    },
+
+    // ---------- FAQ ----------
+    {
+        id: 'faq',
+        titulo: '❓ Preguntas frecuentes',
+        roles: ['all'],
+        articulos: [
+            {
+                titulo: 'Preguntas más comunes',
+                esFAQ: true,
+                faqs: [
+                    {
+                        q: '¿Qué hago si olvidé mi contraseña?',
+                        a: 'Por seguridad no hay recuperación automática. Contacta a un administrador para que te restablezca la contraseña desde el Panel de Administración (editando tu usuario).'
+                    },
+                    {
+                        q: '¿Por qué no puedo ver una salida en el calendario?',
+                        a: 'El calendario muestra salidas según tu rol: como estudiante ves sólo aquellas donde estás inscrito; como guía/asistente ves donde participas o guías; como admin ves todas. Si crees que falta alguna, pídele a un guía que te agregue.'
+                    },
+                    {
+                        q: 'No me deja subir imágenes a la galería.',
+                        a: 'Sólo los roles <strong>admin, guía y asistente</strong> pueden crear publicaciones. Si eres estudiante, pídele a un guía que suba las fotos del viaje.'
+                    },
+                    {
+                        q: '¿Cuántas imágenes puedo subir por publicación?',
+                        a: 'Hasta <strong>4 imágenes</strong> por publicación, en formato JPG o PNG. El sistema las redimensiona a 350px de ancho y las comprime automáticamente.'
+                    },
+                    {
+                        q: '¿Qué significa la calificación con piñas?',
+                        a: 'Es la valoración que el autor le da a la experiencia del viaje, en una escala de 1 a 5 piñas 🍍. Es sólo informativa y decorativa.'
+                    },
+                    {
+                        q: '¿Puedo editar una salida ya guardada?',
+                        a: 'Sí, si eres admin o guía/asistente. Entra a <strong>Mis Salidas</strong>, abre la salida y pulsa <strong>✏️ Editar</strong>. Podrás modificar cualquier campo, incluida la ruta y los participantes.'
+                    },
+                    {
+                        q: '¿Cómo exporto una salida a PDF?',
+                        a: 'En <strong>Mis Salidas</strong>, con la salida abierta, presiona <strong>🖨️ Exportar PDF</strong>. Se genera un PDF con la ficha completa que se descarga automáticamente.'
+                    },
+                    {
+                        q: '¿Cómo cambio mi rol de estudiante a guía?',
+                        a: 'No puedes cambiarlo tú mismo. Un administrador debe asignarte el rol desde el Panel de Administración. Si tu RUT está en la lista de autorizados al registrarte, se te asigna automáticamente.'
+                    },
+                    {
+                        q: '¿Los datos se guardan solos?',
+                        a: 'Sí. Cada guardado (nueva salida, edición de usuario, publicación, etc.) se sube automáticamente a GitHub mediante un Worker. Verás mensajes de confirmación al terminar.'
+                    },
+                    {
+                        q: 'No me carga la página / aparece "Cargando...".',
+                        a: 'Suele ser un problema de conexión con el Worker de GitHub. Recarga la página con F5. Si persiste, avisa al administrador del sistema.'
+                    },
+                    {
+                        q: '¿Puedo usar la plataforma en el celular?',
+                        a: 'Sí. Todo el sistema es responsive. En móviles, las tablas se vuelven desplazables horizontalmente y los botones se agrandan para uso táctil.'
+                    },
+                    {
+                        q: '¿Qué hago si borré una salida por error?',
+                        a: 'No hay papelera. Contacta a un administrador; aunque lo más probable es que haya que volver a crearla. Ten cuidado al pulsar 🗑️ Eliminar.'
+                    }
+                ]
+            }
+        ]
+    }
+    ];
+
+    // ============================================================
+    // 3. RENDERIZAR EL MANUAL SEGÚN EL ROL
+    // ============================================================
+    const contenidoEl = document.getElementById('manualContenido');
+    const indiceEl = document.getElementById('indiceSecciones');
+
+    // Filtrar secciones visibles para el rol
+    const seccionesVisibles = SECCIONES.filter(s =>
+        s.roles.includes('all') || s.roles.includes(rol)
+    );
+
+    // HTML
+    let htmlContenido = '';
+    let htmlIndice = '';
+
+    seccionesVisibles.forEach(sec => {
+        // Header de la sección
+        htmlContenido += `<section class="manual-seccion" id="sec-${sec.id}" data-id="${sec.id}">`;
+        htmlContenido += `<h2>${sec.titulo}</h2>`;
+
+        // Artículos
+        sec.articulos.forEach(art => {
+            htmlContenido += `<article class="manual-articulo">`;
+            htmlContenido += `<h3>${art.titulo}</h3>`;
+
+            if (art.esFAQ && art.faqs) {
+                // Render especial para FAQ (colapsable)
+                art.faqs.forEach(f => {
+                    htmlContenido += `
+                        <div class="faq-item">
+                            <div class="faq-pregunta">${f.q}</div>
+                            <div class="faq-respuesta">${f.a}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                htmlContenido += art.html;
+            }
+
+            htmlContenido += `</article>`;
+        });
+
+        htmlContenido += `</section>`;
+
+        // Índice
+        htmlIndice += `<a href="#sec-${sec.id}" data-target="sec-${sec.id}">${sec.titulo}</a>`;
+    });
+
+    contenidoEl.innerHTML = htmlContenido;
+    indiceEl.innerHTML = htmlIndice;
+
+    // ============================================================
+    // 4. FAQ COLAPSABLE
+    // ============================================================
+    contenidoEl.querySelectorAll('.faq-item').forEach(item => {
+        const pregunta = item.querySelector('.faq-pregunta');
+        pregunta.addEventListener('click', () => {
+            item.classList.toggle('abierto');
+        });
+    });
+
+    // ============================================================
+    // 5. NAVEGACIÓN DEL ÍNDICE (scroll suave)
+    // ============================================================
+    indiceEl.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', e => {
+            e.preventDefault();
+            const target = document.getElementById(a.dataset.target);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // ============================================================
+    // 6. SCROLL SPY (resaltar sección activa)
+    // ============================================================
+    const seccionesEls = contenidoEl.querySelectorAll('.manual-seccion');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.dataset.id;
+                indiceEl.querySelectorAll('a').forEach(a => {
+                    a.classList.toggle('activo', a.dataset.target === `sec-${id}`);
+                });
+            }
+        });
+    }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+
+    seccionesEls.forEach(s => observer.observe(s));
+
+    // ============================================================
+    // 7. BUSCADOR EN VIVO
+    // ============================================================
+    const inputBuscar = document.getElementById('inputBuscar');
+    const btnLimpiar = document.getElementById('btnLimpiar');
+    const resultadoDiv = document.getElementById('resultadoBusqueda');
+
+    function normalizar(str) {
+        return (str || '').toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // quita tildes
+    }
+
+    function buscar(query) {
+        const q = normalizar(query).trim();
+
+        if (!q) {
+            // Reset: mostrar todo
+            seccionesEls.forEach(sec => {
+                sec.style.display = '';
+                sec.querySelectorAll('.manual-articulo').forEach(a => a.style.display = '');
+                sec.querySelectorAll('.faq-item').forEach(f => f.style.display = '');
+            });
+            indiceEl.querySelectorAll('a').forEach(a => a.style.display = '');
+            resultadoDiv.classList.add('oculto');
+            return;
+        }
+
+        let totalMatches = 0;
+
+        seccionesEls.forEach(sec => {
+            let matchesSec = 0;
+            const articulos = sec.querySelectorAll('.manual-articulo');
+
+            articulos.forEach(art => {
+                let matchesArt = 0;
+
+                // ¿Es un artículo con FAQs individuales?
+                const faqs = art.querySelectorAll('.faq-item');
+                if (faqs.length > 0) {
+                    faqs.forEach(f => {
+                        const txt = normalizar(f.textContent);
+                        if (txt.includes(q)) {
+                            f.style.display = '';
+                            matchesArt++;
+                        } else {
+                            f.style.display = 'none';
+                        }
+                    });
+                } else {
+                    const txt = normalizar(art.textContent);
+                    if (txt.includes(q)) {
+                        matchesArt = 1;
+                    }
+                }
+
+                if (matchesArt > 0) {
+                    art.style.display = '';
+                    matchesSec += matchesArt;
+                } else {
+                    art.style.display = 'none';
+                }
+            });
+
+            if (matchesSec > 0) {
+                sec.style.display = '';
+            } else {
+                sec.style.display = 'none';
+            }
+
+            // Actualizar enlace del índice
+            const link = indiceEl.querySelector(`a[data-target="sec-${sec.dataset.id}"]`);
+            if (link) link.style.display = matchesSec > 0 ? '' : 'none';
+
+            totalMatches += matchesSec;
+        });
+
+        // Mensaje de resultado
+        if (totalMatches === 0) {
+            resultadoDiv.textContent = `❌ No se encontraron resultados para "${query}". Prueba con otra palabra.`;
+        } else {
+            resultadoDiv.textContent = `✅ ${totalMatches} resultado${totalMatches !== 1 ? 's' : ''} para "${query}"`;
+        }
+        resultadoDiv.classList.remove('oculto');
+    }
+
+    inputBuscar.addEventListener('input', function() {
+        buscar(this.value);
+    });
+
+    btnLimpiar.addEventListener('click', function() {
+        inputBuscar.value = '';
+        buscar('');
+        inputBuscar.focus();
+    });
+
+    // Buscar con Enter
+    inputBuscar.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            buscar(this.value);
+        }
+        if (e.key === 'Escape') {
+            btnLimpiar.click();
+        }
+    });
+
+    console.log('✅ Manual de Usuario cargado para rol:', rol);
+})();
+</script>
+</body>
+</html>
